@@ -1,0 +1,61 @@
+import { FileTree } from 'nextra/components'
+import { Image } from '@app/primitives'
+import { TitleWrapper } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `add-workspace` - Generator
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `add-workspace`
+
+```md copy
+npm run add:workspace -- --args <workspaceType> <folderName> <packageName> <workspaceStructure> <packageDescription>
+```
+
+```md copy
+npx turbo gen add-workspace --args <workspaceType> <folderName> <packageName> <workspaceStructure> <packageDescription>
+```
+
+<FileTree>
+  <FileTree.Folder name="packages" defaultOpen>
+    <FileTree.Folder name="@green-stack-core" defaultOpen>
+      <FileTree.Folder name="generators" defaultOpen>
+        <FileTree.File name="add-workspace.ts" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+### Prompt Arguments
+
+| Argument           | Type      | Question / Description                                                                                                           |
+|--------------------|-----------|----------------------------------------------------------------------------------------------------------------------------------|
+| workspaceType      | list      | What type of workspace would you like to generate? <br/>=> `package` / `feature`                                                 |
+| folderName         | input     | What foldername do you want to give this workspace? <br/>=> `string`                                                             |
+| packageName        | input     | What package name would you like to import from? <br/>=> `string`                                                                |
+| workspaceStructure | checkbox  | Optional: What will this workspace contain? <br/>=> `schemas`, `resolvers`, `components`, `hooks`, `screens`, `routes`, ...      |
+| packageDescription | input     | Optional: How would you shortly describe the package? <br/>=> `string`                                                           |
+
+<div className="h-8" />
+
+### Resulting Files
+
+```bash
+/{workspaceType}/ # <- e.g. packages/ or features/
+ └── {folderName}/ ❇️
+     └── {workspaceStructure}/ ❇️ # <- e.g. schemas/, resolvers/, components/, ...
+     └── package.json ❇️
+     └── tsconfig.json ❇️
+```
+
+<div className="h-8" />

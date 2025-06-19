@@ -1,45 +1,86 @@
 /* eslint-disable import/no-anonymous-default-export */
 import { PlopTypes } from '@turbo/gen'
-import { parseWorkspaces } from '../scripts/helpers/scriptUtils'
+import { parseWorkspaces, a } from '../scripts/helpers/scriptUtils'
+import { createPrompts } from '../scripts/helpers/scriptUtils'
 import { execSync } from 'child_process'
 import fs from 'fs'
 
 /* --- Disclaimer ------------------------------------------------------------------------------ */
 
-// Learn more about Turborepo Generators at:
-// https://turbo.build/repo/docs/core-concepts/monorepos/code-generation
+// -i- Learn more about Turborepo Generators at:
+// -i- https://turbo.build/repo/docs/core-concepts/monorepos/code-generation
+
+/* --- Usage ----------------------------------------------------------------------------------- */
+
+// -i- npm run add:dependencies -- --args <workspacePkg> <dependencies>
+// -i- npx turbo gen dependencies --args <workspacePkg> <dependencies>
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
-const { workspacePackages } = parseWorkspaces('./')
+const { workspacePackages } = parseWorkspaces('./', true)
+
+/* --- Prompts --------------------------------------------------------------------------------- */
+
+export const gen = createPrompts({
+
+    workspacePkg: {
+        type: 'autocomplete',
+        message: `Where would you like to install these dependencies?`, // @ts-ignore
+        choices: workspacePackages,
+    },
+    dependencies: {
+        type: 'input',
+        message: `Which dependencies should we install the Expo SDK compatible versions for? ${a.muted('(separated by spaces)')}`,
+    },
+
+}, {
+
+    compute: {
+        dependencies: {
+            validate: (value) => !!value,
+        },
+    },
+
+    parser: (answers) => {
+
+        // Args
+        const { workspacePkg } = answers!
+
+        // -- Vars --
+
+        const dependencies = answers!.dependencies.split(' ')
+        const depList = dependencies.join(' ')
+
+        // -- Return --
+
+        return {
+            workspacePkg,
+            dependencies,
+            depList,
+        }
+
+    },
+
+})
+
+/* --- Types ----------------------------------------------------------------------------------- */
+
+type Answers = typeof gen._values
+type Context = typeof gen._parsed
 
 /** --- Dependency Installer ------------------------------------------------------------------- */
-/** -i- Install Expo SDK compatible dependencies in your workspace of choice */
+/** -i- Install Expo SDK compatible dependencies in a workspace */
 export const registerDependencyGenerator = (plop: PlopTypes.NodePlopAPI) => {
     plop.setGenerator('add-dependencies', {
-        description: 'Install Expo SDK compatible dependencies in your workspace of choice',
-        prompts: [
-            {
-                type: 'list',
-                name: 'workspaceTarget',
-                message: 'Which workspace should we install the Expo SDK compatible versions in?',
-                choices: ['@app/next', '@app/expo', ...workspacePackages],
-            },
-            {
-                type: 'input',
-                name: 'dependencies',
-                message: "Which dependencies should we install the Expo SDK compatible versions for? (separated by spaces)",
-                validate: (value) => !!value,
-            },
-        ],
-        actions: (data) => {
+        description: 'Install Expo SDK compatible dependencies in a workspace',
+        prompts: gen.prompts,
+        actions: (data: GenAnswers) => {
+
             // Args
-            const { workspaceTarget } = data!
-            const dependencies = data!.dependencies.split(' ')
-            const depList = dependencies.join(' ')
+            const ctx = gen.parseAnswers(data)
 
             // Log out the dependencies
-            console.log('\n', `> Installing Expo SDK compatible packages ${depList} in '${workspaceTarget}' workspace`) // prettier-ignore
+            console.log('\n', `> Installing Expo SDK compatible packages ${ctx.depList} in '${ctx.workspacePkg}' workspace`) // prettier-ignore
 
             // Read the @app/expo package json
             const originalExpoPackageJsonFile = fs.readFileSync(`apps/expo/package.json`, 'utf-8')
@@ -47,7 +88,7 @@ export const registerDependencyGenerator = (plop: PlopTypes.NodePlopAPI) => {
             const originalDeps = originalExpoPackageJson.dependencies
 
             // Install the new dependencies in @app/expo
-            const output = execSync(`npm -w @app/expo run add-dependencies ${dependencies.join(' ')}`) // prettier-ignore
+            const output = execSync(`npm -w @app/expo run add-dependencies ${ctx.depList}`) // prettier-ignore
             const loggableOutput = output.toString().split('\n').slice(0, 9).join('\n')
             console.log(loggableOutput)
 
@@ -60,12 +101,12 @@ export const registerDependencyGenerator = (plop: PlopTypes.NodePlopAPI) => {
 
             // Add the new dependencies to the chosen workspace
             const installStatements = newDeps.map(([pkg, v]) => `${pkg}@${v}`).join(' ')
-            console.log(`> Moving ${installStatements} to '${workspaceTarget}' workspace`)
-            execSync(`npm -w ${workspaceTarget} install ${installStatements} --force`)
+            console.log(`> Moving ${installStatements} to '${ctx.workspacePkg}' workspace`)
+            execSync(`npm -w ${ctx.workspacePkg} install ${installStatements} --force`)
             console.log(`> Install successfull`, '\n')
 
             // Log out the dependency list
-            const lsOutput = execSync(`npm ls ${depList}`)
+            const lsOutput = execSync(`npm ls ${ctx.depList}`)
             console.log(lsOutput.toString())
 
             // Actions
