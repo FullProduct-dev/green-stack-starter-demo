@@ -176,7 +176,7 @@ const HomeScreen = (props: HomeScreenProps) => {
                         <InfoSection
                             title="Codegen"
                             summary="Build even faster with generators for Routes, APIs, GraphQL & more"
-                            href="https://fullproduct.dev/docs/quickstart"
+                            href="https://fullproduct.dev/docs/generators"
                             isBlank
                         />
                     </View>
