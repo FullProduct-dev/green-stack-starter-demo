@@ -6,7 +6,7 @@ import { appConfig } from '@app/config'
 /* --- Web Default Metadata -------------------------------------------------------------------- */
 
 export const metadata = createMetadata({
-    metadataBase: new URL(appConfig.baseURL),
+    ...(appConfig.baseURL ? { metadataBase: new URL(appConfig.baseURL) } : {}),
     title: appConfig.title || appConfig.appName,
     description: appConfig.description || appConfig.appDescription,
     openGraph: {
