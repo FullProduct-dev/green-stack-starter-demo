@@ -12,7 +12,7 @@ globalThis.__DEV__ = true // -i- Set dev mode for react-native-reanimated
 addAliases({
     // -i- We need aliases for these as they touch parts of react-native that ship Flow types
     // -i- ...which our typescript + node esbuild scripts & generators can't deal with.
-    'expo-constants': './__mocks__/expo-constants.mock.ts',
+    'expo-constants': '@green-stack/core/__mocks__/expo-constants.mock.ts',
     'react-native': 'react-native-web',
     // -i- Animation Mocks
     'react-native-reanimated': 'react-native-reanimated/mock',
