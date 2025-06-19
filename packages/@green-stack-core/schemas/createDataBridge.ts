@@ -32,6 +32,7 @@ export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape ext
     inputSchema,
     outputSchema,
     maxFieldDepth = 5,
+    logWarnings = true,
 }: {
     resolverName: string
     resolverArgsName: string
@@ -39,6 +40,7 @@ export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape ext
     inputSchema: z.ZodObject<ArgsShape>
     outputSchema: z.ZodObject<ResShape>
     maxFieldDepth?: number
+    logWarnings?: boolean
 }) => {
     // Introspect input & output schemas
     const argsSchemaDefs = inputSchema.introspect()
@@ -51,15 +53,15 @@ export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape ext
     if (isRequired) argsInputName = `${argsInputName}!`
 
     // Build query base
-    let query = `${resolverType} ${resolverName}($${_resolverArgsName}: ${argsInputName}) {\n  {{body}}\n}` // prettier-ignore
-    query = query.replace('{{body}}', `${resolverName}(args: $${_resolverArgsName}) {\n{{fields}}\n  }`) // prettier-ignore
+    let query = `${resolverType} ${resolverName}($${_resolverArgsName}: ${argsInputName}) {\n    {{body}}\n}` // prettier-ignore
+    query = query.replace('{{body}}', `${resolverName}(args: $${_resolverArgsName}) {\n{{fields}}\n    }`) // prettier-ignore
 
     // Re-evaluate query setup if there are no args
     // @ts-ignore
     const hasArgs = Object.keys(argsSchemaDefs.schema).length > 0
     if (!hasArgs) {
         query = `${resolverType} ${resolverName} {\n  {{body}}\n}`
-        query = query.replace('{{body}}', `${resolverName} {\n{{fields}}\n  }`)
+        query = query.replace('{{body}}', `${resolverName} {\n{{fields}}\n    }`)
     }
 
     // Nestable field builder
@@ -71,14 +73,14 @@ export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape ext
                 const fieldConfig = (schema.schema?.[fieldKey] || schema[fieldKey]) as Metadata
                 const zodType = fieldConfig.zodType
                 const fieldType = fieldConfig.baseType
-                const spacing = '  '.repeat(depth)
+                const spacing = '    '.repeat(depth)
 
                 // Skip sensitive fields
                 if (fieldConfig.isSensitive) return ''
 
                 // Skip incompatible types
                 const INCOMPATIBLES = ['ZodRecord', 'ZodIntersection', 'ZodDiscriminatedUnion', 'ZodVoid', 'ZodFunction', 'ZodPromise', 'ZodLazy', 'ZodEffects'] as const // prettier-ignore
-                if (INCOMPATIBLES.includes(zodType as any)) {
+                if (logWarnings && INCOMPATIBLES.includes(zodType as any)) {
                     console.log(`-!- Skipping incompatible type in automatic graphql query build: field '${fieldKey}' of type '${zodType}' is unsupported.`)
                     console.log("-i- When creating a data bridge with this field type, you'll need to manually pass the 'graphqlQuery' field with gql.tada upon creation.")
                     console.log("-i- Alternatively, please stick to using the allowed types for GraphQL: z.string, z.number, z.boolean, z.date, z.array, z.object, z.literal, z.enum, z.nativeEnum, and simple z.union types.")
@@ -168,7 +170,7 @@ export const createDataBridge = <
 
     // -- Build default graphql query? --
 
-    const getGraphqlQuery = (showPrintedQuery = false) => {
+    const getGraphqlQuery = (showPrintedQuery = false, logWarnings = true) => {
         // Return custom query if provided
         if (graphqlQuery && !showPrintedQuery) {
             return graphqlQuery as TadaDocumentNode<QueryRes, QueryArgs>
@@ -181,6 +183,7 @@ export const createDataBridge = <
             resolverType,
             inputSchema,
             outputSchema,
+            logWarnings,
         })
 
         // Return the query as a string
@@ -212,3 +215,7 @@ export const createDataBridge = <
         _output: undefined as unknown as z.ZodObject<ResShape>['_output'],
     }
 }
+
+/* --- Exported Types -------------------------------------------------------------------------- */
+
+export type DataBridgeType = ReturnType<typeof createDataBridge>

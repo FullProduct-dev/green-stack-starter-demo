@@ -30,7 +30,7 @@ export const queryBridge = createQueryBridge({
 
 /* --- Types ----------------------------------------------------------------------------------- */
 
-type HomeScreenProps = Prettify<HydratedRouteProps<typeof queryBridge>>
+type HomeScreenProps = HydratedRouteProps<typeof queryBridge>
 
 /* --- <HomeScreen/> --------------------------------------------------------------------------- */
 

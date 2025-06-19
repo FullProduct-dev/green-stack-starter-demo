@@ -49,7 +49,7 @@ See [How to choose cross-platform tech](https://dev.to/codinsonn/why-use-react-n
 > "The best way to learn is through the Pull Requests"  
 > -- Theo / @t3dotgg
 
-[![Screenshot of list of Plugin Branches](https://github.com/user-attachments/assets/f2d4d836-c2ad-4249-bc53-de2ab7d5aac1)](https://github.com/Aetherspace/universal-app-router/pulls)
+[![Screenshot of list of Plugin Branches](https://github.com/user-attachments/assets/f2d4d836-c2ad-4249-bc53-de2ab7d5aac1)](https://github.com/FullProduct-dev/universal-app-router/pulls)
 
 **PR & branch based plugins will provide you with the ability to:**  
 

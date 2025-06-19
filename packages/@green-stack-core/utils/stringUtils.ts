@@ -78,6 +78,14 @@ export const slugify = (str: string) => {
         .replace(/[\s_-]+/g, '-')
 }
 
+/** --- extractPathParams() -------------------------------------------------------------------- */
+/** -i- Extracts an array of potential params from a url, e.g. `'/api/user/[slug]/...' => ['slug']` */
+export const extractPathParams = (url: string) => {
+    const pathSegments = url.split('/')
+    const pathParams = pathSegments.filter((segment) => segment.startsWith('[') && segment.endsWith(']'))
+    return pathParams.map((param) => param.slice(1, -1))
+}
+
 /** --- ansi ----------------------------------------------------------------------------------- */
 /** -i- Ansi constants for escape codes */
 export const ansi = {
@@ -111,36 +119,39 @@ export const ansi = {
     bgMagenta: "\x1b[45m",
     bgCyan: "\x1b[46m",
     bgWhite: "\x1b[47m"
-}
+} as const
 
 /** --- ansi utils ----------------------------------------------------------------------------- */
 /** -i- Ansi helpers functions to format logs and terminal messages */
 export const a = {
     // Utility
-    bold: (msg: string) => `${ansi.bold}${msg}${ansi.reset}`,
-    muted: (msg: string) => `${ansi.dim}${msg}${ansi.reset}`,
-    underscore: (msg: string) => `${ansi.underscore}${msg}${ansi.reset}`,
-    blink: (msg: string) => `${ansi.blink}${msg}${ansi.reset}`,
-    reverse: (msg: string) => `${ansi.reverse}${msg}${ansi.reset}`,
-    hidden: (msg: string) => `${ansi.hidden}${msg}${ansi.reset}`,
+    bold: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bold}${msg}${ansi.reset}`,
+    muted: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.dim}${msg}${ansi.reset}`,
+    underscore: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.underscore}${msg}${ansi.reset}`,
+    blink: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.blink}${msg}${ansi.reset}`,
+    reverse: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.reverse}${msg}${ansi.reset}`,
+    hidden: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.hidden}${msg}${ansi.reset}`,
+    reset: <MSG extends string>(msg: MSG) => `${ansi.reset}${msg}${ansi.reset}`,
+    dim: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.dim}${msg}${ansi.reset}`,
+    italic: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.dim}${msg}${ansi.reset}`,
 
     // Colors
-    black: (msg: string) => `${ansi.black}${msg}${ansi.reset}`,
-    red: (msg: string) => `${ansi.red}${msg}${ansi.reset}`,
-    green: (msg: string) => `${ansi.green}${msg}${ansi.reset}`,
-    yellow: (msg: string) => `${ansi.yellow}${msg}${ansi.reset}`,
-    blue: (msg: string) => `${ansi.blue}${msg}${ansi.reset}`,
-    magenta: (msg: string) => `${ansi.magenta}${msg}${ansi.reset}`,
-    cyan: (msg: string) => `${ansi.cyan}${msg}${ansi.reset}`,
-    white: (msg: string) => `${ansi.white}${msg}${ansi.reset}`,
+    black: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.black}${msg}${ansi.reset}`,
+    red: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.red}${msg}${ansi.reset}`,
+    green: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.green}${msg}${ansi.reset}`,
+    yellow: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.yellow}${msg}${ansi.reset}`,
+    blue: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.blue}${msg}${ansi.reset}`,
+    magenta: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.magenta}${msg}${ansi.reset}`,
+    cyan: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.cyan}${msg}${ansi.reset}`,
+    white: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.white}${msg}${ansi.reset}`,
     
     // Backgrounds
-    bgBlack: (msg: string) => `${ansi.bgBlack}${msg}${ansi.reset}`,
-    bgRed: (msg: string) => `${ansi.bgRed}${msg}${ansi.reset}`,
-    bgGreen: (msg: string) => `${ansi.bgGreen}${msg}${ansi.reset}`,
-    bgYellow: (msg: string) => `${ansi.bgYellow}${msg}${ansi.reset}`,
-    bgBlue: (msg: string) => `${ansi.bgBlue}${msg}${ansi.reset}`,
-    bgMagenta: (msg: string) => `${ansi.bgMagenta}${msg}${ansi.reset}`,
-    bgCyan: (msg: string) => `${ansi.bgCyan}${msg}${ansi.reset}`,
-    bgWhite: (msg: string) => `${ansi.bgWhite}${msg}${ansi.reset}`,
-}
+    bgBlack: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgBlack}${msg}${ansi.reset}`,
+    bgRed: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgRed}${msg}${ansi.reset}`,
+    bgGreen: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgGreen}${msg}${ansi.reset}`,
+    bgYellow: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgYellow}${msg}${ansi.reset}`,
+    bgBlue: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgBlue}${msg}${ansi.reset}`,
+    bgMagenta: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgMagenta}${msg}${ansi.reset}`,
+    bgCyan: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgCyan}${msg}${ansi.reset}`,
+    bgWhite: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgWhite}${msg}${ansi.reset}`,
+} as const

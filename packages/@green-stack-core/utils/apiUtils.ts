@@ -97,23 +97,23 @@ export const createHmac = (data: string, method: 'md5' | 'sha256' = 'sha256'): s
 }
 
 /** --- encrypt() ------------------------------------------------------------------------------ */
-/** -i- Encrypts a piece of data with the APP_SECRET */
+/** -i- Encrypts a piece of data with a custom secret or the APP_SECRET */
 export const encrypt = (data: string, secret = process.env.APP_SECRET) => {
     if (!secret) throw new Error('Custom or APP_SECRET is required to encrypt data')
     return CryptoJS.AES.encrypt(data, secret).toString()
 }
 
 /** --- decrypt() ------------------------------------------------------------------------------ */
-/** -i- Decrypts a piece of data with the APP_SECRET */
+/** -i- Decrypts a piece of data with a custom secret or the APP_SECRET */
 export const decrypt = (data: string, secret = process.env.APP_SECRET) => {
     if (!secret) throw new Error('Custom or APP_SECRET is required to decrypt data')
     const bytes = CryptoJS.AES.decrypt(data, secret)
     return bytes.toString(CryptoJS.enc.Utf8)
 }
 
-/** --- createMiddlewareHeaderContext() -------------------------------------------------------- */
+/** --- createMiddlewareContext() -------------------------------------------------------- */
 /** -i- Use to add serialisable context data to your request header so you can use it in resolvers (signed based on APP_SECRET) */
-export const createMiddlewareHeaderContext = async (
+export const createMiddlewareContext = async (
     req: NextRequest,
     data: Record<string, unknown> = {},
     extraHeaders: Record<string, string> = {}

@@ -1,7 +1,7 @@
 import { UniversalRouteScreen } from '@green-stack/core/navigation/UniversalRouteScreen'
 import ImagesScreen from '../../../screens/ImagesScreen'
 
-/* --- /images --------------------------------------------------------------------------------- */
+/* --- /demos/images --------------------------------------------------------------------------- */
 
 export default (props: any) => (
     <UniversalRouteScreen

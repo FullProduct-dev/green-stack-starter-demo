@@ -1,4 +1,3 @@
-'use client'
 import { useQuery } from '@tanstack/react-query'
 import { UniversalRouteProps, QueryFn, DEFAULT_QUERY_BRIDGE } from './UniversalRouteScreen.helpers'
 import { useRouteParams } from './useRouteParams'
@@ -9,6 +8,7 @@ export const UniversalRouteScreen = <
     ARGS extends Record<string, unknown> = Record<string, unknown>,
     RES extends Record<string, unknown> = Record<string, unknown>,
 >(props: UniversalRouteProps<ARGS, RES>) => {
+    
     // Props
     const { params: routeParams, searchParams, routeScreen: RouteScreen, queryBridge = DEFAULT_QUERY_BRIDGE, ...screenProps } = props
     const { routeParamsToQueryKey, routeParamsToQueryInput, routeDataFetcher } = queryBridge
