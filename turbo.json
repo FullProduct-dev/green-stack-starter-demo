@@ -41,7 +41,8 @@
         },
         "@green-stack/core#collect:resolvers": {
             "outputs": [
-                "../../packages/@registries/resolvers.generated.ts"
+                "../../packages/@registries/resolvers.generated.ts",
+                "../../packages/@registries/bridges.generated.ts"
             ],
             "inputs": [
                 "../../features/**/resolvers/*.ts",
@@ -115,6 +116,21 @@
                 "@green-stack/core#collect:generators"
             ],
             "cache": false
+        },
+        "@green-stack/core#collect:schemas": {
+            "outputs": [
+                "../../packages/@registries/schemas.generated.ts"
+            ],
+            "inputs": [
+                "../../features/**/schemas/*.ts",
+                "../../features/**/schemas/*.schema.ts",
+                "../../packages/**/schemas/*.ts",
+                "../../packages/**/schemas/*.schema.ts",
+                "../../packages/@green-stack-core/utils/**.ts",
+                "../../packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
+                "../../packages/@db-driver/scripts/collect-models.ts"
+            ],
+            "cache": true
         },
         "@green-stack/core#collect:drivers": {
             "dependsOn": ["@green-stack/core#check:workspaces"],
