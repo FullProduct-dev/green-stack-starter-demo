@@ -11,6 +11,17 @@ import * as workspaceGenerators from '../../packages/@registries/generators.gene
 // -i- Learn more about Turborepo Generators at:
 // -i- https://turbo.build/repo/docs/core-concepts/monorepos/code-generation
 
+// -i- Skipping Deprecation Warnings because: not caused by us, don't break anything, adds noise
+// -i- We may fix this with a version bump in the future, but for now we just want to skip them
+const originalEmit = process.emit
+process.emit = (name, ...args) => {
+    const [data] = args
+    const isNamedWarning = name === 'warning' && typeof data === 'object' && data.name
+    const SKIPPED_WARNINGS = ['DeprecationWarning']
+    if (isNamedWarning && SKIPPED_WARNINGS.includes(data.name)) return false
+    return originalEmit.call(process, name, ...args)
+}
+
 // -i- Turborepo & Plop don't play well with CommonJS modules like custom inquirer prompts
 // -i- They require everything to run synchronously, so we need 'import-sync' instead of 'require'
 

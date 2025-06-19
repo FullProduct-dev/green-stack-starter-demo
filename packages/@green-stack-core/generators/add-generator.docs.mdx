@@ -1,0 +1,58 @@
+import { FileTree } from 'nextra/components'
+import { Image } from '@app/primitives'
+import { TitleWrapper } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `add-generator` - Generator
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `add-generator`
+
+```md copy
+npm run add:generator -- --args <workspacePath> <generatedEntity>
+```
+
+```md copy
+npx turbo gen generator --args <workspacePath> <generatedEntity>
+```
+
+<FileTree>
+  <FileTree.Folder name="packages" defaultOpen>
+    <FileTree.Folder name="@green-stack-core" defaultOpen>
+      <FileTree.Folder name="generators" defaultOpen>
+        <FileTree.File name="add-generator.ts" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+### Prompt Arguments
+
+| Argument        | Type         | Question / Description                                                         |
+|-----------------|--------------|--------------------------------------------------------------------------------|
+| workspacePath   | autocomplete | Where would you like to add this generator? <br/>=> e.g. `features/@app-core`  |
+| generatedEntity | input        | What is being generated? <br/>=> `string` (e.g. `component`)                   |
+
+<div className="h-8" />
+
+### Resulting File Changes
+
+```bash
+/{workspacePath}/ # <- e.g. 'features/@app-core/' or 'packages/some-package/'
+ └── generators/
+     └── add-{generatedEntity}.ts ❇️
+
+package.json ➕ # <- adds a root package.json script as well
+```
+
+<div className="h-8" />
