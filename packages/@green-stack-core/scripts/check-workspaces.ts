@@ -16,11 +16,13 @@ const SKIPPED_PACKAGES = [...NODE_INTERNALS, 'react', 'react-native', 'next', 'e
 const mainEnvFilePath = '../../apps/next/.env'
 const localEnvFilePath = '../../apps/next/.env.local'
 
-/* --- Templates ------------------------------------------------------------------------------- */
-
-const template = [
+/** --- createExportsFile() -------------------------------------------------------------------- */
+/** -i- Creates an exports file */
+const createExportsFile = (ctx: {
+    exports: string,
+}) => [
     `// -i- Auto generated with "npx turbo run @green-stack/core#check:workspaces"`,
-    `module.exports = {{exports}}\n`
+    `module.exports = ${ctx.exports}\n`,
 ].join('\n')
 
 /* --- check-workspaces ------------------------------------------------------------------------ */
@@ -198,12 +200,12 @@ const checkWorkspaces = async (isDeepCheck = true) => {
 
         // Save transpiledWorkspaces.generated.js to /packages/registries/ workspace
         const transpiledWorkspacesPath = '../../packages/@registries/transpiledWorkspaces.generated.js'
-        const transpiledWorkspaces = template.replace('{{exports}}', JSON.stringify(workspacePackages, null, 2)) // prettier-ignore
+        const transpiledWorkspaces = createExportsFile({ exports: JSON.stringify(workspacePackages, null, 4) }) // template.replace('{{exports}}', JSON.stringify(workspacePackages, null, 4)) // prettier-ignore
         fs.writeFileSync(transpiledWorkspacesPath, transpiledWorkspaces, 'utf8')
 
         // Save workspaceResolutions.generated.js to /packages/registries/ workspace
         const workspaceResolutionsPath = '../../packages/@registries/workspaceResolutions.generated.js'
-        const workspaceResolutionsFile = template.replace('{{exports}}', JSON.stringify(workspaceResolutions, null, 2)) // prettier-ignore
+        const workspaceResolutionsFile = createExportsFile({ exports: JSON.stringify(workspaceResolutions, null, 4) }) // template.replace('{{exports}}', JSON.stringify(workspaceResolutions, null, 4)) // prettier-ignore
         fs.writeFileSync(workspaceResolutionsPath, workspaceResolutionsFile, 'utf8')
     } catch (err) {
         console.error(err)

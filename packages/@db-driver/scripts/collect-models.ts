@@ -1,30 +1,6 @@
 import fs from 'fs'
 import { addSetItem } from '@green-stack/utils/arrayUtils'
-import { parseWorkspaces, replaceMany, globRel } from '@green-stack/scripts/helpers/scriptUtils'
-
-/* --- models.generated.ts --------------------------------------------------------------------- */
-
-const modelsFileTemplate = `// -i- Auto generated with "npx turbo run @db/driver#collect-models"
-{{modelImportLines}}
-
-/* --- Reexports ------------------------------------------------------------------------------- */
-
-export {
-    {{modelModuleAliasLines}}
-}
-
-/* --- Models ---------------------------------------------------------------------------------- */
-
-const dbModels = {
-    {{modelModuleAliasLines}}
-}
-
-/* --- Exports --------------------------------------------------------------------------------- */
-
-export type DB_MODEL = keyof typeof dbModels
-
-export default dbModels
-`
+import { parseWorkspaces, globRel, createDivider } from '@green-stack/scripts/helpers/scriptUtils'
 
 /* --- Types ----------------------------------------------------------------------------------- */
 
@@ -32,6 +8,36 @@ type ModelRegistry = {
     modelImportLines: string[],
     modelAliasEntryLines: string[],
 }
+
+/** --- createModelsRegistryContent() ---------------------------------------------------------- */
+/** -i- Create the file contents for the model registry */
+export const createModelsRegistryContent = (ctx: {
+    modelImportLines: string[],
+    modelAliasEntryLines: string[],
+}) => [
+
+    `// -i- Auto generated with "npx turbo run @db/driver#collect-models"`,
+    `${ctx.modelImportLines.join('\n')}\n`,
+
+    `${createDivider('Reexports')}\n`,
+
+    `export {`,
+        ctx.modelAliasEntryLines.join(',\n'),
+    `}\n`,
+
+    `${createDivider('Models')}\n`,
+
+    `const dbModels = {`,
+        ctx.modelAliasEntryLines.join(',\n'),
+    `}\n`,
+
+    `${createDivider('Exports')}\n`,
+
+    `export type DB_MODEL = keyof typeof dbModels\n`,
+
+    `export default dbModels\n`,
+
+].join('\n')
 
 /* --- collect-models -------------------------------------------------------------------------- */
 
@@ -77,10 +83,10 @@ const collectModels = () => {
         }, {} as ModelRegistry)
 
         // Build models.generated.ts file
-        const modelModuleAliasLines = modelRegistry.modelAliasEntryLines.join(',\n')
-        const modelImportLines = modelRegistry.modelImportLines.join('\n')
-        let modelsFileContent = modelsFileTemplate.replace('{{modelImportLines}}', modelImportLines) // prettier-ignore
-        modelsFileContent = replaceMany(modelsFileContent, ['    {{modelModuleAliasLines}}'], modelModuleAliasLines) // prettier-ignore
+        const modelsFileContent = createModelsRegistryContent({
+            modelImportLines: modelRegistry.modelImportLines,
+            modelAliasEntryLines: modelRegistry.modelAliasEntryLines,
+        })
         fs.writeFileSync('../../packages/@registries/models.generated.ts', modelsFileContent)
 
     } catch (err) {
