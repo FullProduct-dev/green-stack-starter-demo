@@ -1,0 +1,95 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Function Utils
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# Function Utils
+
+```typescript copy
+import * as functionUtils from '@green-stack/utils/functionUtils'
+```
+
+Collection of utility functions for handling asynchronous operations and error handling:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="utils" defaultOpen>
+                <FileTree.File name="functionUtils.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+## Error Handling
+
+### `tryCatch()`
+
+Attempts to execute a promise, wraps it with try/catch, and returns either the data or error in a structured way.
+
+```typescript
+// Successful promise
+const successPromise = Promise.resolve({ data: 'success' })
+const result = await tryCatch(successPromise)
+// => { data: { data: 'success' } }
+
+// Failed promise with Error
+const errorPromise = Promise.reject(new Error('Something went wrong'))
+const errorResult = await tryCatch(errorPromise)
+// => { error: Error('Something went wrong') }
+
+// Failed promise with non-Error
+const nonErrorPromise = Promise.reject('String error')
+const nonErrorResult = await tryCatch(nonErrorPromise)
+// => { error: Error('String error') }
+```
+
+Common use cases:
+
+```typescript
+// API call with error handling
+const fetchData = async () => {
+    const { data, error } = await tryCatch(fetch('/api/data'))
+    
+    if (error) {
+        console.error('Failed to fetch data:', error)
+        return null
+    }
+    
+    return data
+}
+
+// Database operation
+const createUser = async (userData) => {
+    const { data, error } = await tryCatch(db.users.create(userData))
+    
+    if (error) {
+        // Handle specific error cases
+        if (error.message.includes('duplicate')) {
+            throw new Error('User already exists')
+        }
+        throw error
+    }
+    
+    return data
+}
+```
+
+This is particularly useful when you want to:
+- Handle errors in a consistent way
+- Avoid try/catch blocks in your business logic
+- Ensure all errors are properly converted to Error objects
+- Keep error handling separate from the main logic flow 

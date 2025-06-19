@@ -1,0 +1,101 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `createResolver()`
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `createResolver()`
+
+```typescript copy
+import { createResolver } from '@green-stack/schemas/createResolver'
+```
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="schemas" defaultOpen>
+                <FileTree.File name="createResolver.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+The `createResolver()` function is a utility that simplifies the creation of data resolvers from [Data Bridges](/@green-stack-core/schemas/createDataBridge):
+
+<TitleWrapper>
+    ### Creating a resolver
+</TitleWrapper>
+
+```typescript copy
+/* --- someResolver() --- */
+/* -i- ... */
+export const someResolver = createResolver(async ({
+    args, // <- Auto inferred types (from bridge 'inputSchema')
+    context, // <- Request context (from next.js middleware)
+    parseArgs, // <- Input validator (from bridge 'inputSchema')
+    withDefaults, // <- Response helper (from bridge 'outputSchema')
+}) => {
+
+    // Validate input and apply defaults
+    const validatedArgs = parseArgs(args)
+
+    // -- Business Logic --
+
+    // ... Your back-end business logic goes here ...
+
+    // -- Respond --
+
+    // Typecheck response and apply defaults from bridge's outputSchema
+    return withDefaults({
+        ...,
+    })
+
+}, someDataBridge)
+```
+
+> Pass the bridge (☝️) as the second argument to `createResolver()` to:
+- 1️⃣ infer the input / arg types from the bridge's `inputSchema`
+- 2️⃣ enable `parseArgs()` and `withDefaults()` helpers for validation, hints + defaults
+
+> **The resulting function can be used as just another async function** anywhere in your back-end.
+
+> The difference with a regular function, since the logic is bundled together with its data-bridge / input + output metadata, is that we can easily transform it into APIs
+
+<div className="h-8" />
+
+## Why Resolvers?
+
+Our definition of a resolver is a function that:
+
+- **Takes arguments** (input data)
+- **Returns a value** (output data)
+- **Can be used as an API** (e.g. in a Next.js route handler or GraphQL API)
+- **Has its metadata like the input and output schema bundled wiht it** ([Data Bridges](/@green-stack-core/schemas/createDataBridge))
+
+That last part is important, because when you bundle the business logic with it's input and output metadata, you can easilyt transform it into APIs, while still keeping it as reusable function returning a promise.
+
+More about this in the [Data Bridges](/@green-stack-core/schemas/createDataBridge) docs.
+
+<div className="h-8" />
+
+## Related Automations
+
+### [`add-resolver`](/@green-stack-core/generators/add-resolver) - generator
+
+You don't need to manually create a new resolver with `createResolver()`. You can use the [`add-resolver`](/@green-stack-core/generators/add-resolver) generator to create a new resolver and all related files (like the [DataBridge](/@green-stack-core/schemas/createDataBridge) and [API route](/@green-stack-core/schemas/createNextRouteHandler)) in one go:
+
+```bash copy
+npx turbo gen resolver
+```
+
+<div className="h-8" />

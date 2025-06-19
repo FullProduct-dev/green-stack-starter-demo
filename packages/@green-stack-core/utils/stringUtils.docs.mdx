@@ -1,0 +1,231 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## String Utils
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# String Utils
+
+```typescript copy
+import * as stringUtils from '@green-stack/utils/stringUtils'
+```
+
+Collection of utility functions for string manipulation and formatting:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="utils" defaultOpen>
+                <FileTree.File name="stringUtils.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+## Case Conversion Utils
+
+### `snakeToCamel()`
+
+Converts a snake_case string to camelCase.
+
+```typescript
+const result = snakeToCamel('hello_world') // => 'helloWorld'
+```
+
+### `snakeToDash()`
+
+Converts a snake_case string to kebab-case.
+
+```typescript
+const result = snakeToDash('hello_world') // => 'hello-world'
+```
+
+### `dashToCamel()`
+
+Converts a kebab-case string to camelCase.
+
+```typescript
+const result = dashToCamel('hello-world') // => 'helloWorld'
+```
+
+### `dashToSnake()`
+
+Converts a kebab-case string to snake_case.
+
+```typescript
+const result = dashToSnake('hello-world') // => 'hello_world'
+```
+
+### `camelToSnake()`
+
+Converts a camelCase string to snake_case.
+
+```typescript
+const result = camelToSnake('helloWorld') // => 'hello_world'
+```
+
+### `camelToDash()`
+
+Converts a camelCase string to kebab-case.
+
+```typescript
+const result = camelToDash('helloWorld') // => 'hello-world'
+```
+
+<div className="h-8" />
+
+## Character Case Utils
+
+### `uppercaseFirstChar()`
+
+Uppercases the first character of a string.
+
+```typescript
+const result = uppercaseFirstChar('hello') // => 'Hello'
+```
+
+### `lowercaseFirstChar()`
+
+Lowercases the first character of a string.
+
+```typescript
+const result = lowercaseFirstChar('Hello') // => 'hello'
+```
+
+<div className="h-8" />
+
+## String Transformation Utils
+
+### `slugify()`
+
+Converts a string to a URL-friendly slug.
+
+```typescript
+const result = slugify('Hello World!') // => 'hello-world'
+```
+
+### `replaceStringVars()`
+
+Replaces placeholders like `{somevar}` or `[somevar]` with values from injectables.
+
+```typescript
+const result = replaceStringVars(
+  'Hello {name}, welcome to [place]!',
+  { name: 'John', place: 'Paris' }
+) // => 'Hello John, welcome to Paris!'
+```
+
+### `replaceMany()`
+
+Replaces every string you pass as the targets with the replacement string.
+
+```typescript
+// Removes 'Update' or 'Add' from the string
+replaceMany('useUpdateDataForm()', ['Update', 'Add'], '')
+// => 'useDataForm()'
+
+replaceMany('useAddUserForm()', ['Update', 'Add'], '')
+// => 'useUserForm()'
+```
+
+## String Analysis Utils
+
+### `findTargetString()`
+
+Finds a `$target$` string inside another string.
+
+```typescript
+const folderWithIcons = findTargetString(
+  'some/path/to/specific-folder/icons/',
+  'some/path/to/$target$/icons/'
+) // => 'specific-folder'
+```
+
+### `includesAny()`
+
+Checks whether a given string includes any of the provided words (case-insensitive).
+
+```typescript
+const result = includesAny('Hello World', ['world', 'universe']) // => true
+```
+
+### `extractPathParams()`
+
+Extracts an array of potential params from a URL path.
+
+```typescript
+const params = extractPathParams('/api/user/[slug]/posts/[id]')
+// => ['slug', 'id']
+```
+
+<div className="h-8" />
+
+## ANSI Terminal Formatting
+
+We provide two main objects for terminal text formatting:
+
+### `ansi` - constants
+
+Constants for ANSI escape codes, including:
+
+- Text styles: `reset`, `bold`, `dim`, `underscore`, etc.
+- Colors: `black`, `red`, `green`, `yellow`, etc.
+- Backgrounds: `bgBlack`, `bgRed`, `bgGreen`, etc.
+
+You should finish each ANSI code with `reset` to clear formatting for what follows after it.
+
+To automate this, you can use the `a` helper functions below.
+
+### `a` - terminal formatters
+
+Ansi helper functions for applying ANSI formatting to strings:
+
+```typescript
+// Utility
+a.bold('...') // Makes text bold
+a.underscore('...') // Underlines text
+a.reset('...') // Resets all formatting for this string + after
+a.italic('...') // Italicizes text
+
+// Colors
+a.muted('...') // Makes text muted
+a.black('...') // Black text
+a.red('...') // Red text
+a.green('...') // Green text
+a.yellow('...') // Yellow text
+a.blue('...') // Blue text
+a.magenta('...') // Magenta text
+a.cyan('...') // Cyan text
+a.white('...') // White text
+
+// Backgrounds
+a.bgBlack('...') // Black background
+a.bgRed('...') // Red background
+a.bgGreen('...') // Green background
+a.bgYellow('...') // Yellow background
+a.bgBlue('...') // Blue background
+a.bgMagenta('...') // Magenta background
+a.bgCyan('...') // Cyan background
+a.bgWhite('...') // White background
+```
+
+Each formatting function accepts:
+- `msg`: The message to format
+- `clear`: Optional boolean to reset formatting before applying new style, default is `true`.
+
+Example:
+```typescript
+console.log(a.bold(a.red('Error:')) + ' Something went wrong')
+```

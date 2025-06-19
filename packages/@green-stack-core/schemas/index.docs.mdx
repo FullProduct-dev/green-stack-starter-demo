@@ -1,0 +1,629 @@
+import { Image } from '@app/primitives'
+import { FileTree, Callout } from 'nextra/components'
+import { Hidden, TitleWrapper, LLMOptimized } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Intro - `schema()`
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# Schemas API reference
+
+```typescript copy
+import { z, schema } from '@green-stack/schemas'
+```
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="schemas" defaultOpen>
+                <FileTree.File name="index.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+## Building Schemas
+
+Because `schema` is a tiny wrapper around Zod (V3), it's usage is similar to using `z.object()`
+
+```typescript {4, 8} /Requires a name/1 /'User'/ /to port to other formats later/ filename="User.ts"
+export const User = schema('User', {
+    // Requires a name value (☝️) to port to other formats later, best to keep the same
+
+    // Zod can help you go even narrower than typescript
+    name: z.string().min(2), // <- e.g. Needs to be a string with at least 2 letters
+    age: z.number().min(18), // <- e.g. Age must be a number of at least 18
+
+    // Just like TS, it can help you indicate fields as optional
+    isAdmin: z.boolean().default(false), // <- Marked optional, defaults to false
+    birthdate: z.Date().nullish(), // = same as calling .nullable().optional()
+})
+```
+
+> The main difference is that you have to specify a name for each schema as the first argument. This helps us port your schemas to other formats later:
+
+- [Auto-generated MDX UI component docs](/single-sources-of-truth#automatic-mdx-docgen)
+- [Resolver Inputs, Outputs, Docs, and GraphQL definitions](/data-resolvers)
+- [Data Fetching Functions and Hooks](/data-fetching)
+- [Custom Implementations using the introspection metadata API](/single-sources-of-truth#transforming-to-other-formats)
+
+### Defining Primitives
+
+```typescript
+const someString = z.string() // -> string
+const someNumber = z.number() // -> number
+const someBoolean = z.boolean() // -> boolean
+const someDate = z.date() // -> Date
+```
+
+### Defaults and optionality
+
+You can mark fields as optional or provide default values by using either:
+- `.optional()` - to allow `undefined`
+- `.nullable()` - to allow `null`
+- `.nullish()` - to allow both
+
+You can also use `.default()` to provide a default value when the field isn't passed in:
+
+```ts {8} /.optional()/ /.nullable()/ /.nullish()/ /.default/2 filename="User.ts"
+// Define a schema with optional and nullable fields
+const User = schema('...', {
+
+    name: z.string().optional(), // <- Allow undefined
+    age: z.number().nullable(), // <- Allow null
+    birthData: z.date().nullish(), // <- Allow both
+
+    // Use .default() to make optional in args,
+    // but provide a default value when it IS undefined
+    isAdmin: z.boolean().default(false), // <- false
+})
+```
+
+> When using `.default()`, you might need to be more specifc when inferring types. You can use `z.input()` or `z.output()` to get the correct type. Based on which you choose, defaulted fields will be either optional or required.
+
+### Enums with `inputOptions()`
+
+```typescript copy
+import { inputOptions } from '@green-stack/schemas'
+```
+
+To define more flexible enums you can easily reuse in forms, we also export an `inputOptions()` function:
+
+```typescript
+const MY_ENUM = inputOptions({
+    // Define the enum values, alongside their display names
+    value1: 'Value 1',
+    value2: 'Value 2',
+    value3: 'Value 3',
+})
+
+const schemaWithEnum = schema('MySchema', {
+    myEnumField: MY_ENUM, // <- Use the enum in a schema
+})
+```
+
+This helps you create an enum definition extending Zod's `z.enum()` with some additions:
+
+You can use `.entries` object to get the original object with key-value pairs
+
+```typescript /.entries/
+MY_ENUM.entries
+// {
+//   value1: 'Value 1',
+//   value2: 'Value 2',
+//   value3: 'Value 3',
+// }
+```
+
+You can get auto-completion for the enum values / option keys:
+
+```typescript
+MyEnum.value1 // => 'value1'
+MyEnum.enum.value1 // => 'value1' (alternatively, the way Zod Enums work)
+```
+
+You can retrieve an array of the enum values with `.options`:
+
+```typescript
+MY_ENUM.options // => ['value1', 'value2', 'value3']
+```
+
+All of this on top of what's already available in [Zod Enums](https://v3.zod.dev/?id=zod-enums).
+
+### `.extendSchema()` - add fields
+
+It can happen that you need to differentiate between two similar data shapes, for example, needing to expand on an existing shape.
+
+<FileTree>
+    <FileTree.Folder name="schemas" defaultOpen>
+        <FileTree.File name="User.ts" />
+        <FileTree.File name="AdminUser.ts ← extension of 'User'" />
+    </FileTree.Folder>
+</FileTree>
+
+You can add new fields by calling `.extendSchema()` on the original schema:
+
+```ts {6} /.extendSchema/ filename="AdminUser.ts"
+// Extend the User schema
+const AdminUser = User.extendSchema('AdminUser', {
+    isAdmin: z.boolean().default(true),
+})
+
+type AdminUser = z.infer<typeof AdminUser>
+
+// {
+//     name: string,
+//     age: number,
+//     birthDate?: Date | null,
+//
+//     isAdmin?: boolean, // <- New field added
+// }
+```
+
+> You will **need to provide a new name** for the extended schema. This ensures there is no conflict with the original one when we port it to other formats.
+
+### `.pickSchema()` - select fields
+
+Similar to extending, **you can create a new schema by picking specific fields from another**:
+
+```ts {6} /.pickSchema/ filename="PublicUser.ts"
+const PublicUser = User.pickSchema('PublicUser', {
+    name: true,
+    age: true, // <- Only these fields will be included
+})
+
+type PublicUser = z.infer<typeof PublicUser>
+
+// {
+//     name: string,
+//     age: number,
+// }
+```
+
+### `.omitSchema()` - remove fields
+
+The reverse is also possible by removing certain fields from another. The new schema will have all fields from the original, *except the ones you specify*:
+
+```ts {5} /.omitSchema/ filename="PublicUser.ts"
+const PublicUser = User.omitSchema('PublicUser', {
+    birthDate: true, // <- Will be missing in the new schema
+})
+
+type PublicUser = z.infer<typeof PublicUser>
+
+// {
+//     name: string,
+//     age: number,
+// }
+```
+
+### Nesting and Collections
+
+You can nest schemas within each other.  
+This is useful when you need to represent a more complex data shape
+
+<FileTree>
+    <FileTree.Folder name="schemas" defaultOpen>
+        <FileTree.File name="User.ts" />
+        <FileTree.File name="AdminUser.ts" />
+        <FileTree.File name="PublicUser.ts" />
+        <FileTree.File name="Team.ts ← Contains 'User' members" />
+    </FileTree.Folder>
+</FileTree>
+
+For example, sometimes you need to represent a collection of specific data:
+
+```ts {6, 17} /z.array(User)/ /User[]/ filename="Team.ts"
+const Team = schema('Team', {
+    members: z.array(User), // <- Pass the 'User' schema to z.array()
+    teamName: z.string(),
+})
+
+type Team = z.infer<typeof Team>
+
+// {
+//     teamName: string,
+//     members: {
+//         name: string,
+//         age: number,
+//         birthDate?: Date | null,
+//     }[]
+// }
+
+// ⬇⬇⬇ Which is the same as:
+
+// {
+//     teamName: string,
+//     members: User[]
+// }
+```
+
+## Extracting Types
+
+The main thing to use schemas for is to hard-link validation with types.
+
+You can extract the type from the schema using `z.infer()`, `z.input()` or `z.output()`:
+
+```tsx filename="User.ts"
+// Extract type from the schema and export it as a type alias
+export type User = z.infer<typeof User>
+
+// If you have defaults, you can use z.input() or z.output() instead
+export type UserOutput = z.output<typeof User>
+export type UserInput = z.input<typeof User>
+```
+
+`⬇⬇⬇`
+
+```tsx /?/
+// {
+//     name: string,
+//     age: number,
+//     isAdmin?: boolean,
+//     birthDate?: Date | null,
+// }
+```
+
+> In this case where we check the resulting type of `z.input()`, the 'isAdmin' field will be marked as optional, as it's supposedly not defaulted to `false` yet. If we'd inspect `z.output()`, it would be marked as required since it's either provided or presumed defaulted.
+
+### Advanced Types
+
+*Anything you can define the shape of in Typescript, you can define in Zod:*
+
+```ts {3, 6, 9}
+const Task = schema('Task', {
+
+    // Enums
+    status: z.enum(['draft', 'published', 'archived']),
+
+    // Arrays
+    tags: z.array(z.string()),
+
+    // Tuples
+    someTuple: z.tuple([z.string(), z.number()]),
+
+})
+```
+
+When extracting the type with `type Task = z.infer<typeof Task>`:
+
+```ts
+// {
+//     status: 'draft' | 'published' | 'archived',
+//     tags: string[],
+//     someTuple: [string, number],
+// }
+```
+
+> Check [zod.dev](https://zod.dev) for the full list of what you can define with zod.
+
+## Validating inputs
+
+You can use the `.parse()` method to validate inputs against the schema:
+
+```tsx {1, 4} /.shape.age/
+// Call .parse() on the whole User schema...
+const newUser = User.parse(someInput) // <- Auto infers 'User' type if valid
+
+// ...or validate idividual fields by using '.shape' 👇
+User.shape.age.parse("Invalid - Not a number")
+// Throws => ZodError: "Expected a number, recieved a string."
+// Luckily, TS will already catch this in your editor ( instant feedback 🙌 )
+```
+
+If a field's value does not match the schema, it will throw a `ZodError`:
+
+```ts {8, 14} /.issues/
+try {
+
+    // 🚧 Will fail validation
+    const someNumber = z.number().parse("Not a number")
+
+} catch (error) { // ⬇⬇⬇
+
+    /* Throws 'ZodError' with a .issues array:
+        [{
+            code: 'invalid_type',
+            expected: 'number',
+            received: 'string',
+            path: [],
+            message: 'Expected number, received string',
+        }]
+    */
+
+}
+```
+
+### Custom Errors
+
+You can provide custom error messages by passing the `message` prop:
+
+```ts
+const NumberValue = z.number({ message: 'Please provide a number' })
+// Throws => ZodError: [{ message: "Please provide a number", ... })
+```
+
+You can provide **custom error messages** for specific validations:
+
+```ts
+const MinimumValue = z.number().min(10, { message: 'Value must be at least 10' })
+// Throws => ZodError: [{ message: "Value must be at least 10", ... })
+
+const MaximumValue = z.number().max(100, { message: 'Value must be at most 100' })
+// Throws => ZodError: [{ message: "Value must be at most 100", ... })
+```
+
+## Security Extensions
+
+We added some additional features to Zod to help you with security and data handling.
+
+### Mark fields as `.sensitive()`
+
+```typescript
+    password: z.string().sensitive()
+```
+
+In your schemas, you can mark fields as sensitive using `.sensitive()`. This will:
+
+- Exclude the field from appearing in the GraphQL schema, introspection or queries
+- Mark the field as strippable in API resolvers / responses (*)
+- Mark the field with `isSensitive: true` in schema introspection
+
+> * 'Strippable' means when using either `withDefaults()` OR `applyDefaults()` / `formatOutput()` with the `{ stripSensitive: true }` option as second argument. If none of these are used, the field will still be present in API route handler responses, but not GraphQL.
+
+## Metadata APIs
+
+The reason we're able to use schemas as a [single source of truth](/single-sources-of-truth) to build the right abstractions around, is due to its strong metadata API:
+
+### `.introspect()`
+
+```typescript
+const metadata = User.introspect()
+```
+
+This will return a metadata object with the following type:
+
+```typescript
+type Metadata<S> = {
+
+    // Essentials
+    name?: string, // <- The name you passed to schema(), e.g. 'User'
+    zodType: ZOD_TYPE, // e.g. 'ZodString' | 'ZodNumber' | 'ZodBoolean' | 'ZodDate' | ...
+    baseType: BASE_TYPE, // e.g. 'String' | 'Number' | 'Boolean' | 'Date' | ...
+
+    // Optionality and defaults
+    isOptional?: boolean,
+    isNullable?: boolean,
+    defaultValue?: T, // The resulting Zod type
+
+    // Documentation
+    exampleValue?: T, // The resulting Zod type
+    description?: string,
+    minLength?: number,
+    maxLength?: number,
+    exactLength?: number,
+    minValue?: number,
+    maxValue?: number,
+
+    // Flags
+    isInt?: boolean,
+    isBase64?: boolean,
+    isEmail?: boolean,
+    isURL?: boolean,
+    isUUID?: boolean,
+    isDate?: boolean,
+    isDatetime?: boolean,
+    isTime?: boolean,
+    isIP?: boolean,
+
+    // Literals, e.g. z.literal()
+    literalValue?: T, // The resulting Zod type
+    literalType?: 'string' | 'boolean' | 'number',
+    literalBase?: BASE_TYPE,
+
+    // e.g. Nested schema field(s) to represent:
+    // - object properties (like meta for 'age' / 'isAdmin' / ...)
+    // - array elements
+    // - tuple elements
+    schema?: S,
+
+    // The actual Zod object, only included with .introspect(true)
+    zodStruct?: z.ZodType & { ... }, // <- Outer zod schema (e.g. ZodDefault)
+    innerStruct?: z.ZodType & { ... }, // <- Inner zod schema (not wrapped)
+
+    // Mark as serverside only, strippable in API responses
+    isSensitive?: boolean, 
+
+    // Compatibility with other systems like databases & drivers
+    isID?: boolean,
+    isIndex?: boolean,
+    isUnique?: boolean,
+    isSparse?: boolean,
+}
+```
+
+When inspecting an object, like the `User` schema we've referenced in this doc, the metadata for all the fields defined on the schema will be defined as `Record<fieldName, MetaData>` on the `schema` property.
+
+If you need to access the zod struct that was used to create the schema or field definition, you can pass `true` as the first argument to `.introspect()`:
+
+```typescript
+const metadataWithZodStructs = User.introspect(true)
+```
+
+### `.documentationProps()`
+
+You can use schemas to generate interactive UI docs for your components by describing their props with it.
+
+You can define specific example props for the component's docs by chaining `.example()` on prop definitions, alternatively, `.default()` will be used.
+
+All that's needed afterwards, is to call `.documentationProps()` on the schema from within the component file:
+
+```typescript {2, 12} /.example/ /.documentationProps/ filename="Button.tsx"
+export const ComponentProps = schema('ComponentProps', {
+    // Define the props shape with zod, e.g.:
+    someProp; z.string().example('Some example value'),
+})
+
+/* --- <ComponentName/> --------------- */
+
+export const ComponentName = (rawProps: ComponentProps) => <>...</>
+
+/* --- Documentation ------------------ */
+
+export const documentationProps = ComponentProps.documentationProps('ComponentName')
+```
+
+Doing this will indicate to the `npm run regenerate:docs` command that this component should have docs generated for it.
+
+For an example of what generated docs look like, check out the [Button component docs](/@app-core/components/Button).
+
+To further customize the docs, you can pass options that follow this type as the second argument:
+
+```typescript 
+type DocumentationPropsOptions = {
+    /** -i- Pass to display specific props as starting examples for preview + props table */
+    previewProps: Record<string, any$Unknown>,
+    exampleProps?: Partial<T>,
+    /** -i- If a form component, you can use this prefill the current value from the url */
+    valueProp?: keyof T | HintedKeys,
+    /** -i- If a form component, you can use this save the current value to the url */
+    onChangeProp?: keyof T | HintedKeys, 
+}
+```
+
+For example, for a `<Switch />` component, you can use:
+
+```typescript
+export const getDocumentationProps = SwitchProps.documentationProps('Switch', {
+    exampleProps: { checked: true }, // <- Start in the 'checked' state
+    valueProp: 'checked',
+    onChangeProp: 'onCheckedChange',
+})
+```
+
+> For an example of what this looks like, try visiting:  
+> [/@app-core/forms/Switch?checked=true&label=Hello+from+the+URL](/@app-core/forms/Switch?checked=true&label=Hello+from+the+URL).
+
+## Automations
+
+### Schema generator
+
+Like all elements of our recommended way of working, there is a turborepo generator to help create a schema in a specific workspace:
+
+```shell copy
+npm run add:schema
+```
+
+`⬇⬇⬇`
+
+will prompt you for a target workspace and name:
+
+```shell
+>>> Modify "your-project" using custom generators
+
+? Where would you like to add this schema? 
+❯ @app/core # -- from features/app-core 
+  some-feature # -- from features/some-feature 
+  some-package # -- from packages/some-package
+```
+
+`⬇⬇⬇`
+
+```shell
+>>> Modify "your-project" using custom generators
+
+? Where would you like to add this schema? # @app/core
+? What is the schema name? # SomeData
+? Optional description? # ...
+
+>>> Changes made:
+  • /features/@app-core/schemas/SomeData.ts # (add)
+  • Opened 1 file in VSCode # (open-in-vscode)
+
+>>> Success!
+```
+
+`⬇⬇⬇`
+
+```shell
+@app-core
+ 
+ └── /schemas/...
+     └── SomeData.schema.ts
+```
+
+<Hidden>
+
+Though if you chose to also generate an integration, it might look like this instead:
+
+```shell
+@app-core
+
+ └── /schemas/...
+     └── SomeData.schema.ts 
+
+ └── /hooks/...
+     └── useSomeData.ts # <- Form state hook using `useFormState()`
+
+ └── /models/...
+     └── SomeData.ts # <- `@db/driver` model using `createSchemaModel()`
+```
+
+</Hidden>
+
+## Disclaimers
+
+### About `z.union` and `z.tuple`
+
+Since GraphQL and other systems might not natively support unions or tuples, it could be best to avoid them. We allow you to define them, but tranformations of these to other formats is considered experimental and potentially not entirely type-safe.
+
+You can always use `z.array` and `z.object` to represent the same data shapes.
+
+e.g. instead of:
+
+```ts
+const someUnionField = z.union([z.string(), z.number()])
+// TS: string | number
+
+const someTupleField = z.tuple([z.string(), z.number()])
+// TS: [string, number]
+```
+
+you might try this instead:
+
+```ts
+const SomeSchema = schema('SomeSchema', {
+
+    // Unions
+    someUnionFieldStr: z.string(), // TS: string
+    someUnionFieldNum: z.number(), // TS: number
+
+    // Tuples
+    someTupleField: schema('SomeTupleField', {
+        stringValue: z.string(), // TS: string
+        numberValue: z.number(), // TS: number
+    })
+})
+```
+
+... which will work in GraphQL and other formats as well.
+
+We've done our best to hack in experimental tuple and union support where possible. You can take it as-is, edit it further to your liking or avoid tuples and unions entirely. *The choice is yours.*
+
+## Further reading
+
+From our own docs:
+- [Single Sources of Truth](/single-sources-of-truth) - Core Starterkit Concept
+- [Data Bridges for fetching](/data-resolvers#start-from-a-databridge) - Starterkit Docs
+
+Relevant external resources:
+- [Zod's official docs](https://zod.dev) - zod.dev
+- [The Joy of Single Sources of Truth](https://dev.to/codinsonn/the-joy-of-single-sources-of-truth-277o) - Blogpost by [Thorr ⚡️ @codinsonn.dev](https://codinsonn.dev)

@@ -1,0 +1,226 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## API Utils
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# API Utils
+
+```typescript copy
+import * as apiUtils from '@green-stack/utils/apiUtils'
+```
+
+Collection of utility functions for handling API requests, parameters, and security:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="utils" defaultOpen>
+                <FileTree.File name="apiUtils.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+## Disclaimer - Server Only
+
+> These utilities are designed for server-side use only. They are not intended for client-side execution and may not work correctly in a browser environment.
+
+<div className="h-8" />
+
+## JSON Utils
+
+### `validateJSON()`
+
+Checks whether a string is valid JSON.
+
+```typescript
+validateJSON('{"name": "John"}') // => true
+validateJSON('{"name": John}') // => false (missing quotes)
+validateJSON('not json') // => false
+```
+
+### `parseIfJSON()`
+
+Attempts to parse a string if it's valid JSON, otherwise returns the original value.
+
+```typescript
+parseIfJSON('{"name": "John"}') // => { name: 'John' }
+parseIfJSON('not json') // => 'not json'
+parseIfJSON({ already: 'object' }) // => { already: 'object' }
+```
+
+<div className="h-8" />
+
+## API Parameter Utils
+
+### `getApiParam()`
+
+Gets a specific property by key from supplied API sources (query, params, body, args, context).
+
+```typescript
+const apiSources = {
+    query: { id: '123' },
+    body: { name: 'John' },
+    params: { type: 'user' }
+}
+
+getApiParam('id', apiSources) // => '123'
+getApiParam('name', apiSources) // => 'John'
+getApiParam('type', apiSources) // => 'user'
+getApiParam('nonexistent', apiSources) // => undefined
+```
+
+### `getApiParams()`
+
+Get multiple API parameters from supplied API sources.
+
+```typescript
+const apiSources = {
+    query: { id: '123' },
+    body: { name: 'John' },
+    params: { type: 'user' }
+}
+
+getApiParams(['id', 'name'], apiSources)
+// => { id: '123', name: 'John' }
+
+getApiParams('id name type', apiSources)
+// => { id: '123', name: 'John', type: 'user' }
+```
+
+### `getUrlParams()`
+
+Extracts and parses query parameters from a URL.
+
+```typescript
+getUrlParams('https://api.example.com/users?id=123&name=John')
+// => { id: 123, name: 'John' }
+
+getUrlParams('https://api.example.com/users')
+// => {}
+```
+
+<div className="h-8" />
+
+## Security Utils
+
+### `createHmac()`
+
+Creates a cryptographic signature based on the data and chosen algorithm.
+
+```typescript
+createHmac('sensitive-data', 'sha256')
+// => 'hashed-signature'
+
+createHmac('sensitive-data', 'md5')
+// => 'hashed-signature'
+```
+
+### `encrypt()`
+
+Encrypts data using AES encryption with a secret key.
+
+```typescript
+const encrypted = encrypt('sensitive-data', 'my-secret-key')
+// => 'encrypted-string'
+
+// Using APP_SECRET environment variable
+const encrypted = encrypt('sensitive-data')
+// => 'encrypted-string'
+```
+
+### `decrypt()`
+
+Decrypts data that was encrypted using the `encrypt()` function.
+
+```typescript
+const decrypted = decrypt(encrypted, 'my-secret-key')
+// => 'sensitive-data'
+
+// Using APP_SECRET environment variable
+const decrypted = decrypt(encrypted)
+// => 'sensitive-data'
+```
+
+<div className="h-8" />
+
+## Header Context Utils
+
+### `createMiddlewareContext()`
+
+Adds serializable context data to request headers (signed based on APP_SECRET).
+
+```typescript
+const headers = await createMiddlewareContext(
+    request,
+    { userId: '123', role: 'admin' },
+    { 'X-Custom-Header': 'value' }
+)
+// => Headers object with context and custom headers
+```
+
+### `getHeaderContext()`
+
+Extracts and validates header context from various request types.
+
+```typescript
+// From NextApiRequest
+const context = getHeaderContext(nextApiRequest)
+// => { userId: '123', role: 'admin' }
+
+// From standard Request
+const context = getHeaderContext(request)
+// => { userId: '123', role: 'admin' }
+
+// From GetServerSidePropsContext
+const context = getHeaderContext(context.req)
+// => { userId: '123', role: 'admin' }
+```
+
+Note: Both header context utilities require the `APP_SECRET` environment variable to be set for signing and validation. 
+
+<div className="h-8" />
+
+## Fire and Forget Utils
+
+### `fireGetAndForget()`
+
+Fires a GET request and ignores whether it succeeds or not (useful for webhooks).
+
+```typescript
+fireGetAndForget('https://api.example.com/webhook')
+// => true (immediately, doesn't wait for response)
+
+// With custom config
+fireGetAndForget('https://api.example.com/webhook', {
+    headers: { 'X-API-Key': 'secret' }
+})
+```
+
+### `firePostAndForget()`
+
+Fires a POST request and ignores whether it succeeds or not (useful for webhooks).
+
+```typescript
+firePostAndForget('https://api.example.com/webhook', { event: 'user.created' })
+// => true (immediately, doesn't wait for response)
+
+// With custom config
+firePostAndForget('https://api.example.com/webhook', 
+    { event: 'user.created' },
+    { headers: { 'X-API-Key': 'secret' } }
+)
+```

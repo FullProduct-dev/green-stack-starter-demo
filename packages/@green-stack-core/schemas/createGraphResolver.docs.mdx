@@ -1,0 +1,118 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `createGraphResolver()`
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `createGraphResolver()`
+
+```typescript copy
+import { createGraphResolver } from '@green-stack/schemas/createGraphResolver'
+```
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="schemas" defaultOpen>
+                <FileTree.File name="createGraphResolver.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+We made it quite easy to enable GraphQL for your resolvers. The flow is quite similar to [adding API routes](/@green-stack-core/schemas/createNextRouteHandler).
+
+*From a related route file*, add the following:
+
+<TitleWrapper>
+    ### Registering a GraphQL resolver
+</TitleWrapper>
+
+```ts {3, 11} filename="features / @app-core / routes / api / health / route.ts"
+import { updatePost } from '@app/resolvers/updatePost.resolver'
+import { createNextRouteHandler } from '@green-stack/schemas/createNextRouteHandler'
+import { createGraphResolver } from '@green-stack/schemas/createGraphResolver'
+
+/* --- Routes ------------ */
+
+// exports of `GET` / `POST` / `PUT` / ...
+
+/* --- GraphQL ----------- */
+
+export const graphResolver = createGraphResolver(updatePost)
+// Automatically extracts input (☝️) from graphql request context
+```
+
+After exporting `graphResolver` here, restart the dev server or run `npm run build:schema` manually.
+
+This will:
+- 1. pick up the `graphResolver` export
+- 2. put it in our list of graphql compatible resolvers at `resolvers.generated.ts` in `@app/registries`
+- 3. recreate `schema.graphql` from input & output schemas from registered resolvers
+
+You can now check out your GraphQL API playground at [/api/graphql](http://localhost:3000/api/graphql)
+
+![Apollo Server GraphQL Playground Preview](https://github.com/FullProduct-dev/universal-app-router/assets/5967956/3b6b1d98-1228-44a4-aaa0-968664a027c3)
+
+<div className="h-8" />
+
+## Related Automations
+
+### `collect-resolvers` - script
+
+```bash copy
+npm run collect:resolvers
+```
+
+This script will:
+
+- 1. Scan the `/routes/` folder in any of your non-app workspaces
+- 2. Find all `route.ts` files that export a `createGraphResolver()` function
+- 3. Re-export them in the `@app/registries/resolvers.generated.ts` file
+
+The goal of this script is so you can define which resolvers should be registered for GraphQL on a feature by feature basis, instead of manually linking them somewhere centrally.
+
+Overall, this will keep your features more modular and portable between GREEN stack / FullProduct.dev projects.
+
+The [`collect-routes`](/@green-stack-core/scripts/collect-routes) script runs automatically on `npm run dev` and any production build commands.
+
+<div className="h-8" />
+
+### `build-schema` - script
+
+```bash copy
+npm run build:schema
+```
+
+This script will:
+
+- 1. Import all the resolvers from your `@app/registries/resolvers.generated.ts` file
+- 2. Read the input and output schemas from each resolver (the [Data Bridge](/@green-stack-core/schemas/createDataBridge) for the resolver logic)
+- 3. Generate a new `schema.graphql` file in `@app/core/graphql/` folder
+- 4. Bind the schema to the resolvers to create an executable schema and effortless GraphQL API
+
+Meaning you won't need to manually write your own GraphQL schema, it will be generated automatically based on your resolvers.
+
+The [`build-schema`](/@green-stack-core/scripts/build-schema) script runs automatically on `npm run dev` and any production build commands.
+
+<div className="h-8" />
+
+### [`add-resolver`](/@green-stack-core/generators/add-resolver) - generator
+
+You don't need to manually create a new API route with `createGraphResolver()` every time you create a new resolver. You can use the [`add-resolver`](/@green-stack-core/generators/add-resolver) generator to create a new resolver and its API route at once:
+
+```bash copy
+npx turbo gen resolver
+```
+
+<div className="h-8" />

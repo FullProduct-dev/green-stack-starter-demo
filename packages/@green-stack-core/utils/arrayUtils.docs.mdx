@@ -1,0 +1,133 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Array Utils
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# Array Utils
+
+```typescript copy
+import * as arrayUtils from '@green-stack/utils/arrayUtils'
+```
+
+Collection of utility functions for array manipulation and set-like operations:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="utils" defaultOpen>
+                <FileTree.File name="arrayUtils.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+## Set-like Operations
+
+### `arrFromSet()`
+
+Deduplicates items in an array using Set.
+
+```typescript
+const numbers = [1, 2, 2, 3, 3, 3]
+arrFromSet(numbers) // => [1, 2, 3]
+
+const strings = ['a', 'b', 'a', 'c']
+arrFromSet(strings) // => ['a', 'b', 'c']
+
+// Works with objects too
+const objects = [{ id: 1 }, { id: 1 }, { id: 2 }]
+arrFromSet(objects) // => [{ id: 1 }, { id: 1 }, { id: 2 }]
+```
+
+### `addSetItem()`
+
+Adds an item to array if it doesn't exist already. Uses JSON.stringify for deep comparison.
+
+```typescript
+const arr = [{ id: 1 }, { id: 2 }]
+
+// Adding a new item
+addSetItem(arr, { id: 3 })
+// => [{ id: 1 }, { id: 2 }, { id: 3 }]
+
+// Adding a duplicate (won't add)
+addSetItem(arr, { id: 1 })
+// => [{ id: 1 }, { id: 2 }, { id: 3 }]
+```
+
+### `removeSetItem()`
+
+Removes an item from an array.
+
+```typescript
+const arr = [1, 2, 3, 4]
+
+removeSetItem(arr, 3) // => [1, 2, 4]
+removeSetItem(arr, 5) // => [1, 2, 3, 4] (no change if item not found)
+```
+
+### `toggleArrayItem()`
+
+Adds or removes an item from an array (toggles its presence).
+
+```typescript
+const arr = [1, 2, 3]
+
+// Adding an item
+toggleArrayItem(arr, 4) // => [1, 2, 3, 4]
+
+// Removing an item
+toggleArrayItem(arr, 2) // => [1, 3]
+```
+
+<div className="h-8" />
+
+## Array Transformation
+
+### `createLookup()`
+
+Creates a lookup object from an array of objects, indexed by a specified property key.
+
+```typescript
+const users = [
+    { id: 1, name: 'John' },
+    { id: 2, name: 'Jane' },
+    { id: 3, name: 'Bob' }
+]
+
+// Create a lookup by id
+const userLookup = createLookup(users, 'id')
+// => {
+//     1: { id: 1, name: 'John' },
+//     2: { id: 2, name: 'Jane' },
+//     3: { id: 3, name: 'Bob' }
+//    }
+
+// Access user by id
+userLookup[1] // => { id: 1, name: 'John' }
+
+// Items without the key are skipped
+const mixedData = [
+    { id: 1, name: 'John' },
+    { name: 'Jane' }, // no id, will be skipped
+    { id: 3, name: 'Bob' }
+]
+const lookup = createLookup(mixedData, 'id')
+// => {
+//     1: { id: 1, name: 'John' },
+//     3: { id: 3, name: 'Bob' }
+//    }
+``` 
