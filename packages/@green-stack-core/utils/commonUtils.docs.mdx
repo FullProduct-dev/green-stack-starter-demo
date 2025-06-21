@@ -1,0 +1,126 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Common Utils
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# Common Utils
+
+```typescript copy
+import * as commonUtils from '@green-stack/utils/commonUtils'
+```
+
+Collection of common utility functions for general use:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="utils" defaultOpen>
+                <FileTree.File name="commonUtils.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+## Validation Utils
+
+### `isEmpty()`
+
+Checks for null, undefined, empty strings, empty objects or empty arrays.
+
+```typescript
+// Empty values
+isEmpty(null) // => true
+isEmpty(undefined) // => true
+isEmpty('') // => true
+isEmpty([]) // => true
+isEmpty({}) // => true
+
+// Non-empty values
+isEmpty('hello') // => false
+isEmpty([1, 2, 3]) // => false
+isEmpty({ key: 'value' }) // => false
+
+// Custom behavior for empty strings
+isEmpty('', false) // => false (when failOnEmptyStrings is false)
+```
+
+### `isKvRecord()`
+
+Checks whether an object is a simple key-value record (all values are primitives).
+
+```typescript
+// Valid key-value records
+isKvRecord({ name: 'John', age: 30 }) // => true
+isKvRecord({ active: true, count: 0 }) // => true
+isKvRecord({ title: undefined, id: null }) // => true
+
+// Invalid key-value records
+isKvRecord({ data: [] }) // => false (array value)
+isKvRecord({ handler: () => {} }) // => false (function value)
+isKvRecord({ user: { name: 'John' } }) // => false (nested object)
+isKvRecord([]) // => false (array)
+isKvRecord(null) // => false (null)
+```
+
+<div className="h-8" />
+
+## Console Utils
+
+These utilities help with logging messages only once, which is useful for one-off messages, warnings, or errors.
+
+### `consoleOnce()`
+
+Base function that logs to the console only once, skip on subsequent logs.
+
+```typescript
+consoleOnce('This will only show once', console.log, 'Additional data')
+consoleOnce('This will only show once', console.log, 'Additional data') // Won't show
+```
+
+### `logOnce()`
+
+Logs a message to the console only once.
+
+```typescript
+logOnce('This will only show once')
+logOnce('This will only show once') // Won't show
+```
+
+### `warnOnce()`
+
+Shows a warning message only once.
+
+```typescript
+warnOnce('This warning will only show once')
+warnOnce('This warning will only show once') // Won't show
+```
+
+### `errorOnce()`
+
+Shows an error message only once.
+
+```typescript
+errorOnce('This error will only show once')
+errorOnce('This error will only show once') // Won't show
+```
+
+All console utilities support additional arguments that will be passed to the console method:
+
+```typescript
+logOnce('User logged in:', { userId: 123, timestamp: new Date() })
+warnOnce('Deprecated feature used:', { feature: 'oldMethod', version: '1.0.0' })
+errorOnce('API Error:', { status: 500, message: 'Internal Server Error' })
+```

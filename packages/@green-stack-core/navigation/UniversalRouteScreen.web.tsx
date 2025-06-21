@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import { useState, useEffect, useContext } from 'react'
 import { useQuery, HydrationBoundary } from '@tanstack/react-query'
 import { UniversalRouteProps, QueryFn, DEFAULT_QUERY_BRIDGE } from './UniversalRouteScreen.helpers'
@@ -32,11 +32,17 @@ export const UniversalRouteScreen = <
     RES extends Record<string, unknown> = Record<string, unknown>,
 >(props: UniversalRouteProps<ARGS, RES>) => {
     // Props
-    const { queryBridge = DEFAULT_QUERY_BRIDGE, routeScreen: RouteScreen, ...screenProps } = props
+    const {
+        queryBridge = DEFAULT_QUERY_BRIDGE,
+        routeScreen: RouteScreen,
+        params: nextParams,
+        searchParams: nextSearchParams,
+        ...screenProps
+    } = props
     const { routeParamsToQueryKey, routeParamsToQueryInput, routeDataFetcher } = queryBridge
     const fetcherDataToProps = queryBridge.fetcherDataToProps || ((data: Awaited<ReturnType<QueryFn<ARGS, RES>>>) => data)
-    const routeParams = extractParams(props.params)
-    const searchParams = extractParams(props.searchParams)
+    const routeParams = extractParams(nextParams)
+    const searchParams = extractParams(nextSearchParams)
 
     // Hooks
     const nextRouterParams = useRouteParams(props)

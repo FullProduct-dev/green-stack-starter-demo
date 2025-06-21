@@ -1,0 +1,75 @@
+import { FileTree } from 'nextra/components'
+import { Image } from '@app/primitives'
+import { TitleWrapper } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `add-resolver` - Generator
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `add-resolver`
+
+```md copy
+npm run add:resolver -- --args <workspacePath> <resolverName> <resolverDescription> <resolverType> ...
+```
+
+```md copy
+npx turbo gen resolver --args <workspacePath> <resolverName> <resolverDescription> <resolverType> ...
+```
+
+<FileTree>
+  <FileTree.Folder name="packages" defaultOpen>
+    <FileTree.Folder name="@green-stack-core" defaultOpen>
+      <FileTree.Folder name="generators" defaultOpen>
+        <FileTree.File name="add-resolver.ts" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+### Prompt Arguments
+
+| Argument            | Type         | Question / Description                                                                                                       |
+|---------------------|--------------|------------------------------------------------------------------------------------------------------------------------------|
+| workspacePath       | autocomplete | Where would you like to add this resolver? <br/>=> e.g. `features/@app-core`                                                 |
+| resolverName        | input        | What is the resolver name? <br/>=> `string`                                                                                  |
+| resolverDescription | input        | Optional description: What will this data resolver do? <br/>=> `string`                                                      |
+| resolverType        | list         | Will this resolver query or mutate data? <br/>=> `query` / `mutation`                                                        |
+| generatables        | checkbox     | What would you like to generate linked to this resolver? <br/>=> `GRAPHQL` / `GET` / `POST` / `PUT` / `DELETE` / `formHook`  |
+| inputSchemaTarget   | autocomplete | Which schema should we use for the resolver inputs? <br/>=> e.g. `HealthCheckInput`                                          |
+| inputSchemaName     | input        | What will you call this new input schema? <br/>=> `string`                                                                   |
+| outputSchemaTarget  | autocomplete | Which schema should we use for the resolver output? <br/>=> e.g. `HealthCheckOutput`                                                         |
+| outputSchemaName    | input        | What will you call this new output schema? <br/>=> `string`                                                  |
+| apiPath             | input        | What API path would you like to use for REST? <br/>=> e.g. `/api/some/endpoint/with/[params]/`                               |
+| formHookName        | input        | What should the form hook be called? <br/>=> e.g. `useSomeResolver`                                                          |
+
+<div className="h-8" />
+
+### Resulting File Changes
+
+```bash
+/apps/next/
+ └── app/(generated)/{routePath}/route.ts ❇️ # <- e.g. '/api/some/endpoint/with/[params]/' (Next.js route handler)
+
+/{workspacePath}/ # <- e.g. 'features/@app-core/' or 'packages/some-package/'
+ └── resolvers/
+     └── {resolverName}.bridge.ts ❇️ # <- Bridge Metadata file for the resolver and API
+     └── {resolverName}.resolver.ts ❇️ # <- Reusable Fn with Business logic (server only)
+     └── {resolverName}.{resolverType}.ts ❇️ # <- e.g. `query` / `mutation` fetcher
+ └── routes/
+     └── {apiPath}/ ❇️ # <- e.g. '/api/some/endpoint/with/[params]/'
+         └── route.ts ❇️ # <- If `GET` / `POST` / `PUT` / `DELETE` / `GRAPHQL` was selected
+ └── hooks/
+     └── {formHookFileName}.ts ❇️ # <- If `formHook` selected, e.g. `useResolverFormState.ts`
+```
+
+<div className="h-8" />

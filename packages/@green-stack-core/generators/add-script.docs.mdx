@@ -1,0 +1,61 @@
+import { FileTree } from 'nextra/components'
+import { Image } from '@app/primitives'
+import { TitleWrapper } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `add-script` - Generator
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `add-script`
+
+```md copy
+npm run add:script -- --args <workspacePath> <scriptName> <scriptFileName>
+```
+
+```md copy
+npx turbo gen script --args <workspacePath> <scriptName> <scriptFileName>
+```
+
+<FileTree>
+  <FileTree.Folder name="packages" defaultOpen>
+    <FileTree.Folder name="@green-stack-core" defaultOpen>
+      <FileTree.Folder name="generators" defaultOpen>
+        <FileTree.File name="add-script.ts" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+### Prompt Arguments
+
+| Argument        | Type         | Question / Description                                                        |
+|-----------------|--------------|-------------------------------------------------------------------------------|
+| workspacePath   | autocomplete | Where would you like to add this script? <br/>=> e.g. `features/@app-core`    |
+| scriptName      | input        | What is the script name? <br/>=> `string`                                     |
+| scriptFileName  | input        | What should we name the script file? <br/>=> `string`                         |
+
+<div className="h-8" />
+
+### Resulting File Changes
+
+```bash
+/{workspacePath}/ # <- e.g. 'features/@app-core/' or 'packages/some-package/'
+  └── scripts/
+      └── {scriptFileName}.ts ❇️
+  └── package.json ➕ # <- adds the script to the package.json scripts section
+
+package.json ➕ # <- adds a root package.json script as well
+turbo.json ➕ # <- adds a turbo.json monorepo script config entry
+```
+
+<div className="h-8" />

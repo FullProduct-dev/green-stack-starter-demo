@@ -16,6 +16,8 @@
         "../../packages/@green-stack-core/global.d.ts",
         "../../features/@app-core/nativewind-env.d.ts",
         "../../features/@app-core/appConfig.ts",
+        "../../apps/docs/**/*.ts",
+        "../../apps/docs/**/*.tsx",
         "../../features/**/*.ts",
         "../../features/**/*.tsx",
         "../../packages/**/*.ts",

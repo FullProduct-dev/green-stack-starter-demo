@@ -115,9 +115,9 @@ test('parseWorkspaces() returns all workspace info and mappings', () => {
         workspaceImports,
         workspacePathsMap,
         workspacePaths,
-        workspacePackages
+        workspacePackages,
     } = utils.parseWorkspaces('./')
-    // Verify we can retrieve the package.json config for the @green-stack/core workspace
+    // Verify we can retrieve the package.json config for the 'packages/@green-stack-core' workspace
     expect(workspaceConfigs['packages/@green-stack-core']).toBeDefined()
     expect(workspaceConfigs['packages/@green-stack-core'].name).toBe('@green-stack/core')
     // Check that the 'packages/@green-stack-core' workspace is mapped to the '@green-stack/core' package
@@ -130,21 +130,40 @@ test('parseWorkspaces() returns all workspace info and mappings', () => {
     expect(workspacePackages).toContain('@green-stack/core')
 })
 
+test('parseWorkspaces() return constants for PATH_CONFIGS, PKG_CONFIGS, PATH_PKGS, and PKG_PATHS', () => {
+    const {
+        PATH_CONFIGS,
+        PKG_CONFIGS,
+        PATH_PKGS,
+        PKG_PATHS,
+    } = utils.parseWorkspaces('./')
+    // Verify we can retrieve the package.json config for the 'packages/@green-stack-core' workspace
+    expect(PATH_CONFIGS['packages/@green-stack-core']).toBeDefined()
+    expect(PATH_CONFIGS['packages/@green-stack-core'].name).toBe('@green-stack/core')
+    // Verify we can retrieve the package.json config for the '@green-stack/core' workspace
+    expect(PKG_CONFIGS['@green-stack/core']).toBeDefined()
+    expect(PKG_CONFIGS['@green-stack/core'].name).toBe('@green-stack/core')
+    // Check that the 'packages/@green-stack-core' path is mapped to '@green-stack/core' package name
+    expect(PATH_PKGS['packages/@green-stack-core']).toBe('@green-stack/core')
+    // Check that the '@green-stack/core' package name is mapped to 'packages/@green-stack-core' path
+    expect(PKG_PATHS['@green-stack/core']).toBe('packages/@green-stack-core')
+})
+
 test('getWorkspaceOptions() lists all available workspace path options for generators to use', () => {
     const workspaceOptions = utils.getWorkspaceOptions('./')
     // Check that the @green-stack/core package is omitted
-    expect(workspaceOptions["packages/@green-stack-core  --  importable from: '@green-stack/core'"]).toBeUndefined()
+    expect(workspaceOptions[utils.opt(`@green-stack/core  --  from ${utils.a.bold('packages/@green-stack-core')}`)]).toBeUndefined()
     // Check that the @app/core workspace is included
-    expect(workspaceOptions["features/@app-core  --  importable from: '@app/core'"]).toBe("features/@app-core")
+    expect(workspaceOptions[utils.opt(`@app/core  --  from ${utils.a.bold('features/@app-core')}`)]).toBe("features/@app-core")
 })
 
 test('getAvailableSchemas() lists all available schemas in the codebase for generators to use', () => {
     const schemaConfigMap = utils.getAvailableSchemas('./')
     // Check that the healthCheck input & output schemas are included
-    expect(schemaConfigMap['@app/core - HealthCheckInput']).toBeDefined()
-    expect(schemaConfigMap['@app/core - HealthCheckOutput']).toBeDefined()
+    expect(schemaConfigMap['HealthCheckInput']).toBeDefined()
+    expect(schemaConfigMap['HealthCheckOutput']).toBeDefined()
     // Check that the config for the healthCheck input schema is correct
-    const HealthCheckArgsInfo = schemaConfigMap['@app/core - HealthCheckInput']
+    const HealthCheckArgsInfo = schemaConfigMap['HealthCheckInput']
     expect(HealthCheckArgsInfo.schemaName).toBe('HealthCheckInput')
     expect(HealthCheckArgsInfo.schemaPath).toBe('features/@app-core/schemas/HealthCheckInput.ts')
     expect(HealthCheckArgsInfo.workspacePath).toBe('features/@app-core')
@@ -152,7 +171,7 @@ test('getAvailableSchemas() lists all available schemas in the codebase for gene
     expect(HealthCheckArgsInfo.isNamedExport).toBe(true)
     expect(HealthCheckArgsInfo.isDefaultExport).toBe(false)
     // Check that the config for the healthCheck output schema is correct
-    const HealthCheckResponseInfo = schemaConfigMap['@app/core - HealthCheckOutput']
+    const HealthCheckResponseInfo = schemaConfigMap['HealthCheckOutput']
     expect(HealthCheckResponseInfo.schemaName).toBe('HealthCheckOutput')
     expect(HealthCheckResponseInfo.schemaPath).toBe('features/@app-core/schemas/HealthCheckOutput.ts')
     expect(HealthCheckResponseInfo.workspacePath).toBe('features/@app-core')
@@ -164,9 +183,9 @@ test('getAvailableSchemas() lists all available schemas in the codebase for gene
 test('getAvailableDataBridges() lists all available DataBridges in the codebase for generators to use', () => {
     const dataBridgeConfigMap = utils.getAvailableDataBridges('./')
     // Check that the healthCheck DataBridge is included
-    expect(dataBridgeConfigMap['@app/core >>> healthCheck()']).toBeDefined()
+    expect(dataBridgeConfigMap['healthCheckBridge']).toBeDefined()
     // Check that the config for the healthCheck DataBridge is correct
-    const healthCheckBridgeInfo = dataBridgeConfigMap['@app/core >>> healthCheck()']
+    const healthCheckBridgeInfo = dataBridgeConfigMap['healthCheckBridge']
     expect(healthCheckBridgeInfo.bridgePath).toBe('features/@app-core/resolvers/healthCheck.bridge.ts')
     expect(healthCheckBridgeInfo.bridgeName).toBe('healthCheckBridge')
     expect(healthCheckBridgeInfo.workspacePath).toBe('features/@app-core')

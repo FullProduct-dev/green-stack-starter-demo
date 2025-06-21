@@ -1,0 +1,154 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Style Utils
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# Style Utils
+
+```typescript copy
+import * as styleUtils from '@green-stack/utils/styleUtils'
+```
+
+Collection of utility functions for handling CSS classes, theme colors, and CSS variable manipulation:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="utils" defaultOpen>
+                <FileTree.File name="styleUtils.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+## Class Name Utils
+
+### `cn()`
+
+Combines an array of classNames but filters out falsy array elements. Uses `clsx` and `tailwind-merge` under the hood.
+
+```typescript
+// Basic usage
+cn('text-red-500', 'bg-blue-500')
+// => 'text-red-500 bg-blue-500'
+
+// With conditional classes
+cn(
+    'base-class',
+    isActive && 'active-class',
+    isError ? 'error-class' : 'success-class'
+)
+// => 'base-class active-class error-class' (when isActive is true and isError is true)
+
+// Merging Tailwind classes
+cn('px-2 py-1 bg-red-500', 'px-4 bg-blue-500')
+// => 'py-1 px-4 bg-blue-500' (later classes override earlier ones)
+```
+
+<div className="h-8" />
+
+## CSS Variable Utils
+
+### `extractCssVar()`
+
+Extracts the CSS variable name from any string if present.
+
+```typescript
+extractCssVar('var(--primary-color)') // => '--primary-color'
+extractCssVar('color: var(--text-color)') // => '--text-color'
+extractCssVar('regular-text') // => '' (no CSS variable found)
+```
+
+<div className="h-8" />
+
+## Theme Color Utils
+
+### `getThemeColor()`
+
+Retrieves the nativewind theme color for the global.css variable provided.
+
+```typescript
+// Get color for current theme
+getThemeColor('primary-color')
+// => '#007AFF' (or whatever the color is in your theme)
+
+// Get color for specific theme
+getThemeColor('primary-color', 'dark')
+// => '#0A84FF' (dark theme color)
+```
+
+### `useThemeColor()`
+
+React hook that retrieves the nativewind theme color for the global.css variable provided.
+
+```typescript
+function MyComponent() {
+    const primaryColor = useThemeColor('primary-color')
+    // => '#007AFF' in light mode, '#0A84FF' in dark mode
+    
+    return (
+        <div style={{ color: primaryColor }}>
+            Themed Text
+        </div>
+    )
+}
+```
+
+<div className="h-8" />
+
+## CSS Parsing Utils
+
+### `parseGlobalCSS()`
+
+Parses the contents of the global.css file to extract light & dark mode colors if present. Only detects colors defined within `:root` and `.dark:root`.
+
+```typescript
+const globalCSS = `
+:root {
+    --primary-color: #007AFF;
+    --secondary-color: #5856D6;
+    --text-color: #000000;
+}
+
+.dark:root {
+    --primary-color: #0A84FF;
+    --secondary-color: #5E5CE6;
+    --text-color: #FFFFFF;
+}
+`
+
+const themeColors = parseGlobalCSS(globalCSS)
+// => {
+//      light: {
+//          '--primary-color': '#007AFF',
+//          '--secondary-color': '#5856D6',
+//          '--text-color': '#000000'
+//      },
+//      dark: {
+//          '--primary-color': '#0A84FF',
+//          '--secondary-color': '#5E5CE6',
+//          '--text-color': '#FFFFFF'
+//      }
+//    }
+```
+
+The parser supports various color formats:
+- Hex colors (`#RRGGBB` or `#RGB`)
+- RGB/RGBA colors (`rgb(r, g, b)` or `rgba(r, g, b, a)`)
+- HSL colors (`hsl(h, s%, l%)`)
+- CSS variables (`var(--variable-name)`)
+
+Note: The parser will only detect colors if they are defined within `:root` and `.dark:root` selectors in your global CSS file. 

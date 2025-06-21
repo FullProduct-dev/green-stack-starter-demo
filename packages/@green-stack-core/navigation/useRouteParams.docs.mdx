@@ -1,0 +1,88 @@
+import { Image } from '@app/primitives'
+import { FileTree, Callout } from 'nextra/components'
+import { TitleWrapper } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Usage - `useRouteParams()`
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# useRouteParams()
+
+Tiny absctraction layer that retrieves the parameters of a route in both the Expo Router and Next.js app routers. Serverside, in the browser and on iOS or Android:
+
+```tsx copy
+import { useRouteParams } from '@green-stack/navigation'
+```
+
+```tsx copy
+const routeParams = useRouteParams(routeProps)
+```
+
+Typescript should complain if you don't, but make sure to include the route's screen props when using this hook, as it relies on them to access the route parameters in Next.js
+
+## React Portability Patterns
+
+Each environment has it's own ways of accessing route parameters. This is why there are also versions specifically for each of those environments:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="navigation" defaultOpen>
+                <FileTree.File name="useRouteParams.expo.ts" />
+                <FileTree.File name="useRouteParams.next.ts" />
+                <FileTree.File name="useRouteParams.ts" />
+                <FileTree.File name="useRouteParams.types.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+Where `useRouteParams.next.tsx` covers the Next.js app router, and `useRouteParams.expo.tsx` covers Expo Router. The main `useRouteParams.tsx` retrieves whichever implementation was provided to the `<UniversalAppProviders>` component and, which is further passed to `<CoreContext.Provider/>`:
+
+```tsx /.expo/ /useExpoRouteParams/ filename="ExpoRootLayout.tsx" copy
+import { useRouteParams as useExpoRouteParams } from '@green-stack/navigation/useRouteParams.expo'
+
+// ... Later ...
+
+<UniversalAppProviders
+    useContextRouteParams={useExpoRouteParams}
+>
+    ...
+</UniversalAppProviders>
+```
+
+```tsx /.next/ /useNextRouteParams/ filename="NextRootLayout.tsx" copy
+import { useRouteParams as useNextRouteParams } from '@green-stack/navigation/useRouteParams.next'
+
+// ... Later ...
+
+<UniversalAppProviders
+    useContextRouteParams={useNextRouteParams}
+>
+    ...
+</UniversalAppProviders>
+```
+
+While the `useRouteParams.types.ts` file ensures both implementations are compatible with the same interface, allowing you to use the same `useRouteParams()` hook across both Expo and Next.js environments.
+
+### Why this pattern?
+
+The 'React Portability Patterns' used here are designed to ensure that you can easily reuse optimized versions of hooks across different flavours of writing React.
+
+On the one hand, that means it's already set up to work with both Expo and Next.js in an optimal way.
+
+But, you can actually add your own implementations for other environments, without having to refactor the code that uses the `useRouteParams` hook.
+
+### Supporting more environments
+
+Just add your own `useRouteParams.<environment>.ts` file that respects the shared types, and then pass it to the `<UniversalAppProviders>` component as `useContextRouteParams`.
+
+<div className="h-8" />

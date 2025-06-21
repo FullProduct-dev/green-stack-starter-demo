@@ -140,7 +140,7 @@ export const EfficiencyResults = (props: EfficiencyResultsProps) => {
 
             <View className="flex-row">
                 <Button
-                    text={showBenefits ? 'Hide Breakdown' : 'Benefits & Breakdown'}
+                    text={showBenefits ? 'Breakdown' : 'Benefits & Breakdown'}
                     iconLeft={!showBenefits ? 'AddFilled' : undefined}
                     iconRight={showBenefits ? 'ChevronUpFilled' : undefined}
                     type={(showBenefits || !formState.values.identifiesWith) ? 'secondary' : 'success'}
@@ -279,19 +279,19 @@ export const EfficiencyResults = (props: EfficiencyResultsProps) => {
                     <View className="h-6" />
 
                     <Li>
-                        <Link href="https://universal-base-starter-docs.vercel.app/universal-routing" target="_blank">
+                        <Link href="https://fullproduct.dev/docs/universal-routing" target="_blank">
                             {`Universal Routing`}
                         </Link>
                         {` (file based, auto deeplinks)`}
                     </Li>
                     <Li>
-                        <Link href="https://universal-base-starter-docs.vercel.app/data-fetching" target="_blank">
+                        <Link href="https://fullproduct.dev/docs/data-fetching" target="_blank">
                             {`Cross-platform Data-Fetching`}
                         </Link>
                         {` (react-query)`}
                     </Li>
                     <Li>
-                        <Link href="https://universal-base-starter-docs.vercel.app/write-once-styles" target="_blank">
+                        <Link href="https://fullproduct.dev/docs/write-once-styles" target="_blank">
                             {`Style universal UI`}
                         </Link>
                         {` with Nativewind (tailwind)`}
@@ -300,13 +300,13 @@ export const EfficiencyResults = (props: EfficiencyResultsProps) => {
                     <View className="h-4" />
 
                     <Li>
-                        <Link href="https://universal-base-starter-docs.vercel.app/single-sources-of-truth" target="_blank">
+                        <Link href="https://fullproduct.dev/docs/single-sources-of-truth" target="_blank">
                             {`Schemas as Single Sources of Truth`}
                         </Link>
                         {` (zod)`}
                     </Li>
                     <Li>
-                        <Link href="https://universal-base-starter-docs.vercel.app/data-resolvers" target="_blank">
+                        <Link href="https://fullproduct.dev/docs/data-resolvers" target="_blank">
                             {`Effortless GraphQL API's`}
                         </Link>
                         {` (optional)`}
@@ -317,7 +317,7 @@ export const EfficiencyResults = (props: EfficiencyResultsProps) => {
                             <View className="h-4" />
 
                             <Li>
-                                <Link href="https://universal-base-starter-docs.vercel.app/project-structure" target="_blank">
+                                <Link href="https://fullproduct.dev/docs/project-structure" target="_blank">
                                     {`Portable architecture`}
                                 </Link>
                                 {` (copy-paste features)`}
@@ -351,7 +351,7 @@ export const EfficiencyResults = (props: EfficiencyResultsProps) => {
 
                     <P className="text-muted">
                         {`Check out some `}
-                        <Link href="https://universal-base-starter-docs.vercel.app/@app-core/components/Button" target="_blank">
+                        <Link href="https://fullproduct.dev/docs/@app-core/components/Button" target="_blank">
                             {`example component docs`}
                         </Link>
                         {` to know what that looks like. Try changing the preview, refreshing or sharing a url.`}
@@ -362,11 +362,11 @@ export const EfficiencyResults = (props: EfficiencyResultsProps) => {
                     {isDev && (
                         <P className="text-muted">
                             {`It's a good example of what's possible when you use `}
-                            <Link href="https://universal-base-starter-docs.vercel.app/single-sources-of-truth#building-schemas-with-zod" target="_blank">
+                            <Link href="https://fullproduct.dev/docs/single-sources-of-truth#building-schemas-with-zod" target="_blank">
                                 {`Zod schemas`}
                             </Link>
                             {` as the `}
-                            <Link href="https://universal-base-starter-docs.vercel.app/single-sources-of-truth" target="_blank">
+                            <Link href="https://fullproduct.dev/docs/single-sources-of-truth" target="_blank">
                                 {`Single Source of Truth`}
                             </Link>
                             {`.`}

@@ -1,0 +1,56 @@
+import { FileTree } from 'nextra/components'
+import { Image } from '@app/primitives'
+import { TitleWrapper } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `add-dependencies` - Script
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `add-dependencies`
+
+```md copy
+npm run add:dependencies -- --args <workspacePkg> <dependencies>
+```
+
+```md copy
+npx turbo gen dependencies --args <workspacePkg> <dependencies>
+```
+
+Less of a generator and more of a utility script, this generator **installs Expo SDK compatible versions** of the specified dependencies in the selected workspace's `package.json`.
+
+<FileTree>
+  <FileTree.Folder name="packages" defaultOpen>
+    <FileTree.Folder name="@green-stack-core" defaultOpen>
+      <FileTree.Folder name="generators" defaultOpen>
+        <FileTree.File name="add-dependencies.ts" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+### Prompt Arguments
+
+| Argument      | Type         | Question / Description                                                                                    |
+|---------------|--------------|-----------------------------------------------------------------------------------------------------------|
+| workspacePath | autocomplete | Where would you like to install these dependencies? <br/>=> e.g. `@app/core` or `some-package`            |
+| dependencies  | input        | Which dependencies should we install Expo SDK compatible versions for? <br/>=> `string` (comma separated) |
+
+<div className="h-8" />
+
+### Resulting File Changes
+
+```bash
+# Installs dependencies in the selected workspace's package.json ❇️
+```
+
+<div className="h-8" />

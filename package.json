@@ -38,10 +38,17 @@
     "collect:resolvers": "npx turbo run @green-stack/core#collect:resolvers",
     "collect:drivers": "npx turbo run @green-stack/core#collect:drivers",
     "collect:models": "npx turbo run @db/driver#collect:models",
+    "collect:schemas": "npx turbo run @green-stack/core#collect:schemas",
     "link:routes": "npx turbo run @green-stack/core#link:routes",
     "add:dependencies": "npx turbo gen add-dependencies",
     "add:workspace": "npx turbo gen add-workspace",
-    "add:schema": "npx turbo gen add-schema",
+    "add:schema": "npx turbo gen schema",
+    "add:generator": "npx turbo gen generator",
+    "add:script": "npx turbo gen script",
+    "add:mdx-blogpost": "npx turbo gen mdx-blogpost",
+    "add:resolver": "npx turbo gen resolver",
+    "add:form": "npx turbo gen form",
+    "add:route": "npx turbo gen route",
     "env:local": "npx turbo run env:local",
     "gen": "npx turbo gen",
     "turbo:login": "npx turbo login",
@@ -52,6 +59,7 @@
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.9.1",
     "@turbo/gen": "^1.13.2",
+    "import-sync": "^2.2.3",
     "inquirer-autocomplete-prompt": "^3.0.1",
     "turbo": "^1.13.2"
   }

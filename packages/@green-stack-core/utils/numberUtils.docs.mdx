@@ -1,0 +1,138 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Number Utils
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# Number Utils
+
+```typescript copy
+import * as numberUtils from '@green-stack/utils/numberUtils'
+```
+
+Collection of utility functions for number manipulation and validation:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="utils" defaultOpen>
+                <FileTree.File name="numberUtils.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+## Random Number Utils
+
+### `randomInt()`
+
+Generates a random integer between a max & min range.
+
+```typescript
+// Generate a random number between 0 and 10
+const result = randomInt(10) // => 7
+
+// Generate a random number between 5 and 10
+const result2 = randomInt(10, 5) // => 8
+```
+
+<div className="h-8" />
+
+## Rounding Utils
+
+### `roundTo()`
+
+Uses scientific string notation to round numbers to specific decimals. Can pass a specific math rounding function as third arg.
+
+```typescript
+// Round to 2 decimal places using default rounding
+roundTo(3.14159, 2) // => 3.14
+
+// Round to 2 decimal places using ceiling
+roundTo(3.14159, 2, Math.ceil) // => 3.15
+
+// Round to 2 decimal places using floor
+roundTo(3.14159, 2, Math.floor) // => 3.14
+```
+
+### `roundUpTo()`
+
+Convenience function to round up to specific decimals.
+
+```typescript
+roundUpTo(3.14159, 2) // => 3.15
+```
+
+### `roundDownTo()`
+
+Convenience function to round down to specific decimals.
+
+```typescript
+roundDownTo(3.14159, 2) // => 3.14
+```
+
+<div className="h-8" />
+
+## Number Validation Utils
+
+### `hasLeadingZeroes()`
+
+Detects leading zeroes in "numbers".
+
+```typescript
+hasLeadingZeroes('0568') // => true
+hasLeadingZeroes('568') // => false
+hasLeadingZeroes('0') // => false
+```
+
+### `isValidNumber()`
+
+Checks if a string is a valid number, excluding leading zeroes.
+
+```typescript
+// Valid numbers
+isValidNumber('0') // => true
+isValidNumber('1') // => true
+isValidNumber('250') // => true
+isValidNumber('0.123') // => true
+isValidNumber(42) // => true
+
+// Invalid numbers
+isValidNumber('0568') // => false (leading zero)
+isValidNumber('abc') // => false (not a number)
+isValidNumber('') // => false (empty string)
+isValidNumber(null) // => false (null)
+isValidNumber(undefined) // => false (undefined)
+isValidNumber(NaN) // => false (NaN)
+```
+
+### `parseIfValidNumber()`
+
+Checks if a variable can be parsed as a valid number, and then parses that number.
+
+```typescript
+// Valid numbers
+parseIfValidNumber('42') // => 42
+parseIfValidNumber('0.123') // => 0.123
+parseIfValidNumber(42) // => 42
+
+// Invalid numbers
+parseIfValidNumber('0568') // => undefined
+parseIfValidNumber('abc') // => undefined
+parseIfValidNumber('') // => undefined
+parseIfValidNumber(null) // => undefined
+parseIfValidNumber(undefined) // => undefined
+parseIfValidNumber(NaN) // => undefined
+``` 

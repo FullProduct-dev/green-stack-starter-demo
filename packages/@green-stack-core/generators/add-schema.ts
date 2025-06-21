@@ -1,27 +1,99 @@
 /* eslint-disable import/no-anonymous-default-export */
 import { PlopTypes } from '@turbo/gen'
-import { validateNonEmptyNoSpaces, getWorkspaceOptions, createDivider } from '../scripts/helpers/scriptUtils'
+import { validateNonEmptyNoSpaces, getWorkspaceOptions, createDivider, a, createAutocompleteSource, parseWorkspaces } from '../scripts/helpers/scriptUtils'
+import { createPrompts } from '../scripts/helpers/scriptUtils'
 
 /* --- Disclaimer ------------------------------------------------------------------------------ */
 
-// Learn more about Turborepo Generators at:
-// https://turbo.build/repo/docs/core-concepts/monorepos/code-generation
+// -i- Learn more about Turborepo Generators at:
+// -i- https://turbo.build/repo/docs/core-concepts/monorepos/code-generation
+
+/* --- Usage ----------------------------------------------------------------------------------- */
+
+// -i- npm run add:schema -- --args <workspacePath> <schemaName> <schemaDescription>
+// -i- npx turbo gen schema --args <workspacePath> <schemaName> <schemaDescription>
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
+const { PATH_PKGS } = parseWorkspaces('./')
 const workspaceOptions = getWorkspaceOptions('./')
 
-/* --- Helpers --------------------------------------------------------------------------------- */
+/* --- Prompts --------------------------------------------------------------------------------- */
 
-export const createSchemaContent = (ctx: {
-    schemaName: string,
-    schemaFields: string[],
-    schemaDescription: string,
-    descriptions: string[],
-    jsDocTitle: string,
-    jsDocDescription?: string,
-    describeStatement?: string,
-}) => [
+export const gen = createPrompts({
+
+    workspacePath: {
+        type: 'autocomplete',
+        message: 'Where would you like to add this schema?', // @ts-ignore
+        choices: workspaceOptions,
+    },
+    schemaName: {
+        type: 'input',
+        message: 'What is the schema name?',
+    },
+    schemaDescription:{
+        type: 'input',
+        message: 'Optional description: What data structure does this schema describe?',
+    },
+
+}, {
+
+    compute: {
+        schemaName: {
+            validate: validateNonEmptyNoSpaces,
+        },
+    },
+
+    parser: (answers) => {
+
+        // Args
+        const { workspacePath, schemaName, schemaDescription } = answers!
+
+        // -- Vars --
+
+        const workspacePkg = PATH_PKGS[workspacePath]
+        const descriptions = [] as string[]
+        const schemaFields = [] as string[]
+
+        let jsDocDescription = ''
+        let jsDocTitle = ''
+        let describeStatement = ''
+
+        // -- Optionals --
+
+        if (schemaDescription) {
+            descriptions.push(`${schemaName}: \`${schemaDescription}\`,`)
+            jsDocDescription = `/** -i- ${schemaDescription} */`
+            jsDocTitle = createDivider(schemaName, true)
+            describeStatement = `.describe(d)`
+        } else {
+            jsDocTitle = createDivider(schemaName, false)
+        }
+
+        // -- Return --
+
+        return {
+            ...answers,
+            workspacePkg,
+            descriptions,
+            schemaFields,
+            jsDocDescription,
+            jsDocTitle,
+            describeStatement,
+        }
+
+    }
+
+})
+
+/* --- Types ----------------------------------------------------------------------------------- */
+
+type Answers = typeof gen._values
+type Context = typeof gen._parsed
+
+/** --- createSchemaContent() ------------------------------------------------------------------ */
+/** -i- Builds the file contents for a new schema based on passed metadata */
+export const createSchemaContent = (ctx: Context) => [
 
     `import { z, schema } from '@green-stack/schemas'\n`,
 
@@ -41,93 +113,30 @@ export const createSchemaContent = (ctx: {
 ].join('\n')
 
 /** --- Schema Generator ----------------------------------------------------------------------- */
-/** -i- Simple generator to add a new zod schema as a single source of truth */
+/** -i- Add a new zod schema as a single source of truth */
 export const registerSchemaGenerator = (plop: PlopTypes.NodePlopAPI) => {
-    plop.setGenerator('add-schema', {
-        description: 'Simple generator to add a new zod schema as a single source of truth',
-        prompts: [
-            {
-                type: 'list',
-                name: 'workspaceTarget',
-                message: 'Where would you like to add this schema?',
-                choices: Object.keys(workspaceOptions),
-            },
-            {
-                type: 'input',
-                name: 'schemaName',
-                message: 'What is the schema name?',
-                validate: validateNonEmptyNoSpaces,
-            },
-            {
-                type: 'input',
-                name: 'schemaDescription',
-                message: 'Optional description: What data structure does this schema describe?',
-            },
-            // {
-            //     type: 'checkbox',
-            //     name: 'commonFields',
-            //     message: 'Optional examples: Would you like to add any common field definitions?', // prettier-ignore
-            //     choices: ['id', 'slug'],
-            // },
-        ],
-        actions: (data) => {
-            // Args
-            const { workspaceTarget, schemaName, schemaDescription, commonFields = [] } = data!
-
-            // -- Vars --
-
-            const workspacePath = workspaceOptions[workspaceTarget]
-            const descriptions = [] as string[]
-            const schemaFields = [] as string[]
-
-            let jsDocDescription = ''
-            let jsDocTitle = ''
-            let describeStatement = ''
-
-            // -- Optionals --
-
-            if (schemaDescription) {
-                descriptions.push(`${schemaName}: \`${schemaDescription}\`,`)
-                jsDocDescription = `/** -i- ${schemaDescription} */`
-                jsDocTitle = createDivider(schemaName, true)
-                describeStatement = `.describe(d)`
-            } else {
-                jsDocTitle = createDivider(schemaName, false)
-            }
-        
-            // if (commonFields.includes('id')) {
-            //     descriptions.push(`id: \`the unique identifier for this ${schemaName}\`,`)
-            //     schemaFields.push(`id: z.string().uuid().describe(d.id),`)
-            // }
-        
-            // if (commonFields.includes('slug')) {
-            //     descriptions.push(`slug: \`the unique slug for this ${schemaName}\`,`)
-            //     schemaFields.push(`slug: z.string().describe(d.slug),`)
-            // }
+    plop.setGenerator('schema', {
+        description: 'Add a new zod schema as a single source of truth',
+        prompts: gen.prompts,
+        actions: (answers: GenAnswers) => {
+            
+            const ctx = gen.parseAnswers(answers)
 
             // -- Build schema --
 
-            const schemaContent = createSchemaContent({
-                schemaName,
-                schemaFields,
-                schemaDescription,
-                descriptions,
-                jsDocTitle,
-                jsDocDescription,
-                describeStatement,
-            })
+            const schemaContent = createSchemaContent(ctx)
 
             // -- Actions --
 
             const actions = [
                 {
                     type: 'add',
-                    path: `${workspacePath}/schemas/${schemaName}.schema.ts`,
+                    path: `${ctx.workspacePath}/schemas/${ctx.schemaName}.schema.ts`,
                     template: schemaContent,
                 },
                 {
                     type: 'open-files-in-vscode',
-                    paths: [`${workspacePath}/schemas/${schemaName}.schema.ts`],
+                    paths: [`${ctx.workspacePath}/schemas/${ctx.schemaName}.schema.ts`],
                 },
             ] as PlopTypes.ActionType[]
 

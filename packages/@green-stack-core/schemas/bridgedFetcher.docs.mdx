@@ -1,0 +1,85 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `bridgedFetcher()`
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `bridgedFetcher()`
+
+```typescript copy
+import { bridgedFetcher } from '@green-stack/schemas/bridgedFetcher'
+```
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="schemas" defaultOpen>
+                <FileTree.File name="bridgedFetcher.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+A util to turn a [Data Bridge](/@green-stack-core/schemas/createDataBridge) into a universal fetcher function that can be used in your front-end code with, for example, `react-query`.
+
+<TitleWrapper>
+    ### Creating a bridged fetcher
+</TitleWrapper>
+
+```ts {3} /bridgedFetcher/3 filename="updatePost.query.ts"
+import { updatePostBridge } from './updatePost.bridge'
+// ☝️ Reuse your data bridge
+import { bridgedFetcher } from '@green-stack/schemas/bridgedFetcher'
+// ☝️ Universal graphql fetcher that can be used in any JS environment
+
+/* --- updatePostFetcher() --------- */
+
+export const updatePostFetcher = bridgedFetcher(updatePostBridge)
+```
+
+<div className="h-8" />
+
+### Fetching with `react-query`
+
+```typescript copy
+import { useQuery } from '@tanstack/react-query'
+```
+
+For simply fetching data with `react-query`, you can use the `useQuery` hook with the `bridgedFetcher`:
+
+```typescript copy
+useQuery({
+    queryKey: ['updatePost', postId],
+    queryFn: someBridgedFetcher,
+    // provide the fetcher (👆) as the queryFn 
+    ...options,
+})
+```
+
+Be sure to check the [`useQuery()`](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery) docs for all the available options you might want to prefill or abstract.
+
+You can also do [mutations](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation) with `useMutation()` for updating data in any way.
+
+<div className="h-8" />
+
+## Related Automations
+
+### [`add-resolver`](/@green-stack-core/generators/add-resolver) - generator
+
+You don't need to manually create a new fetcher with `bridgedFetcher()` every time you create a new resolver. You can use the [`add-resolver`](/@green-stack-core/generators/add-resolver) generator to create a new resolver and its fetching function in one go:
+
+```bash copy
+npx turbo gen resolver
+```
+
+<div className="h-8" />

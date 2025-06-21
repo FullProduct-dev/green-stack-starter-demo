@@ -27,6 +27,7 @@ export const Checkbox = forwardRef<
     ElementRef<typeof CheckboxRoot>,
     CheckboxProps
 >((rawProps, ref) => {
+    
     // Props
     const props = CheckboxProps.applyDefaults(rawProps)
     const { checked, disabled, label, hasError, onCheckedChange } = props

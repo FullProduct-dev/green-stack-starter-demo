@@ -13,7 +13,7 @@ import { isWeb } from '@app/config'
 
 export const ButtonProps = schema('ButtonProps', {
     type: z.enum(['primary', 'secondary', 'outline', 'link', 'warn', 'danger', 'info', 'success']).default('primary'),
-    text: z.string().optional().example('Press me'),
+    text: z.string().default('').example('Press me'),
     size: z.enum(['sm', 'md', 'lg']).default('md'),
     href: z.string().url().optional().example('https://fullproduct.dev'),
     iconLeft: UniversalIconProps.shape.name.optional(),
@@ -65,7 +65,7 @@ export const Button = <HREF extends KnownRoutes | never = never>(rawProps: Butto
 
     // Flags
     const isPressable = !!props.onPress && !didMount
-    const asLink = !!props.href && !isPressable
+    const asLink = !!props.href && !isPressable && !props.disabled
     const hasLabel = !!buttonText || !!children
     const hasLeftIcon = !!props.iconLeft
     const hasRightIcon = !!props.iconRight
@@ -229,7 +229,7 @@ export const Button = <HREF extends KnownRoutes | never = never>(rawProps: Butto
 
     return (
         <Pressable
-            className={buttonClassNames}
+            className={buttonClassNames} // @ts-ignore
             style={props.style}
             onPress={onButtonPress}
             onPressIn={props.onPressIn}

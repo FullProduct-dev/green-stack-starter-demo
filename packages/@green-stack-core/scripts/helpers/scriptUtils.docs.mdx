@@ -1,0 +1,445 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Script Utils
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# Script Utils
+
+```typescript copy
+import * as scriptUtils from '@green-stack/scripts/helpers/scriptUtils'
+```
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="scripts" defaultOpen>
+                <FileTree.Folder name="helpers" defaultOpen>
+                    <FileTree.File name="scriptUtils.ts" />
+                </FileTree.Folder>
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+A collection of utility functions for working with scripts, file paths, and workspace management in the Green Stack ecosystem.
+
+## File System Utilities
+
+### `excludeDirs()`
+
+Filter function to exclude folders and directories. Returns true if the path contains a file (has an extension).
+
+```typescript
+excludeDirs('path/to/file.ts') // => true
+excludeDirs('path/to/folder') // => false
+
+// Usage as a filter function:
+
+const paths = [
+    '/components/Button.tsx',
+    '/components/Input.tsx',
+    '/components/',
+    '/schemas'
+]
+
+const filteredPaths = paths.filter(excludeDirs)
+// => ['/components/Button.tsx', '/components/Input.tsx']
+```
+
+### `excludeModules()`
+
+Filter function to exclude node_modules folders. Returns true if the path does not include 'node_modules'.
+
+```typescript
+excludeModules('src/components/Button.tsx') // => true
+excludeModules('node_modules/react/index.js') // => false
+
+// Usage as a filter function:
+
+const paths = [
+    'src/components/Button.tsx',
+    'src/components/Input.tsx',
+    'node_modules/react/index.js',
+    'node_modules/@app-core/utils.js'
+]
+
+const filteredPaths = paths.filter(excludeModules)
+// => ['src/components/Button.tsx', 'src/components/Input.tsx']
+```
+
+### `globRel()`
+
+Gets the relative glob path of a glob-style selector using [`globSync`](https://github.com/isaacs/node-glob?tab=readme-ov-file#globsyncpattern-string--string-options-globoptions--string--path). The path must contain one of the workspace folder locations ('features', 'packages', or 'apps').
+
+```typescript
+globRel('packages/**/*.ts')
+// => ['packages/@green-stack-core/utils.ts', 'packages/@app-core/components.ts']
+
+globRel('features/**/components/*.tsx')
+// => ['features/@app-core/components/Button.tsx', 'features/@app-core/components/Input.tsx']
+```
+
+### `hasOptOutPatterns()`
+
+Checks if file content has opt-out patterns to determine if the file should be ignored.
+
+```typescript
+const content = `
+export const optOut = true
+// Rest of the file...
+`
+hasOptOutPatterns(content) // => true
+
+const content2 = `
+// @automation optOut = true
+// Rest of the file...
+`
+hasOptOutPatterns(content2) // => true
+```
+
+<div className="h-8" />
+
+## String Utilities
+
+### `normalizeName()`
+
+Makes sure only lowercase and uppercase letters are left in a given string by removing all other characters.
+
+```typescript
+normalizeName('user-profile') // => 'userprofile'
+normalizeName('User_Profile_123') // => 'UserProfile'
+```
+
+### `matchMethods()`
+
+Checks that a certain method (like 'GET', 'POST', etc.) is included in a list of method names.
+
+```typescript
+const methods = ['GET', 'POST', 'PUT']
+matchMethods(methods, 'GET') // => true
+matchMethods(methods, 'DELETE') // => false
+```
+
+### `createDivider()`
+
+Creates a code divider that's always 100 chars wide. Can be used for documentation or code comments.
+
+```typescript
+createDivider('Section Title')
+// => '/* --- Section Title ----------------------------------------------------------------------------------- */'
+
+createDivider('Section Title', true)
+// => '/** --- Section Title ----------------------------------------------------------------------------------- */'
+```
+
+### `validateNonEmptyNoSpaces()`
+
+Validates that a string is not empty and does not contain spaces.
+
+```typescript
+validateNonEmptyNoSpaces('validName') // => true
+validateNonEmptyNoSpaces('') // => 'Please enter a non-empty value'
+validateNonEmptyNoSpaces('invalid name') // => 'Please enter a value without spaces'
+```
+
+> Handy for plop prompt input validation.
+
+<div className="h-8" />
+
+## Workspace Management
+
+### `parseWorkspaces()`
+
+Figure out all info about all workspaces in the monorepo and return mapped linking info for use in scripts and generators.
+
+```typescript
+const workspaceInfo = parseWorkspaces(
+    folderLevel = '../../',
+    includeApps = false,
+)
+// => {
+//
+//        /** -i- Map of { [path]: package.json config, ... } */
+//        workspaceConfigs: { ... },
+//
+//        /** -i- Map of { [path]: pkgName, ... } */
+//        workspaceImports: { ... },
+//
+//        /** -i- Map of { [pkgName]: path, ... } */
+//        workspacePathsMap: { ... },
+//
+//        /** -i- Array of all workspace packages, e.g. ['features/@app-core', 'packages/@green-stack-core', ...] */
+//        workspacePaths: [ ... ],
+//
+//        /** -i- Array of all workspace packages, e.g. ['@app/core', '@green-stack/core', ...] */
+//        workspacePackages: [ ... ]
+//
+//        // -- Aliases and Constants --
+//
+//        /** -i- Map of { [path]: package.json config, ... } */
+//        PATH_CONFIGS: { ... },
+//
+//        /** -i- Map of { [pkgName]: package.json config, ... } */
+//        PKG_CONFIGS: { ... },
+//
+//        /** -i- Map of { [path]: pkgName, ... } */
+//        PATH_PKGS: { ... },
+//
+//        /** -i- Map of { [pkgName]: path, ... } */
+//        PKG_PATHS: { ... },
+//
+//    }
+```
+
+### `getWorkspaceOptions()`
+
+List all the available workspaces for generators to use.
+
+```typescript
+const options = getWorkspaceOptions('../../', {
+    filter: ['@app'],
+    excludePackages: true
+})
+// => {
+//        '@app/core  --  from features/@app-core': 'features/@app-core',
+//        '@app/ui  --  from features/@app-ui': 'features/@app-ui'
+//    }
+```
+
+### `getAvailableSchemas()`
+
+List all the available schemas in the codebase that generators can use.
+
+```typescript
+const schemas = getAvailableSchemas(
+    folderLevel = '../../',
+    schemaKey = 'schemaName',
+)
+// => {
+//        'UserSchema': {
+//            schemaPath: 'features/@app-core/schemas/User.ts',
+//            schemaName: 'UserSchema',
+//            schemaFileName: 'User.ts',
+//            schemaOption: '@app/core - User (♻ - Schema)',
+//            workspacePath: 'features/@app-core',
+//            workspaceName: '@app/core',
+//            isNamedExport: true,
+//            isDefaultExport: false,
+//            schema?: ZodSchema | undefined
+//        },
+//        ... (more schemas)
+//    }
+```
+
+The default arguments for `folderLevel` and `schemaKey` are `'../../'` and `'schemaName'`, respectively. You can adjust these based on your project structure. If you want the resulting lookup object to be keyed by either the path or option, you can pass `schemaPath` or `schemaOption` as the `schemaKey`.
+
+### `getAvailableDataBridges()`
+
+List all the available data bridges for generators to use.
+
+```typescript
+const bridges = getAvailableDataBridges('../../', {
+    filterType?: 'query', // 'query' | 'mutation'
+    bridgeKey?: 'bridgeName', // 'bridgeName' | 'bridgePath' | 'bridgeOption' | 'bridgeInputOption'
+    allowNonGraphql?: false, // boolean
+})
+// => {
+//        'UserBridge': {
+//            bridgePath: 'features/@app-core/resolvers/healthCheck.bridge.ts',
+//            bridgeName: 'healthCheckBridge',
+//            bridgeOption: '@app/core - healthCheck (♻ - Bridge)',
+//            bridgeInputOption: '@app/core - healthCheck (♻ - Bridge) Input',
+//            workspacePath: 'features/@app-core',
+//            workspaceName: '@app/core',
+//            resolverName: 'healthCheck',
+//            resolverType: 'query' | 'mutation',
+//            operationType: 'search' | 'add' | 'update' | 'delete' | 'get' | 'list',
+//            fetcherName: 'healthCheckQuery',
+//            inputSchemaName: 'HealthCheckInput',
+//            outputSchemaName: 'HealthCheckOutput',
+//            allowedMethods: ['GET', 'POST'],
+//            isNamedExport: true,
+//            isDefaultExport: false,
+//            isMutation: false,
+//            isQuery: true,
+//            bridge?: DataBridgeType | undefined,
+//        },
+//        ... (more bridges)
+//    }
+```
+
+<div className="h-8" />
+
+## Import Management
+
+### `readImportAliases()`
+
+Retrieve the import aliases from the main tsconfig.json in `@app/core`.
+
+```typescript
+const aliases = readImportAliases('../../')
+// => {
+//        '@app/core': '@app/core',
+//        '@app/ui': '@app/ui',
+//        '@green-stack/core': '@green-stack/core'
+//    }
+```
+
+### `swapImportAlias()`
+
+Swap an import path with an alias if a match occurs.
+
+```typescript
+swapImportAlias('@app/core/appConfig')
+// => '@app/config'
+
+swapImportAlias('@app/config')
+// => '@app/config'
+```
+
+<div className="h-8" />
+
+## CLI Utilities
+
+### `opt()`
+
+Format a CLI option with proper styling and hierarchy.
+
+Will grey out the anything after the `--` when displayed in the terminal.
+
+```typescript
+opt('Some Option')
+// => 'Some Option' (nothing greyed out using ansi colors)
+
+opt('Some Option  --  This extra info is greyed out')
+// => 'Some option  --  This extra info is greyed out'
+```
+
+<div className="h-8" />
+
+## Helper Functions
+
+### `includesOption()`
+
+Higher-order function to prefill a list of options that are checked against in the actual filter method.
+
+```typescript
+const includesGetOrPost = includesOption(['GET', 'POST'])
+const methods = ['GET', 'POST', 'PUT']
+methods.filter(includesGetOrPost) // => ['GET', 'POST']
+```
+
+### `maybeImport()`
+
+Attempts to `require()` a file, but returns an empty object if it fails or the file doesn't exist.
+
+```typescript
+// File exists
+maybeImport('./config.js')
+// => { port: 3000, host: 'localhost' }
+
+// File doesn't exist
+maybeImport('./nonexistent.js')
+// => {}
+
+// With error logging
+maybeImport('./config.js', 'logErrors')
+// => Logs error if file doesn't exist
+```
+
+<div className="h-8" />
+
+## Types
+
+### `SchemaFileMeta`
+
+Metadata about a schema file:
+
+```typescript
+type SchemaFileMeta = {
+    schema?: ZodSchema | {}
+    schemaPath: string
+    schemaName: string
+    schemaFileName: string
+    schemaOption: string
+    workspacePath: string
+    workspaceName: string
+    isNamedExport: boolean
+    isDefaultExport: boolean
+}
+```
+
+### `FetcherFileMeta`
+
+Metadata about a fetcher file:
+
+```typescript
+type FetcherFileMeta = {
+    resolverName: string
+    fetcherName: string
+    fetcherType: 'query' | 'mutation'
+}
+```
+
+### `BridgeFileMeta`
+
+Metadata about a data bridge file:
+
+```typescript
+type BridgeFileMeta = {
+    bridge?: DataBridgeType | {}
+    bridgePath: string
+    bridgeName: string
+    bridgeOption: string
+    bridgeInputOption: string
+    workspacePath: string
+    workspaceName: string
+    resolverName: string
+    resolverType: 'query' | 'mutation'
+    operationType: 'add' | 'update' | 'delete' | 'get' | 'list' | 'search'
+    fetcherName: string
+    inputSchemaName: string
+    outputSchemaName: string
+    allowedMethods: ALLOWED_METHODS[]
+    isNamedExport: boolean
+    isDefaultExport: boolean
+    isMutation: boolean
+    isQuery: boolean
+}
+``` 
+
+## Re-exports
+
+### Utils from `stringUtils`
+
+Re-exports all the utility functions from `@green-stack/core/utils/stringUtils`:
+
+- [`snakeToCamel()`](/@green-stack-core/utils/stringUtils#snaketocamel)
+- [`snakeToDash()`](/@green-stack-core/utils/stringUtils#snaketodash)
+- [`dashToCamel()`](/@green-stack-core/utils/stringUtils#dashtocamel)
+- [`dashToSnake()`](/@green-stack-core/utils/stringUtils#dashtosnake)
+- [`camelToSnake()`](/@green-stack-core/utils/stringUtils#cameltosnake)
+
+- [`uppercaseFirstChar()`](/@green-stack-core/utils/stringUtils#uppercasefirstchar)
+- [`lowercaseFirstChar()`](/@green-stack-core/utils/stringUtils#lowercasefirstchar)
+
+- [`slugify()`](/@green-stack-core/utils/stringUtils#slugify)
+- [`replaceStringVars()`](/@green-stack-core/utils/stringUtils#replacestringvars)
+- [`replaceMany()`](/@green-stack-core/utils/stringUtils#replacemany)
+
+- [`includesAny()`](/@green-stack-core/utils/stringUtils#includesany)
+- [`extractPathParams()`](/@green-stack-core/utils/stringUtils#extractpathparams)
+
+- [`ansi` - constants](/@green-stack-core/utils/stringUtils#ansi---constants)
+- [`a` - terminal formatters](/@green-stack-core/utils/stringUtils#a---terminal-formatters)

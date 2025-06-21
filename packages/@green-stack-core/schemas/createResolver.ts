@@ -7,7 +7,7 @@ import type {
 } from 'next'
 import { getApiParams, getHeaderContext } from '../utils/apiUtils'
 import { parseUrlParamsObject } from '../utils/objectUtils'
-import { tryCatch } from '../utils/fnUtils'
+import { tryCatch } from '../utils/functionUtils'
 import { z, ApplyDefaultsOptions } from './index'
 
 /* --- Types ----------------------------------------------------------------------------------- */
