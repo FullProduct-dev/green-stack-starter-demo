@@ -1,0 +1,57 @@
+import { FileTree } from 'nextra/components'
+import { Image } from '@app/primitives'
+import { TitleWrapper } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `add-schema` - Generator
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `add-schema`
+
+```md copy
+npm run add:schema -- --args <workspacePath> <schemaName> <schemaDescription>
+```
+
+```md copy
+npx turbo gen schema --args <workspacePath> <schemaName> <schemaDescription>
+```
+
+<FileTree>
+  <FileTree.Folder name="packages" defaultOpen>
+    <FileTree.Folder name="@green-stack-core" defaultOpen>
+      <FileTree.Folder name="generators" defaultOpen>
+        <FileTree.File name="add-schema.ts" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+### Prompt Arguments
+
+| Argument         | Type         | Question / Description                                                                |
+|------------------|--------------|---------------------------------------------------------------------------------------|
+| workspacePath    | autocomplete | Where would you like to add this schema? <br/>=> e.g. `features/@app-core`            |
+| schemaName       | input        | What is the schema name? <br/>=> `string`                                             |
+| schemaDescription| input        | Optional description: What data structure does this schema describe? <br/>=> `string` |
+
+<div className="h-8" />
+
+### Resulting File Changes
+
+```bash
+/{workspacePath}/ # <- e.g. 'features/@app-core/' or 'packages/some-package/'
+ └── schemas/
+     └── {schemaName}.schema.ts ❇️
+```
+
+<div className="h-8" />

@@ -24,6 +24,7 @@ export const TextInput = forwardRef<
     ElementRef<typeof BaseTextInput>,
     TextInputProps
 >((rawProps, ref) => {
+    
     // Props
     const props = TextInputProps.applyDefaults(rawProps)
 

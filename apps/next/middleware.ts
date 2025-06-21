@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createMiddlewareHeaderContext } from '@green-stack/utils/apiUtils'
+import { createMiddlewareContext } from '@green-stack/utils/apiUtils'
 import type { RequestContext } from '@app/core/middleware/createRequestContext'
 
 /* --- Middleware ------------------------------------------------------------------------------ */
@@ -30,7 +30,7 @@ export const middleware = async (req: NextRequest) => {
     // Execute the request handler (and pass the request context header)
     const res = NextResponse.next({
         request: {
-            headers: await createMiddlewareHeaderContext(req, headerContext, extraHeaders),
+            headers: await createMiddlewareContext(req, headerContext, extraHeaders),
         },
     })
 

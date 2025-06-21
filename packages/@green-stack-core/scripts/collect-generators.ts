@@ -37,8 +37,8 @@ const collectGenerators = () => {
         const pathContents = fs.readFileSync(generatorPath, 'utf8')
         const usesPlopTypes = pathContents.includes('PlopTypes')
         const usesTurboGenerators = pathContents.includes('@turbo/gen')
-        const exportLines = pathContents.split('\n').filter((line) => line.includes('export'))
-        const generatorExportLine = exportLines.find((line) => line.includes('Generator'))
+        const exportLines = pathContents.split('\n').filter((line) => line.includes('export') && !line.includes('${'))
+        const generatorExportLine = exportLines.find((line) => line.includes('export const register') && line.includes('Generator'))
         if (!usesPlopTypes || !usesTurboGenerators || !generatorExportLine) return acc
 
         // Extract the generator name

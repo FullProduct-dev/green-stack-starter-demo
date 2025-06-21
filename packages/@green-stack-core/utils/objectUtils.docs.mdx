@@ -1,0 +1,206 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Object Utils
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# Object Utils
+
+```typescript copy
+import * as objectUtils from '@green-stack/utils/objectUtils'
+```
+
+Collection of utility functions for object manipulation and URL parameter handling:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="utils" defaultOpen>
+                <FileTree.File name="objectUtils.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+## URL Parameter Utils
+
+### `parseUrlParamsObject()`
+
+Parses object property values, converting string representations to their proper types. Handles nested objects and arrays.
+
+```typescript
+// Basic type conversion
+parseUrlParamsObject({
+    id: '123',        // => 123 (number)
+    active: 'true',   // => true (boolean)
+    name: 'John'      // => 'John' (string)
+})
+
+// Nested objects
+parseUrlParamsObject({
+    'user.name': 'John',
+    'user.age': '25'
+})
+// => { user: { name: 'John', age: 25 } }
+
+// Arrays
+parseUrlParamsObject({
+    'items[0]': '1',
+    'items[1]': '2'
+})
+// => { items: [1, 2] }
+
+// Ignoring specific keys
+parseUrlParamsObject({
+    id: '123',
+    raw: 'true'
+}, ['raw'])
+// => { id: 123, raw: 'true' }
+```
+
+### `buildUrlParamsObject()`
+
+Builds an object with all array and object keys flattened. Essentially the opposite of `parseUrlParamsObject()`.
+
+```typescript
+// Arrays
+buildUrlParamsObject({ arr: [0, 2] })
+// => { 'arr[0]': 0, 'arr[1]': 2 }
+
+// Nested objects
+buildUrlParamsObject({ obj: { prop: true } })
+// => { 'obj.prop': true }
+
+// Empty values are removed
+buildUrlParamsObject({ 
+    name: 'John',
+    empty: null,
+    nested: { value: undefined }
+})
+// => { name: 'John' }
+```
+
+<div className="h-8" />
+
+## Object Transformation
+
+### `swapEntries()`
+
+Swaps the object's keys and values while keeping the types intact. Particularly useful for object enums.
+
+```typescript
+const Status = {
+    ACTIVE: 'active',
+    INACTIVE: 'inactive'
+} as const
+
+const StatusReverse = swapEntries(Status)
+// => { 
+//      active: 'ACTIVE',
+//      inactive: 'INACTIVE'
+//    }
+
+// Type-safe usage
+const status: keyof typeof Status = 'ACTIVE'
+const value: typeof Status[typeof status] = 'active'
+```
+
+### `createKey()`
+
+Turns an object into a string by deeply rendering both keys & values to string and joining them.
+
+```typescript
+// Simple object
+createKey({ id: 1, name: 'John' })
+// => 'id-1-name-John'
+
+// Nested object
+createKey({ 
+    user: { id: 1, name: 'John' },
+    active: true
+})
+// => 'active-true-user-id-1-name-John'
+
+// Array values
+createKey({ 
+    ids: [1, 2, 3],
+    tags: ['a', 'b']
+})
+// => 'ids-1-2-3-tags-a-b'
+
+// Custom separator
+createKey({ id: 1, name: 'John' }, '_')
+// => 'id_1_name_John'
+```
+
+<div className="h-8" />
+
+## Dot Prop Utils
+
+The module re-exports several utilities from the `dot-prop` package for working with nested object properties:
+
+### `getProperty()`
+
+Gets a property from a nested object using dot notation.
+
+```typescript
+const obj = { user: { name: 'John' } }
+getProperty(obj, 'user.name') // => 'John'
+```
+
+### `setProperty()`
+
+Sets a property in a nested object using dot notation.
+
+```typescript
+const obj = {}
+setProperty(obj, 'user.name', 'John')
+// => { user: { name: 'John' } }
+```
+
+### `deleteProperty()`
+
+Deletes a property from a nested object using dot notation.
+
+```typescript
+const obj = { user: { name: 'John' } }
+deleteProperty(obj, 'user.name')
+// => { user: {} }
+```
+
+### `hasProperty()`
+
+Checks if a property exists in a nested object using dot notation.
+
+```typescript
+const obj = { user: { name: 'John' } }
+hasProperty(obj, 'user.name') // => true
+hasProperty(obj, 'user.age') // => false
+```
+
+### `deepKeys()`
+
+Gets all keys from a nested object, including nested properties.
+
+```typescript
+const obj = { 
+    user: { 
+        name: 'John',
+        address: { city: 'New York' }
+    }
+}
+deepKeys(obj)
+// => ['user.name', 'user.address.city']
+``` 

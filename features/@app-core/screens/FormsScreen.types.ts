@@ -21,8 +21,8 @@ export const annualWorkHours = annualWorkDays * oneDay // Work hours per year
 
 export const FEATURES = inputOptions({
     'universal-starter': 'Write-once workflow for Web, iOS & Android',
-    'git-plugins': 'Git based plugin branches & PRs',
-    'stack-freedom': 'Choose my own Auth / DB / Mail / plugins',
+    // 'git-plugins': 'Git based plugin branches & PRs',
+    // 'stack-freedom': 'Choose my own Auth / DB / Mail / plugins',
     'zod-query-toolkit': 'Auto typed API\'s + fetching (zod, react-query)',
     'generators-scripts': 'Scripts and Generators to skip boilerplate',
     'designed-for-copypaste': 'Portable structure for copy-paste features',
@@ -48,12 +48,13 @@ export const TECH_KNOWLEDGE = inputOptions({
 } as const)
 
 export const PLUGINS = inputOptions({
-    'auth': 'Authentication - Auth0 / Clerk / Custom ...',
-    'db': 'Database - Prisma / Supabase / MongoDB ...',
-    'mail': 'Mail - Resend / Sendgrid / Mailgun ...',
-    'notifications': 'Notifications - OneSignal / Expo ...',
-    'payments': 'Payments - Stripe / Lemonsqueezy ...',
-    'storage': 'Storage - S3 / Cloudinary / Supabase ...',
+    'auth': 'Authentication - Clerk / ...',
+    'db': 'Database - MongoDB / ...',
+    // -i- Coming Soon
+    // 'mail': 'Mail - Resend / Sendgrid / Mailgun ...',
+    // 'notifications': 'Notifications - OneSignal / Expo ...',
+    // 'payments': 'Payments - Stripe / Lemonsqueezy ...',
+    // 'storage': 'Storage - S3 / Cloudinary / Supabase ...',
 })
 
 /* --- Props ----------------------------------------------------------------------------------- */

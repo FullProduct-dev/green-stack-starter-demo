@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import { QueryConfig } from '@app/core/graphql/graphqlQuery.types'
 import type { TadaDocumentNode } from 'gql.tada'
 import type { QueryKey } from '@tanstack/react-query'
@@ -62,13 +62,13 @@ export type HydratedRouteProps<
         routeParamsToQueryInput: any
         initialData?: any
     } = {
-        fetcherDataToProps: (fetcherData: any$Unknown) => any$Unknown,
+        fetcherDataToProps: (fetcherData: any$Unknown) => Record<string, any$Unknown>,
         routeDataFetcher: (...args: any[]) => Promise<any>,
         routeParamsToQueryKey: any,
         routeParamsToQueryInput: any
         initialData?: any
     }
-> = ReturnType<Exclude<QueryBridge['fetcherDataToProps'], undefined>> & {
+> = Prettify<ReturnType<Exclude<QueryBridge['fetcherDataToProps'], undefined>> & {
     /** -i- The route key for the query */
     queryKey: QueryKey
     /** -i- The input args for the query */
@@ -79,7 +79,7 @@ export type HydratedRouteProps<
     searchParams: Partial<Parameters<QueryBridge['routeDataFetcher']>[0]>
     /** -i- Refetch the initial data */
     refetchInitialData?: () => Promise<{ data: ReturnType<Exclude<QueryBridge['fetcherDataToProps'], undefined>> }>
-}
+}>
 
 /** --- createQueryBridge() -------------------------------------------------------------------- */
 /** -i- Util to create a typed bridge between a fetcher and a route's props */ // @ts-ignore

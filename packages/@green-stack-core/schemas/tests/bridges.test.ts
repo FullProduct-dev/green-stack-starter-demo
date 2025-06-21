@@ -1,5 +1,6 @@
+// @ts-ignore
 import { expect, test } from 'bun:test'
-import { print } from 'graphql'
+import { ASTNode, print } from 'graphql'
 import { z, schema } from '../index'
 import { createDataBridge } from '../createDataBridge'
 import { bridgedFetcher } from '../bridgedFetcher'
@@ -13,7 +14,7 @@ const healtCheckBridge = createDataBridge({
 })
 
 // -i- When it's an input, we append 'Input' to the name if it doesn't already have it or 'Args'
-const expectedQuery = `query healthCheck($healthCheckArgs: HealthCheckInput) {
+const expectedQuery = `query healthCheck($healthCheckArgs: HealthCheckInput!) {
   healthCheck(args: $healthCheckArgs) {
     echo
   }
@@ -27,7 +28,7 @@ test("Bridges created by createDataBridge infer the right argsName & query type"
 
 test("Bridges created by createDataBridge can build the graphql query from args & response schemas", () => {
     const graphqlQuery = healtCheckBridge.getGraphqlQuery()
-    expect(print(graphqlQuery)).toBe(expectedQuery)
+    expect(print(graphqlQuery as ASTNode)).toBe(expectedQuery)
 })
 
 test("Bridges created by createDataBridge can use a custom graphql query", async () => {
@@ -38,7 +39,7 @@ test("Bridges created by createDataBridge can use a custom graphql query", async
         graphqlQuery: healthCheckQuery,
     })
     const graphqlQuery = bridgeWithCustomQuery.getGraphqlQuery()
-    expect(print(graphqlQuery)).not.toBe(expectedQuery)
+    expect(print(graphqlQuery as ASTNode)).not.toBe(expectedQuery)
 })
 
 test("bridgedFetcher() can create a fetcher function from a DataBridge", async () => {

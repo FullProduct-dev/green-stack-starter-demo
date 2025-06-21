@@ -1,0 +1,28 @@
+### `children` vs `text` prop
+
+You can pass either `props.children` or `props.text` to the Button component. If you pass `props.children`, it will render the children as the button content. This supports JSX and other React Components. Whereas `props.text` only supports actual text strings.
+
+If you pass both, `props.children` will be used instead `props.text`.
+
+### `style` prop
+
+Instead of using just `className`, you can also pass a `style` prop. We will combine the styles from `className` and `style` props. This allows you to use inline styles for dynamic styling while still applying CSS classes.
+
+If both classNames and `style` prop influence the same style, the `style` prop will take precedence.
+
+### `onPress` event handlers
+
+Just like react-native's Pressable, our `Button` component supports the `onPress` prop, alongside other event handlers:
+
+- [`onPress()`](https://reactnative.dev/docs/pressable#onpress) - Called when a touch is released.
+- [`onPressIn()`](https://reactnative.dev/docs/pressable#onpressin) - Called when a touch is initiated.
+- [`onPressOut()`](https://reactnative.dev/docs/pressable#onpressout) - Called when a touch is released, after `onPressIn`.
+- [`onHoverIn()`](https://reactnative.dev/docs/pressable#onhoverin) - Called when the pointer enters the button area.
+- [`onHoverOut()`](https://reactnative.dev/docs/pressable#onhoverout) - Called when the pointer leaves the button area.
+- [`onLongPress()`](https://reactnative.dev/docs/pressable#onlongpress) - Called when a long press gesture is detected.
+- [`onBlur()`](https://reactnative.dev/docs/pressable#onblur) - Called when the button loses focus.
+- [`onFocus()`](https://reactnative.dev/docs/pressable#onfocus) - Called when the button gains focus.
+
+Naturally, when `props.disabled` is `true`, all event handlers will be ignored.
+
+If you pass both `href` and `onPress` props, we will try to execute both. Giving preference to the `onPress` handler first.

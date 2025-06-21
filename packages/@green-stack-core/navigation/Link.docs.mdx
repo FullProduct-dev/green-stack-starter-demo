@@ -1,0 +1,202 @@
+import { Image } from '@app/primitives'
+import { FileTree, Callout } from 'nextra/components'
+import { TitleWrapper, LLMOptimized } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## Usage - `Link`
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# Universal `Link` component
+
+If you import the `Link` component from `@green-stack/navigation`, it will automatically use the correct navigation system for the platform you are on.
+
+```tsx copy
+import { Link } from '@green-stack/navigation'
+```
+
+However, you can also ***import it from `@app/primitives` to apply tailwind styles***:
+
+```tsx copy
+import { Link } from '@app/primitives'
+```
+
+You can use the `href` prop to navigate to a new page:
+
+```tsx {3}
+<Link
+    className="text-link p-2 rounded"
+    href="/examples/[slug]"
+>
+    See example
+</Link>
+```
+
+<div className="h-8" />
+
+### `UniversalLinkProps`
+
+| Property               | Type                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+|------------------------|--------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| children               | React.ReactNode                      | The content to be rendered inside the link.                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| href                   | string \| HREF                       | The path to route to on web or mobile. String only. Hints for internal routes provided through codegen.                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| style                  |                                      | Style prop: https://reactnative.dev/docs/text#style                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| className              | string                               | Nativewind classNames should be applied to either the parent or children of Link. Ideally, create or use a TextLink component instead.                                                                                                                                                                                                                                                                                                                                                        |
+| replace                | boolean                              | Should replace the current route without adding to the history - Default: false.                                                                                                                                                                                                                                                                                                                                                                                                              |
+| onPress                |                                      | Extra handler that fires when the link is pressed.                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| target                 |                                      | Specifies where to display the linked URL.                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| asChild                | boolean                              | **Mobile only** - Forward props to child component. Useful for custom buttons - Default: false.                                                                                                                                                                                                                                                                                                                                                                                                   |
+| push                   | boolean                              | **Mobile only** - Should push the current route, always adding to the history - Default: true.                                                                                                                                                                                                                                                                                                                                                                                                    |
+| testID                 | string \| undefined                  | **Mobile only** - Used to locate this view in end-to-end tests.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| nativeID               | string \| undefined                  | **Mobile only** - Used to reference react managed views from native code. @deprecated use `id` instead.                                                                                                                                                                                                                                                                                                                                                                                           |
+| id                     | string \| undefined                  | **Mobile only** - Used to reference react managed views from native code.                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| allowFontScaling       |                                      | **Mobile only** - Specifies whether fonts should scale to respect Text Size accessibility settings.                                                                                                                                                                                                                                                                                                                                                                                               |
+| numberOfLines          |                                      | **Mobile only** - Specifies the maximum number of lines to use for rendering text.                                                                                                                                                                                                                                                                                                                                                                                                                |
+| maxFontSizeMultiplier  |                                      | **Mobile only** - Specifies the maximum scale factor for text.                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| suppressHighlighting   |                                      | **Mobile only** - When true, no visual change is made when text is pressed down.                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| scroll                 | boolean                              | **Web only** - Whether to override the default scroll behavior - Default: false.                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| shallow                | boolean                              | **Web only** - Update the path of the current page without rerunning getStaticProps, getServerSideProps or getInitialProps - Default: false.                                                                                                                                                                                                                                                                                                                                                      |
+| passHref               | boolean                              | **Web only** - Forces `Link` to send the `href` property to its child - Default: false.                                                                                                                                                                                                                                                                                                                                                                                                           |
+| prefetch               | boolean                              | **Web only** - Prefetch the page in the background. Any `<Link />` that is in the viewport (initially or through scroll) will be preloaded. Prefetch can be disabled by passing `prefetch={false}`. When `prefetch` is set to `false`, prefetching will still occur on hover. Pages using [Static Generation](https://docs.expo.dev/router/reference/static-rendering/) will preload `JSON` files with the data for faster page transitions. Prefetching is only enabled in production. - Default: true |
+| locale                 | string \| false                      | **Web only** - The active locale is automatically prepended. `locale` allows for providing a different locale. When `false` `href` has to include the locale as the default behavior is disabled.                                                                                                                                                                                                                                                                                                 |
+| as                     | Url \| undefined                     | **Web only** - Optional decorator for the path that will be shown in the browser URL bar.                                                                                                                                                                                                                                                                                                                                                                                                         |
+
+<LLMOptimized>
+
+Here's what that would look like in TypeScript:
+
+```tsx
+type UniversalLinkProps<HREF extends KnownRoutes = KnownRoutes> = {
+
+    children: React.ReactNode;
+
+    /** Universal - The path to route to on web or mobile. String only. */
+    href: HREF;
+
+    /** Universal - Style prop: https://reactnative.dev/docs/text#style */
+    style?: StyleProp<TextStyle>;
+
+    /** -!- Nativewind classNames should be applied to either the parent or children of Link. Ideally, create or use a TextLink component instead */
+    className?: string; // never;
+
+    /** Universal - Should replace the current route without adding to the history - Default: false. */
+    replace?: boolean;
+
+    /** Universal - Extra handler that fires when the link is pressed. */
+    onPress?: ((e: MouseEvent<HTMLAnchorElement> | GestureResponderEvent) => void) | null | undefined;
+
+    /** Universal -  */
+    target?: "_self" | "_blank" | "_parent" | "_top" | undefined;
+
+    // - Expo -
+
+    /** Mobile only - Forward props to child component. Useful for custom buttons - Default: false */
+    asChild?: boolean;
+
+    /** Mobile only - Should push the current route, always adding to the history - Default: true */
+    push?: boolean;
+
+    /** Mobile only - Used to locate this view in end-to-end tests. */
+    testID?: string | undefined;
+
+    /** Mobile only - Used to reference react managed views from native code. @deprecated use `id` instead. */
+    nativeID?: string | undefined;
+    id?: string | undefined;
+
+    allowFontScaling?: boolean | undefined;
+    numberOfLines?: number | undefined;
+    maxFontSizeMultiplier?: number | null | undefined;
+    suppressHighlighting?: boolean | undefined;
+
+    // - Next -
+
+    /** Web only - Whether to override the default scroll behavior - Default: false */
+    scroll?: boolean;
+
+    /** Web only - Update the path of the current page without rerunning getStaticProps, getServerSideProps or getInitialProps - Default: false */
+    shallow?: boolean;
+
+    /** Web only - Forces `Link` to send the `href` property to its child - Default: false */
+    passHref?: boolean;
+
+    /** Web only - Prefetch the page in the background. Any `<Link />` that is in the viewport (initially or through scroll) will be preloaded. Prefetch can be disabled by passing `prefetch={false}`. When `prefetch` is set to `false`, prefetching will still occur on hover. Pages using [Static Generation](/docs/basic-features/data-fetching/get-static-props.md) will preload `JSON` files with the data for faster page transitions. Prefetching is only enabled in production. - Defaultvalue: true */
+    prefetch?: boolean;
+
+    /** Web only - The active locale is automatically prepended. `locale` allows for providing a different locale. When `false` `href` has to include the locale as the default behavior is disabled. */
+    locale?: string | false;
+
+    /** Web only - Optional decorator for the path that will be shown in the browser URL bar. Before Next.js 9.5.3 this was used for dynamic routes, check our [previous docs](https://github.com/vercel/next.js/blob/v9.5.2/docs/api-reference/next/link.md#dynamic-routes) to see how it worked. Note: when this path differs from the one provided in `href` the previous `href`/`as` behavior is used as shown in the [previous docs](https://github.com/vercel/next.js/blob/v9.5.2/docs/api-reference/next/link.md#dynamic-routes). */
+    as?: Url | undefined;
+
+}
+```
+
+</LLMOptimized>
+
+<div className="h-8" />
+
+## React Portability Patterns
+
+Each environment has it's own optimized Link component. This is why there are also versions specifically for each of those environments:
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="navigation" defaultOpen>
+                <FileTree.File name="Link.expo.tsx" />
+                <FileTree.File name="Link.next.tsx" />
+                <FileTree.File name="Link.tsx" />
+                <FileTree.File name="Link.types.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+- `Link.next.tsx` is optimized for the Next.js app router.
+- `Link.expo.tsx` is optimized for Expo Router.
+- `Link.types.ts` ensures both implementations are compatible with the same interface, allowing you to use the same `Link` component across both Expo and Next.js environments.
+
+The main `Link.tsx` retrieves whichever implementation was provided as `contextLink` to the `<UniversalAppProviders>` component, which is further passed to `<CoreContext.Provider/>`:
+
+```tsx /.expo/ /useExpoLink/ filename="ExpoRootLayout.tsx" copy
+import { Link as ExpoLink } from '@green-stack/navigation/Link.expo'
+
+// ... Later ...
+
+<UniversalAppProviders
+    contextLink={ExpoLink}
+>
+    ...
+</UniversalAppProviders>
+```
+
+```tsx /.next/ /useNextLink/ filename="NextRootLayout.tsx" copy
+import { Link as NextLink } from '@green-stack/navigation/Link.next'
+
+// ... Later ...
+
+<UniversalAppProviders
+    contextLink={NextLink}
+>
+    ...
+</UniversalAppProviders>
+```
+
+### Why this pattern?
+
+The 'React Portability Patterns' used here are designed to ensure that you can easily reuse optimized versions of components across different flavours of writing React.
+
+On the one hand, that means it's already set up to work with both Expo and Next.js in an optimal way.
+
+But, you can actually add your own implementations for other environments, without having to refactor the code that uses the `Link` component.
+
+### Supporting more environments
+
+Just add your own `Link.<environment>.tsx` file that respects the shared types, and then pass it to the `<UniversalAppProviders>` component as `contextLink`.

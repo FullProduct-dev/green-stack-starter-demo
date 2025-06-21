@@ -3,7 +3,7 @@ import type { ComponentProps, JSX, JSXElementConstructor } from 'react'
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
-export const BASE_TYPE_MAP = {
+export const ZOD_TO_BASE = {
     // - Primitives -
     ZodString: 'String',
     ZodNumber: 'Number',
@@ -38,10 +38,45 @@ export const BASE_TYPE_MAP = {
     ZodEffects: 'Any', // Unsure how to handle, attempted to serialize as JSON
 } as const
 
+export const ZOD_TO_DEF = {
+    // - Primitives -
+    ZodString: (fieldMeta: Metadata) => `.string()`,
+    ZodNumber: (fieldMeta: Metadata) => `.number()`,
+    ZodBoolean: (fieldMeta: Metadata) => `.boolean()`,
+    ZodDate: (fieldMeta: Metadata) => `.date()`,
+    // - Advanced & Objectlikes -
+    ZodEnum: (fieldMeta: Metadata, innerDef = '...') => `.enum([${innerDef}])`,
+    ZodArray: (fieldMeta: Metadata, innerDef = '...') => `.array(${innerDef})`,
+    ZodObject: (fieldMeta: Metadata, innerDef = '...') => `.object({\n${innerDef}\n})`,
+    // - Mostly Supported, Experimental -
+    ZodNull: (fieldMeta: Metadata) => `.null()`,
+    ZodUndefined: (fieldMeta: Metadata) => `.undefined()`,
+    ZodTuple: (fieldMeta: Metadata, innerDef = '..., ...') => `.tuple([${innerDef}])`,
+    ZodUnion: (fieldMeta: Metadata, innerDef = '..., ...') => `.union([${innerDef}])`,
+    ZodLiteral: (fieldMeta: Metadata, innerDef = '...') => `.literal(${innerDef})`,
+    ZodNativeEnum: (fieldMeta: Metadata, innerDef = '...') => `.nativeEnum(${innerDef})`,
+    // - Might Work, Not Advised -
+    ZodAny: (fieldMeta: Metadata) => `.any()`,
+    ZodRecord: (fieldMeta: Metadata, innerDef = '...') => `.record(${innerDef})`,
+    ZodUnknown: (fieldMeta: Metadata) => `.unknown()`,
+    ZodBigInt: (fieldMeta: Metadata) => `.bigint()`,
+    ZodSymbol: (fieldMeta: Metadata) => `.symbol()`,
+    ZodIntersection: (fieldMeta: Metadata, innerDef = '...') => `.intersection(${innerDef})`,
+    ZodDiscriminatedUnion: (fieldMeta: Metadata, innerDef = '...') => `.discriminatedUnion(${innerDef})`,
+    ZodMap: (fieldMeta: Metadata, innerDef = '...') => `.map(${innerDef})`,
+    ZodSet: (fieldMeta: Metadata, innerDef = '...') => `.set(${innerDef})`,
+    // - Unsupported, Avoid in Schemas -
+    ZodVoid: (fieldMeta: Metadata) => `.void()`,
+    ZodFunction: (fieldMeta: Metadata) => `.function()`,
+    ZodPromise: (fieldMeta: Metadata) => `.promise()`,
+    ZodLazy: (fieldMeta: Metadata, innerDef = '...') => `.lazy(() => ${innerDef})`,
+    ZodEffects: (fieldMeta: Metadata, innerDef = '...') => `.effects(() => ${innerDef})`,
+} as const
+
 /* --- Types ----------------------------------------------------------------------------------- */
 
-export type ZOD_TYPE = keyof typeof BASE_TYPE_MAP
-export type BASE_TYPE = typeof BASE_TYPE_MAP[ZOD_TYPE]
+export type ZOD_TYPE = keyof typeof ZOD_TO_BASE
+export type BASE_TYPE = typeof ZOD_TO_BASE[ZOD_TYPE]
 export type SCHEMA_TYPE = (ZOD_TYPE | BASE_TYPE) & {}
 
 export type Metadata<S = Record<string, any$Unknown> | any$Unknown[]> = {
@@ -392,7 +427,7 @@ if (!ZodType.prototype.metadata) {
         const reversedMeta = [...stackedMeta].reverse()
         const [innermostMeta] = reversedMeta
         const zodType = innermostMeta.zodStruct!._def.typeName as unknown as ZOD_TYPE
-        const baseType = BASE_TYPE_MAP[zodType as ZOD_TYPE]
+        const baseType = ZOD_TO_BASE[zodType as ZOD_TYPE]
         // Flatten stacked metadata in reverse order
         const flatMeta = reversedMeta.reduce((acc, { zodStruct, ...meta }) => ({
             ...acc,
@@ -447,7 +482,7 @@ if (!ZodType.prototype.metadata) {
         const values = {
             ...defaultValues,
             ...data,
-            ...result.data,
+            ...(!applyExamples ? result.data : {}),
         } as (typeof thisSchema)['_type']
         // Apply options to nested schemas?
         if (stripSensitive || stripUnknown) {
@@ -520,18 +555,118 @@ export const schema = <S extends z.ZodRawShape>(name: string, shape: S) => {
  * // 💡 Retrieve list of options as a tuple with the .options property
  * MyEnum.options // => ['key1', 'key2'] */
 export const inputOptions = <T extends Readonly<Record<string, string>>>(obj: T) => {
+
     // Extract the keys from the object
     type K = Exclude<keyof T, number | symbol>
+
     // Create the enum from the keys only
     const zEnum = z.enum(Object.keys(obj) as [K, ...K[]])
+
     // Assign the entries to the enum so it can still be used as such
     const reassigned = Object.keys(obj).reduce((acc, key) => {
         return Object.assign(acc, { [key]: obj[key] })
     }, zEnum)
+
     // Return the enum with the entries
     return Object.assign(reassigned, { entries: obj }) as typeof zEnum & { entries: T } & {
         [K in keyof T]: T[K]
     }
+}
+
+/** --- renderFieldMetaToZodDefV3() ------------------------------------------------------------ */
+/** -i- Renders field Metadata to Zod V3 field definition (as a string) */
+export const renderFieldMetaToZodDefV3 = (fieldKey: string, fieldMeta: Metadata) => {
+
+    // Extract metadata
+    const { zodType } = fieldMeta
+    
+    // Find related base definition builder
+    const getBaseDef = (key: ZOD_TYPE) => ZOD_TO_DEF[key as keyof typeof ZOD_TO_DEF]
+    const toBaseDef = getBaseDef(zodType as ZOD_TYPE)
+    if (typeof toBaseDef !== 'function') return ''
+
+    // Determine the inner definition if required
+    let innerDef = ''
+    if (zodType === 'ZodEnum') innerDef = Object.keys(fieldMeta.schema!).map((key) => JSON.stringify(key)).join(', ') // @ts-ignore
+    if (zodType === 'ZodArray' && !fieldMeta.schema?.name) innerDef = `z${getBaseDef(fieldMeta.schema!.zodType)?.(fieldMeta.schema)}` // @ts-ignore
+    if (zodType === 'ZodArray' && fieldMeta.schema?.name) innerDef = fieldMeta.schema!.name // @ts-ignore
+    if (zodType === 'ZodObject' && fieldMeta.schema?.name) innerDef = fieldMeta.schema!.name // @ts-ignore
+    if (zodType === 'ZodObject' && !fieldMeta.schema?.name) innerDef = `...` // TODO: Fix this?
+    if (zodType === 'ZodTuple') innerDef = fieldMeta.schema!.map((entry: Meta$Tuple) => `z${getBaseDef(entry.zodType)?.(entry)}`).join(', ')
+    if (zodType === 'ZodUnion') innerDef = fieldMeta.schema!.map((entry: Meta$Union) => `z${getBaseDef(entry.zodType)?.(entry)}`).join(', ')
+    if (zodType === 'ZodLiteral') innerDef = JSON.stringify(fieldMeta.literalValue) // @ts-ignore
+    if (zodType === 'ZodRecord' && fieldMeta.schema?.name) innerDef = `z.string(), ${fieldMeta.schema!.name}` // @ts-ignore
+    if (zodType === 'ZodRecord' && !fieldMeta.schema?.name) innerDef = `z.string(), z${getBaseDef(fieldMeta.schema!.zodType)?.(fieldMeta.schema!)}` // @ts-ignore
+
+    // Build the base definition for unproblematic types
+    let baseDefV3 = toBaseDef(fieldMeta, innerDef)
+
+    // Constants
+    const tab = `    `
+    const tabs = tab.repeat(2)
+
+    // Figure out whether to use optionality / which one
+    let optionality = ``
+    if (fieldMeta.isOptional) optionality = `${tabs}.optional()`
+    if (fieldMeta.isNullable) optionality = `${tabs}.nullable()`
+    if (fieldMeta.isNullable && fieldMeta.isOptional) optionality = `${tabs}.nullish()`
+    if (fieldMeta.defaultValue) optionality = `${tabs}.default(${JSON.stringify(fieldMeta.defaultValue)})`
+
+    // Rebuild the Zod definition for this field
+    const fieldEntry = [
+
+        `${tab}${fieldKey}: z`,
+        `${tabs}${baseDefV3}`,
+        fieldMeta.isIndex && `${tabs}.index()`,
+        fieldMeta.isUnique && `${tabs}.unique()`,
+        fieldMeta.isSparse && `${tabs}.sparse()`,
+        fieldMeta.isInt && `${tabs}.int()`,
+        fieldMeta.isEmail && `${tabs}.email()`,
+        fieldMeta.isURL && `${tabs}.url()`,
+        fieldMeta.isUUID && `${tabs}.uuid()`,
+        fieldMeta.isBase64 && `${tabs}.base64()`,
+        fieldMeta.isDate && `${tabs}.date()`,
+        fieldMeta.isDatetime && `${tabs}.datetime()`,
+        fieldMeta.isTime && `${tabs}.time()`,
+        fieldMeta.isIP && `${tabs}.ip()`,
+        fieldMeta.minLength && `${tabs}.min(${fieldMeta.minLength})`,
+        fieldMeta.maxLength && `${tabs}.max(${fieldMeta.maxLength})`,
+        fieldMeta.exactLength && `${tabs}.length(${fieldMeta.exactLength})`,
+        fieldMeta.minValue && `${tabs}.min(${fieldMeta.minValue})`,
+        fieldMeta.maxValue && `${tabs}.max(${fieldMeta.maxValue})`,
+        optionality,
+        fieldMeta.exampleValue && `${tabs}.example(${JSON.stringify(fieldMeta.exampleValue)})`,
+        fieldMeta.description && `${tabs}.describe(${JSON.stringify(fieldMeta.description)})`,
+        fieldMeta.isSensitive && `${tabs}.sensitive() // = stripped in API responses, serverside only`,
+
+    ].filter(Boolean).join('\n')
+
+    // Return the field entry
+    return `${fieldEntry},`
+}
+
+/** --- renderSchemaToZodDefV3() --------------------------------------------------------------- */
+/** -i- Renders schema Metadata to Zod V3 flavoured schema definition (as a string) */
+export const renderSchemaToZodDefV3 = (schemaMeta: Meta$Schema, flavor: 'ZOD' | 'FPD' = 'ZOD') => {
+    
+    // Check if schema metadata is empty / incompatible
+    if (!schemaMeta.schema || typeof schemaMeta.schema !== 'object') {
+        console.log(`Schema '${schemaMeta.name}' has no fields defined:`, schemaMeta)
+        return ''
+    }
+    
+    // Build list of fieldDefinitions
+    const fieldDefs = Object.entries(schemaMeta.schema!).map(([fieldKey, fieldMeta]) => {
+        return renderFieldMetaToZodDefV3(fieldKey, fieldMeta)
+    })
+
+    // Rebuild the Zod definition for this field
+    return [
+        flavor === 'FPD' && `const ${schemaMeta.name} = schema('${schemaMeta.name}', {`,
+        flavor === 'ZOD' && `const ${schemaMeta.name} = z.object({`,
+            ...fieldDefs,
+        `})`,
+    ].filter(Boolean).join('\n')
 }
 
 /* --- Reexports ------------------------------------------------------------------------------- */

@@ -1,0 +1,347 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `createDataBridge()`
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `createDataBridge()`
+
+```typescript copy
+import { createDataBridge } from '@green-stack/schemas/createDataBridge'
+```
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="schemas" defaultOpen>
+                <FileTree.File name="createDataBridge.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+<div className="h-8" />
+
+To create a `DataBridge`, simply provide call `createDataBridge()` with with the input and output schemas and some additional metadata:
+
+```typescript copy
+const healthCheckBridge = createDataBridge({
+
+    // Input and Output
+    inputSchema: HealthCheckInput,
+    outputSchema: HealthCheckOutput,
+
+    // Basic Metadata
+    resolverName: 'healthCheck',
+    resolverType: 'query', // 'query' | 'mutation'
+
+    // REST Metadata
+    apiPath: '/api/health',
+    allowedMethods: ['GET'], // 'GET' | 'POST' | 'PUT' | 'DELETE' | 'GRAPHQL'
+
+    // Optional Metadata
+    resolverArgsName?: 'healthCheckArgs', // Custom Args name for GraphQL schema and queries
+    
+})
+```
+
+<div className="h-8" />
+
+## Why "Data Bridges"?
+
+[Schemas](/@green-stack-core/schemas) serve as the [single source of truth](/single-sources-of-truth) for your data shape. But what about the shape of your APIs?
+
+By combining input and output schemas into a `bridge` file, and adding some API metadata, bridges serve as the source of truth for your API resolver:
+
+### Reusable Client-Server Contract
+
+Think of a **"Databridge"** as a literal *bridge between the front and back-end*.
+
+It's a metadata object you can use from either side to provide / transform / extract:
+
+- ✅ **Route handler args** from request params / body
+- ✅ Input and output **types + validation + defaults**
+- ✅ GraphQL **schema definitions** for `schema.graphql`
+- ✅ The query string to call our GraphQL API with
+
+### Recommended file conventions
+
+<FileTree>
+    <FileTree.Folder name="@some-feature" defaultOpen>
+        <FileTree.Folder name="schemas">
+            <FileTree.File name="Post.schema.ts" />
+        </FileTree.Folder>
+        <FileTree.Folder name="resolvers" defaultOpen>
+            <FileTree.File name="updatePost.bridge.ts" />
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+*There's two reasons we suggest you define this "DataBridge" in a separate file*:
+
+- 1. **Reusability**: If kept separate from business logic, you can reuse it in both front and back-end code.
+- 2. **Consistency**: Predicatable patterns make it easier to build automations and generators around them.
+
+> For this reason, we suggest you add `.bridge.ts` to your bridge filenames.
+
+<div className="h-8" />
+
+## Using a `DataBridge`
+
+You can use the resulting `DataBridge` in various ways, depending on your needs:
+
+### Flexible Resolvers
+
+To use the data bridge we just created to bundle together the input and output types with our business logic, create a new resolver file and passing the bridge as the final arg to [`createResolver()`](/@green-stack-core/schemas/createResolver) at the end.
+
+The first argument is your resolver function will contain a function with your business logic:
+
+```ts {7, 17, 22} /updatePostBridge/ /createResolver/1,3 filename="updatePost.resolver.ts"
+import { createResolver } from '@green-stack/schemas/createResolver'
+import { updatePostBridge } from './updatePost.bridge'
+import { Posts } from '@db/models'
+
+/** --- updatePost() ---- */
+/** -i- Update a specific post. */
+export const updatePost = createResolver(async ({
+    args, // <- Auto inferred types (from 'inputSchema')
+    context, // <- Request context (from middleware)
+    parseArgs, // <- Input validator (from 'inputSchema')
+    withDefaults, // <- Response helper (from 'outputSchema')
+}) => {
+
+    // Validate input and apply defaults, infers input types as well
+    const { slug, ...postUpdates } = parseArgs(args)
+
+    // -- Context / Auth Guards / Security --
+
+    // e.g. use the request 'context' to log out current user
+    const { user } = context // example, requires auth middleware
+
+    // -- Business Logic --
+
+    // e.g. update the post in the database
+    const updatedPost = await Posts.updateOne({ slug }, postUpdates)
+
+    // -- Respond --
+
+    // Typecheck response and apply defaults from bridge's outputSchema
+    return withDefaults({
+        slug,
+        title,
+        content,
+    })
+
+}, updatePostBridge)
+```
+
+> You pass the bridge (☝️) as the second argument to `createResolver()` to:
+- 1️⃣ infer the input / arg types from the bridge's `inputSchema`
+- 2️⃣ enable `parseArgs()` and `withDefaults()` helpers for validation, hints + defaults
+
+> **The resulting function can be used as just another async function** anywhere in your back-end.
+
+> The difference with a regular function, since the logic is bundled together with its data-bridge / input + output metadata, is that we can easily transform it into APIs:
+
+<div className="h-8" />
+
+### API Route Handlers
+
+<FileTree>
+    <FileTree.Folder name="@some-feature" defaultOpen>
+        <FileTree.Folder name="schemas">
+            <FileTree.File name="Post.schema.ts" />
+        </FileTree.Folder>
+        <FileTree.Folder name="resolvers">
+            <FileTree.File name="updatePost.bridge.ts" />
+            <FileTree.File name="updatePost.resolver.ts" />
+        </FileTree.Folder>
+        <FileTree.Folder name="routes" defaultOpen>
+            <FileTree.Folder name="api / posts / [slug] / update" defaultOpen>
+                <FileTree.File name="route.ts ← ✅ Add route handler here" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+You can create a new API route by exporting a `GET` / `POST` / `UPDATE` / `DELETE` handler assigned to a `createNextRouteHandler()` that wraps your "bridged resolver":
+
+```ts /createNextRouteHandler/1,3 /updatePost/4 filename="@some-feature / routes / api / posts / [slug] / update / route.ts"
+import { updatePost } from '@app/resolvers/updatePost.resolver'
+import { createNextRouteHandler } from '@green-stack/schemas/createNextRouteHandler'
+
+/* --- Routes ------------ */
+
+export const UPDATE = createNextRouteHandler(updatePost)
+// Automatically extracts (☝️) args from url / search params
+// based on the zod 'inputSchema'
+
+// If you want to support e.g. POST (👇), same deal (checks request body too)
+export const POST = createNextRouteHandler(updatePost)
+```
+
+What `createNextRouteHandler()` does under the hood:
+- 1. extract the input from the request context
+- 2. validate it
+- 3. call the resolver function with the args (and e.g. token / session / request context)
+- 4. return the output from your resolver with defaults applied
+
+> Check [Next.js Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) to understand supported exports (like `GET` or `POST`) and their options.
+
+> Restart your dev server or run `npm run link:routes` to make sure your new API route is available.
+
+<div className="h-8" />
+
+### GraphQL Resolvers
+
+We made it quite easy to enable GraphQL for your resolvers. The flow is quite similar.
+
+*In the same file*, add the following:
+
+```ts {3, 11} filename="features / @app-core / routes / api / health / route.ts"
+import { updatePost } from '@app/resolvers/updatePost.resolver'
+import { createNextRouteHandler } from '@green-stack/schemas/createNextRouteHandler'
+import { createGraphResolver } from '@green-stack/schemas/createGraphResolver'
+
+/* --- Routes ------------ */
+
+// exports of `GET` / `POST` / `PUT` / ...
+
+/* --- GraphQL ----------- */
+
+export const graphResolver = createGraphResolver(updatePost)
+// Automatically extracts input (☝️) from graphql request context
+```
+
+After exporting `graphResolver` here, restart the dev server or run `npm run build:schema` manually.
+
+This will:
+- 1. pick up the `graphResolver` export
+- 2. put it in our list of graphql compatible resolvers at `resolvers.generated.ts` in `@app/registries`
+- 3. recreate `schema.graphql` from input & output schemas from registered resolvers
+
+You can now check out your GraphQL API playground at [/api/graphql](http://localhost:3000/api/graphql)
+
+![Apollo Server GraphQL Playground Preview](https://github.com/FullProduct-dev/universal-app-router/assets/5967956/3b6b1d98-1228-44a4-aaa0-968664a027c3)
+
+<div className="h-8" />
+
+### Universal Data Fetching
+
+The easiest way to create a fetcher is to use the `bridgedFetcher()` helper:
+
+```ts {3} /bridgedFetcher/3 filename="updatePost.query.ts"
+import { updatePostBridge } from './updatePost.bridge'
+// ☝️ Reuse your data bridge
+import { bridgedFetcher } from '@green-stack/schemas/bridgedFetcher'
+// ☝️ Universal graphql fetcher that can be used in any JS environment
+
+/* --- updatePostFetcher() --------- */
+
+export const updatePostFetcher = bridgedFetcher(updatePostBridge)
+```
+
+This will automatically build the query string with all relevant fields from the bridge.
+
+To write a custom query with only certain fields, you can use our `graphql()` helper *with* `bridgedFetcher()`:
+
+```ts {3, 11, 21, 31, 41} filename="updatePost.query.ts"
+import { ResultOf, VariablesOf } from 'gql.tada'
+// ☝️ Type helpers that interface with the GraphQL schema
+import { graphql } from '../graphql/graphql'
+// ☝️ Custom gql.tada query builder that integrates with our types
+import { bridgedFetcher } from '@green-stack/schemas/bridgedFetcher'
+// ☝️ Universal graphql fetcher that can be used in any JS environment
+
+/* --- Query ----------------------- */
+
+// VSCode and gql.tada will help suggest or autocomplete thanks to our schema definitions
+export const updatePostQuery = graphql(`
+  query updatePost ($updatePostArgs: UpdatePostInput) {
+    updatePost(args: $updatePostArgs) {
+      slug
+      title
+      body
+    }
+  }
+`)
+
+// ⬇⬇⬇ automatically typed as ⬇⬇⬇
+
+// TadaDocumentNode<{
+//     updatePost(args: Partial<Post>): {
+//         slug: string | null;
+//         title: boolean | null;
+//         body: boolean | null;
+//     };
+// }>
+
+// ⬇⬇⬇ can be turned into reusable types ⬇⬇⬇
+
+/* --- Types ----------------------- */
+
+export type UpdatePostQueryInput = VariablesOf<typeof updatePostQuery>
+
+export type UpdatePostQueryOutput = ResultOf<typeof updatePostQuery>
+
+/* --- updatePostFetcher() --------- */
+
+export const updatePostFetcher = bridgedFetcher({
+  ...updatePostBridge, // <- Reuse your data bridge ...
+  graphqlQuery: updatePostQuery, // <- ... BUT, use our custom query
+})
+```
+
+> Whether you use a custom query or not, you now have a fetcher that:
+
+- ✅ Uses the executable graphql schema serverside
+- ✅ Can be used in the browser or mobile using fetch
+
+Want to know even more? Check the [Universal Data Fetching Docs](/universal-data-fetching).
+
+<div className="h-8" />
+
+### Resolver Form State
+
+<FileTree>
+    <FileTree.Folder name="@some-feature" defaultOpen>
+        <FileTree.Folder name="schemas">
+            <FileTree.File name="Post.schema.ts" />
+        </FileTree.Folder>
+        <FileTree.Folder name="resolvers">
+            <FileTree.File name="updatePost.bridge.ts" />
+            <FileTree.File name="updatePost.resolver.ts" />
+        </FileTree.Folder>
+        <FileTree.Folder name="hooks" defaultOpen>
+            <FileTree.File name="useUpdatePostFormState.tsx ←" />
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+To further keep your API's input and form state in sync, you can link the input schema to a form state hook using `useFormState()`:
+
+```tsx copy
+import { useFormState } from '@green-stack/forms/useFormState'
+```
+
+```tsx {10} filename="useUpdatePostFormState.ts"
+// Create a set of form state utils to use in your components
+const formState = useFormState(updatePostBridge.inputSchema, {
+    initialValues: { ... },
+    // ... other options
+})
+```
+
+More about this in the [Form Management Docs](/form-management).
+
+<div className="h-8" />

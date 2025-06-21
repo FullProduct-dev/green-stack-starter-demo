@@ -40,3 +40,26 @@ export const warnOnce = (message: string, ...restMessages: any$Unknown[]) => {
 export const errorOnce = (message: string, ...restMessages: any$Unknown[]) => {
     return consoleOnce(message, console.error, ...restMessages)
 }
+
+/** --- isKvRecord() --------------------------------------------------------------------------- */
+/** -i- Checks whether an object is a simple key <> value object */
+export const isKvRecord = (value: unknown): value is Record<string, Primitive> => {
+
+    // Check if the value is an object and not null or an array
+    if (typeof value !== "object" || value === null || Array.isArray(value)) return false
+
+    // Check if the object is a plain object (not an instance of a class)
+    if (Object.getPrototypeOf(value) !== Object.prototype) return false
+
+    // Check if all values are of primitives like string, number, boolean, or undefined
+    return Object.values(value).every((v) => {
+        if (v === null) return true
+        const type = typeof v
+        return (
+            type === "string" ||
+            type === "number" ||
+            type === "boolean" ||
+            type === "undefined"
+        )
+    })
+}

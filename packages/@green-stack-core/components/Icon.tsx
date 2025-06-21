@@ -1,5 +1,5 @@
 import { View as RNView } from 'react-native'
-import { z, iconProps } from '../svg/svg.primitives'
+import { z, iconProps } from '@green-stack/core/svg/svg.primitives'
 import { REGISTERED_ICONS } from '@app/registries/icons.registry'
 import { Image } from './Image'
 import { cn, styled } from '../styles'

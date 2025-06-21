@@ -247,7 +247,7 @@ export const FormsScreen = (props: FormScreenProps) => {
 
                         {/* -- Plugin Branches -- */}
 
-                        {excitingFeatures.includes('git-plugins') && (
+                        {/* {excitingFeatures.includes('git-plugins') && (
                             <>
                                 <H2 className="text-primary">
                                     What plugins would you merge?
@@ -262,7 +262,7 @@ export const FormsScreen = (props: FormScreenProps) => {
 
                                 <View className="h-1 w-12 my-6 bg-slate-300" />
                             </>
-                        )}
+                        )} */}
 
                         {/* -- TextArea -- */}
 

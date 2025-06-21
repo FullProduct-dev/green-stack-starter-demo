@@ -15,9 +15,11 @@
         "clsx": "^2.1.1",
         "crypto-js": "^4.2.0",
         "dot-prop": "^9.0.0",
+        "expo-system-ui": "~4.0.6",
         "react-native-reanimated": "3.16.3",
         "tailwind-merge": "^2.5.2",
-        "zod": "^3.23.7"
+        "zod": "^3.23.7",
+        "zod-to-ts": "^1.2.0"
     },
     "devDependencies": {
         "@graphql-tools/load-files": "^7.0.0",
@@ -36,6 +38,7 @@
         "collect:resolvers": "npm run run:script ../../packages/@green-stack-core/scripts/collect-resolvers.ts",
         "collect:generators": "npm run run:script ../../packages/@green-stack-core/scripts/collect-generators.ts",
         "collect:drivers": "npm run run:script ../../packages/@green-stack-core/scripts/collect-drivers.ts",
+        "collect:schemas": "npm -w @green-stack/core run run:script ../../packages/@green-stack-core/scripts/collect-schemas.ts",
         "link:routes": "npm run run:script ../../packages/@green-stack-core/scripts/link-routes.ts",
         "add:dependencies": "npm run run:script ../../packages/@green-stack-core/scripts/add-dependencies.ts",
         "test": "cd ../../ && bun test --tsconfig-override ./packages/@green-stack-core/tsconfig.json --preload ./packages/@green-stack-core/preload.test.ts --verbose"

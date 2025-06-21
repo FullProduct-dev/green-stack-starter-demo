@@ -1,0 +1,97 @@
+import { Image } from '@app/primitives'
+import { FileTree } from 'nextra/components'
+import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
+
+<TitleWrapper>
+    ## `createNextRouteHandler()`
+</TitleWrapper>
+
+<Image
+    src={require('@app/assets/green-stack-logo.png')}
+    style={{ marginTop: 20 }}
+    width={60}
+    height={60}
+    unoptimized
+/>
+
+# `createNextRouteHandler()`
+
+```typescript copy
+import { createNextRouteHandler } from '@green-stack/schemas/createNextRouteHandler'
+```
+
+<FileTree>
+    <FileTree.Folder name="packages" defaultOpen>
+        <FileTree.Folder name="@green-stack-core" defaultOpen>
+            <FileTree.Folder name="schemas" defaultOpen>
+                <FileTree.File name="createNextRouteHandler.ts" />
+            </FileTree.Folder>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+
+You can create a new API route by exporting a `GET` / `POST` / `UPDATE` / `DELETE` handler assigned to a `createNextRouteHandler()` that wraps your "bridged resolver":
+
+<TitleWrapper>
+    ### Creating API routes
+</TitleWrapper>
+
+```ts /createNextRouteHandler/1,3 /updatePost/4 filename="@some-feature / routes / api / posts / [slug] / update / route.ts"
+import { updatePost } from '@app/resolvers/updatePost.resolver'
+import { createNextRouteHandler } from '@green-stack/schemas/createNextRouteHandler'
+
+/* --- Routes ------------ */
+
+export const UPDATE = createNextRouteHandler(updatePost)
+// Automatically extracts (☝️) args from url / search params
+// based on the zod 'inputSchema'
+
+// If you want to support e.g. POST (👇), same deal (checks request body too)
+export const POST = createNextRouteHandler(updatePost)
+```
+
+### How it works
+
+What `createNextRouteHandler()` does under the hood:
+- 1. extract the input from the request context
+- 2. validate it
+- 3. call the resolver function with the args (and e.g. token / session / request context)
+- 4. return the output from your resolver with defaults applied
+
+> Check [Next.js Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) to understand supported exports (like `GET` or `POST`) and their options.
+
+> Restart your dev server or run `npm run link:routes` to make sure your new API route is available.
+
+<div className="h-8" />
+
+## Related Automations
+
+### `link-routes` - script
+
+```bash copy
+npm run link:routes
+```
+
+This script will:
+
+- 1. Scan the `/routes/` folder in any of your non-app workspaces
+- 2. Find all `route.ts` files that export a `createNextRouteHandler()` function
+- 3. Re-export your `GET` / `POST` / `PUT` / `DELETE` route handlers to the `@app/next` workspace
+
+The goal of this script is so you can define your API routes colocated by feature, instead of grouping by the "API route" type.
+
+Overall, this will keep your features more modular and portable between GREEN stack / FullProduct.dev projects.
+
+The [`link-routes`](/@green-stack-core/scripts/link-routes) script runs automatically on `npm run dev` and any production build commands.
+
+<div className="h-8" />
+
+### [`add-resolver`](/@green-stack-core/generators/add-resolver) - generator
+
+You don't need to manually create a new API route with `createNextRouteHandler()` every time you create a new resolver. You can use the [`add-resolver`](/@green-stack-core/generators/add-resolver) generator to create a new resolver and its API route at once:
+
+```bash copy
+npx turbo gen resolver
+```
+
+<div className="h-8" />

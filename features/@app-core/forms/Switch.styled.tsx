@@ -210,7 +210,8 @@ export const Switch = Platform.select({
 
 /* --- Docs ------------------------------------------------------------------------------------ */
 
-export const getDocumentationProps = SwitchProps.documentationProps<SwitchProps>('Switch', {
+export const getDocumentationProps = SwitchProps.documentationProps('Switch', {
+    exampleProps: { checked: true },
     valueProp: 'checked',
     onChangeProp: 'onCheckedChange',
 })

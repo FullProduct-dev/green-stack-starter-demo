@@ -1,4 +1,3 @@
-import { use } from 'react'
 import type { useLocalSearchParams } from 'expo-router'
 import type { UniversalRouteScreenProps } from './useRouteParams.types'
 import { parseUrlParamsObject } from '../utils/objectUtils'

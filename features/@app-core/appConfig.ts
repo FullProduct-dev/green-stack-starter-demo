@@ -23,8 +23,9 @@ export const isServer = isWeb && typeof window === 'undefined'
 
 export const isExpoGo = Constants?.appOwnership === 'expo' || !!Constants?.expoVersion
 
+export const isDocs = process.env.NEXT_PUBLIC_APP_ENV === 'docs'
 export const isExpo = isExpoGo || process.env.EXPO_PUBLIC_APP_ENV === 'expo'
-export const isNext = (!isExpo && isWeb) || process.env.NEXT_PUBLIC_APP_ENV === 'next'
+export const isNext = (!isExpo && isWeb) || process.env.NEXT_PUBLIC_APP_ENV === 'next' || isDocs
 
 export const isWebLocalServer = isWeb && isServer && process.env.PORT === '3000'
 export const isWebLocalhost = isWeb && (globalThis?.location?.hostname === 'localhost' || isWebLocalServer)
@@ -61,7 +62,9 @@ export const isMobileSize = isServer ? undefined : Dimensions.get('window').widt
 /** --- appConfig ------------------------------------------------------------------------------ */
 /** -i- App config variables powered by env vars universally, and including some expo contants config on mobile */
 export const appConfig = {
-    // - Flags -
+
+    // --- Flags ---
+
     isProd,
     isDev,
     isWeb,
@@ -71,6 +74,7 @@ export const appConfig = {
     isServer,
     isExpo,
     isNext,
+    isDocs,
     isLocal,
     isWebLocalhost,
     isNextLocal,
@@ -78,19 +82,41 @@ export const appConfig = {
     isExpoWebLocal,
     isExpoMobileLocal,
     isMobileSize,
-    // - Server URLs -
+
+    // --- Server URLs ---
+
     baseURL,
     backendURL,
     apiURL,
     graphURL,
-    // - Secrets -
-    // Don't use NEXT_PUBLIC_ / EXPO_PUBLIC_ prefixes here to make sure these are undefined client-side
+
+    // --- Secrets ---
+
+    // -!- Don't use NEXT_PUBLIC_ / EXPO_PUBLIC_ prefixes here to make sure these are undefined client-side
     appSecret: process.env.APP_SECRET,
-    // - Drivers -
+
+    // --- Drivers ---
+
     drivers: createDriverConfig({
         db: DRIVER_OPTIONS.db.mockDB,
     }),
-    // - Constants -
+
+    // --- Web Default Metadata ---
+
+    // -i- Can be overwritten on each route using Next.js metadata exports (RSC only, so no "use client" routes)
+    // -i- https://nextjs.org/docs/app/building-your-application/optimizing/metadata
+
+    title: 'My Universal App',
+    description: 'TODO: Add description',
+    openGraph: {
+        title: 'My Universal App',
+        description: 'TODO: Add description',
+        url: baseURL,
+        siteName: 'TODO: Set your site name',
+    },
+
+    // --- Mobile Metadata ---
+
     appName: Constants?.manifest2?.name || Constants?.manifest?.name,
     appVersion: Constants?.manifest2?.version || Constants?.manifest?.version,
     appDescription: Constants?.manifest2?.description || Constants?.manifest?.description,
@@ -98,7 +124,11 @@ export const appConfig = {
     appSlug: Constants?.manifest2?.slug || Constants?.manifest?.slug,
     appScheme: Constants?.manifest2?.scheme || Constants?.manifest?.scheme,
     appHostUri: Constants?.expoConfig?.hostUri,
+
+    // --- Constants ---
+
     debugMode: Constants?.debugMode,
+    
 } as const
 
 /* --- Debug ----------------------------------------------------------------------------------- */
