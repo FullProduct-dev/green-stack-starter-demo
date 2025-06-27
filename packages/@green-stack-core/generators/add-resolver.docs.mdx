@@ -41,16 +41,16 @@ npx turbo gen resolver --args <workspacePath> <resolverName> <resolverDescriptio
 | Argument            | Type         | Question / Description                                                                                                       |
 |---------------------|--------------|------------------------------------------------------------------------------------------------------------------------------|
 | workspacePath       | autocomplete | Where would you like to add this resolver? <br/>=> e.g. `features/@app-core`                                                 |
-| resolverName        | input        | What is the resolver name? <br/>=> `string`                                                                                  |
-| resolverDescription | input        | Optional description: What will this data resolver do? <br/>=> `string`                                                      |
-| resolverType        | list         | Will this resolver query or mutate data? <br/>=> `query` / `mutation`                                                        |
-| generatables        | checkbox     | What would you like to generate linked to this resolver? <br/>=> `GRAPHQL` / `GET` / `POST` / `PUT` / `DELETE` / `formHook`  |
+| resolverName        | text         | What is the resolver name? <br/>=> `string`                                                                                  |
+| resolverDescription | text         | Optional description: What will this data resolver do? <br/>=> `string`                                                      |
+| resolverType        | radio        | Will this resolver query or mutate data? <br/>=> `query` / `mutation`                                                        |
+| generatables        | checklist    | What would you like to generate linked to this resolver? <br/>=> `GRAPHQL` / `GET` / `POST` / `PUT` / `DELETE` / `formHook`  |
 | inputSchemaTarget   | autocomplete | Which schema should we use for the resolver inputs? <br/>=> e.g. `HealthCheckInput`                                          |
-| inputSchemaName     | input        | What will you call this new input schema? <br/>=> `string`                                                                   |
+| inputSchemaName     | text         | What will you call this new input schema? <br/>=> `string`                                                                   |
 | outputSchemaTarget  | autocomplete | Which schema should we use for the resolver output? <br/>=> e.g. `HealthCheckOutput`                                                         |
-| outputSchemaName    | input        | What will you call this new output schema? <br/>=> `string`                                                  |
-| apiPath             | input        | What API path would you like to use for REST? <br/>=> e.g. `/api/some/endpoint/with/[params]/`                               |
-| formHookName        | input        | What should the form hook be called? <br/>=> e.g. `useSomeResolver`                                                          |
+| outputSchemaName    | text         | What will you call this new output schema? <br/>=> `string`                                                  |
+| apiPath             | text         | What API path would you like to use for REST? <br/>=> e.g. `/api/some/endpoint/with/[params]/`                               |
+| formHookName        | text         | What should the form hook be called? <br/>=> e.g. `useSomeResolver`                                                          |
 
 <div className="h-8" />
 
