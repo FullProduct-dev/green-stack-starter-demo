@@ -302,7 +302,7 @@ export const getAvailableSchemas = (
 ) => {
     
     // Destructure the options
-    const { schemaKeyToUse, includeOptOut } = options
+    const { schemaKeyToUse = 'schemaName', includeOptOut } = options
 
     // Get workspace imports
     const { workspaceImports } = parseWorkspaces(folderLevel)
