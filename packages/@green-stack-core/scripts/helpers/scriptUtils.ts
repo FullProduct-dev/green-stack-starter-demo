@@ -292,8 +292,18 @@ export const getWorkspaceOptions = (folderLevel = '../../', options: {
 /** -i- List all the available schemas in the codebase that generators can use */
 export const getAvailableSchemas = (
     folderLevel = '../../',
-    schemaKeyToUse: 'schemaName' | 'schemaPath' | 'schemaOption' = 'schemaName',
+    options: {
+        schemaKeyToUse?: 'schemaName' | 'schemaPath' | 'schemaOption',
+        includeOptOut?: boolean,
+    } = {
+        schemaKeyToUse: 'schemaName',
+        includeOptOut: false,
+    }
 ) => {
+    
+    // Destructure the options
+    const { schemaKeyToUse, includeOptOut } = options
+
     // Get workspace imports
     const { workspaceImports } = parseWorkspaces(folderLevel)
     const schemaRegistry = maybeImport('@app/registries/schemas.generated.ts')
@@ -316,7 +326,7 @@ export const getAvailableSchemas = (
         
         // Skip if the file has opt-out patterns
         const fileContents = fs.readFileSync(schemaPath, 'utf8')
-        if (hasOptOutPatterns(fileContents)) return acc
+        if (!includeOptOut && hasOptOutPatterns(fileContents)) return acc
 
         // Check if there is a schema registry entry for this schema
         const schemaRegistryEntry = schemaRegistry[schemaName] || {}
@@ -363,16 +373,18 @@ export const getAvailableDataBridges = (
     options: {
         filterType?: 'query' | 'mutation',
         allowNonGraphql?: false,
+        includeOptOut?: boolean,
         bridgeKey?: 'bridgeName' | 'bridgePath' | 'bridgeOption' | 'bridgeInputOption'
     } = {
         filterType: undefined,
         allowNonGraphql: false,
+        includeOptOut: false,
         bridgeKey: 'bridgeName',
     },
 ) => {
 
     // Destructure the options
-    const { filterType, allowNonGraphql, bridgeKey = 'bridgeName' } = options
+    const { filterType, allowNonGraphql, includeOptOut, bridgeKey = 'bridgeName' } = options
 
     // Get workspace imports
     const { workspaceImports } = parseWorkspaces(folderLevel)
@@ -395,7 +407,7 @@ export const getAvailableDataBridges = (
 
         // Skip files that have opt-out patterns
         const fetcherFileContents = fs.readFileSync(fetcherPath, 'utf8')
-        if (hasOptOutPatterns(fetcherFileContents)) return acc
+        if (!includeOptOut && hasOptOutPatterns(fetcherFileContents)) return acc
         
         // Figure out fetcher name and type
         const [resolverName, fetcherType] = fetcherPath.split('/').pop()!.split('.') as [string, 'query' | 'mutation']
@@ -418,7 +430,7 @@ export const getAvailableDataBridges = (
 
         // Skip files that have opt-out patterns
         const bridgeFileContents = fs.readFileSync(bridgePath, 'utf8')
-        if (hasOptOutPatterns(bridgeFileContents)) return acc
+        if (!includeOptOut && hasOptOutPatterns(bridgeFileContents)) return acc
 
         // Figure out the bridge name and contents
         const bridgeName = bridgePath.split('/').pop()!.replace('.bridge.ts', 'Bridge')

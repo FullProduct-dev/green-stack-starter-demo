@@ -12,7 +12,7 @@ const collectSchemas = () => {
     try {
 
         // Figure out the available schemas
-        const availableSchemas = getAvailableSchemas()
+        const availableSchemas = getAvailableSchemas('../../', { includeOptOut: true })
 
         // Build the schema registry file
         const schemaRegistry = Object.values(availableSchemas).reduce((acc, schema) => {

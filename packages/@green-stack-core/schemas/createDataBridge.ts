@@ -15,11 +15,12 @@ export type INPUT_INDICATORS = typeof INPUT_INDICATORS[number]
 
 export type ALLOWED_METHODS = typeof ALLOWED_METHODS[number]
 
-/** --- normalizeInputSchemaName() ------------------------------------------------------------- */
+/** --- normalizeSchemaName() ------------------------------------------------------------------ */
 /** -i- Appends schema name with 'Input', but only if there isn't already an indicator of input in there */
-export const normalizeInputSchemaName = (schemaName: string, prefix: 'type' | 'input') => {
+export const normalizeSchemaName = (schemaName: string, prefix: 'type' | 'input') => {
     const isInputSchemaName = INPUT_INDICATORS.some((term) => schemaName?.includes(term))
     if (prefix === 'input' && !isInputSchemaName) return `${schemaName}Input`
+    if (prefix === 'type' && isInputSchemaName) return `${schemaName}Type`
     return schemaName
 }
 
@@ -42,10 +43,11 @@ export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape ext
     maxFieldDepth?: number
     logWarnings?: boolean
 }) => {
+
     // Introspect input & output schemas
     const argsSchemaDefs = inputSchema.introspect()
     const responseSchemaDefs = outputSchema.introspect()
-    let argsInputName = normalizeInputSchemaName(argsSchemaDefs.name!, 'input')
+    let argsInputName = normalizeSchemaName(argsSchemaDefs.name!, 'input')
     const _resolverArgsName = lowercaseFirstChar(resolverArgsName)
 
     // Determine nullability of args

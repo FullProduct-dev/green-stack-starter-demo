@@ -207,9 +207,14 @@ const workspaceInfo = parseWorkspaces(
 List all the available workspaces for generators to use.
 
 ```typescript
-const options = getWorkspaceOptions('../../', {
-    filter: ['@app'],
-    excludePackages: true
+const options = getWorkspaceOptions(folderLevel = '../../', {
+    filter: ['@app'], // string[]
+    exclude = [], // string[] -i- (List of packages to exclude)
+    excludePackages = false, // boolean -i- (Exclude workspaces from /packages/?)
+    includeApps = false, // boolean -i- (Include workspaces from /apps/?)
+    includeGreenStack = false, // boolean -i- (Include /packages/@green-stack-core/?)
+    skipFormatting = false, // boolean -i- (Skip formatting the output)
+    prefer = [], // string[] -i- (Puts these options at the top of the list)
 })
 // => {
 //        '@app/core  --  from features/@app-core': 'features/@app-core',
@@ -222,10 +227,10 @@ const options = getWorkspaceOptions('../../', {
 List all the available schemas in the codebase that generators can use.
 
 ```typescript
-const schemas = getAvailableSchemas(
-    folderLevel = '../../',
-    schemaKey = 'schemaName',
-)
+const schemas = getAvailableSchemas(folderLevel = '../../', {
+    schemaKey = 'schemaName', // 'schemaName' | 'schemaPath' | 'schemaOption'
+    includeOptOut = false, // boolean
+})
 // => {
 //        'UserSchema': {
 //            schemaPath: 'features/@app-core/schemas/User.ts',
@@ -253,13 +258,14 @@ const bridges = getAvailableDataBridges('../../', {
     filterType?: 'query', // 'query' | 'mutation'
     bridgeKey?: 'bridgeName', // 'bridgeName' | 'bridgePath' | 'bridgeOption' | 'bridgeInputOption'
     allowNonGraphql?: false, // boolean
+    includeOptOut?: false, // boolean
 })
 // => {
 //        'UserBridge': {
 //            bridgePath: 'features/@app-core/resolvers/healthCheck.bridge.ts',
 //            bridgeName: 'healthCheckBridge',
-//            bridgeOption: '@app/core - healthCheck (♻ - Bridge)',
-//            bridgeInputOption: '@app/core - healthCheck (♻ - Bridge) Input',
+//            bridgeOption: '@app/core >>> healthCheck() (♻ - Resolver)',
+//            bridgeInputOption: '@app/core >>> healthCheck() (♻ - Input)',
 //            workspacePath: 'features/@app-core',
 //            workspaceName: '@app/core',
 //            resolverName: 'healthCheck',
@@ -290,9 +296,29 @@ Retrieve the import aliases from the main tsconfig.json in `@app/core`.
 ```typescript
 const aliases = readImportAliases('../../')
 // => {
-//        '@app/core': '@app/core',
-//        '@app/ui': '@app/ui',
-//        '@green-stack/core': '@green-stack/core'
+//       '@app/core/appConfig': '@app/config',
+//       '@app/core/schemas': '@app/schemas',
+//       '@app/core/utils': '@app/utils',
+//       '@app/core/hooks': '@app/hooks',
+//       '@app/core/components/styled': '@app/primitives',
+//       '@app/core/components': '@app/components',
+//       '@app/core/forms': '@app/forms',
+//       '@app/core/screens': '@app/screens',
+//       '@app/core/assets': '@app/assets',
+//       '@app/core/resolvers': '@app/resolvers',
+//       '@app/core/middleware': '@app/middleware',
+//       '@green-stack/core/schemas': '@green-stack/schemas',
+//       '@green-stack/core/navigation/index': '@green-stack/navigation',
+//       '@green-stack/core/navigation': '@green-stack/navigation',
+//       '@green-stack/core/utils': '@green-stack/utils',
+//       '@green-stack/core/hooks': '@green-stack/hooks',
+//       '@green-stack/core/components': '@green-stack/components',
+//       '@green-stack/core/styles/index': '@green-stack/styles',
+//       '@green-stack/core/styles': '@green-stack/styles',
+//       '@green-stack/core/forms': '@green-stack/forms',
+//       '@green-stack/core/context': '@green-stack/context',
+//       '@green-stack/core/scripts': '@green-stack/scripts',
+//       '@green-stack/core/svg/svg.primitives': '@green-stack/svg',
 //    }
 ```
 
