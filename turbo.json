@@ -128,7 +128,7 @@
                 "../../packages/**/schemas/*.schema.ts",
                 "../../packages/@green-stack-core/utils/**.ts",
                 "../../packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
-                "../../packages/@db-driver/scripts/collect-models.ts"
+                "../../packages/@green-stack-core/scripts/collect-schemas.ts"
             ],
             "cache": true
         },

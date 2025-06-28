@@ -1,6 +1,6 @@
 import { gql } from 'graphql-tag'
 import { Metadata, Meta$Schema, ZodSchema } from './index'
-import { normalizeInputSchemaName } from './createDataBridge'
+import { normalizeSchemaName } from './createDataBridge'
 import { createSchemaPlugin } from './createSchemaPlugin'
 import { isEmpty, warnOnce } from '../utils/commonUtils'
 
@@ -49,7 +49,7 @@ export const createResolverDefinition = (resolverConfig: ResolverConfig) => {
     const nullableToken = areArgsOptional ? '' : '!'
     // If there are args, we need to state an input type for them
     if (!argsMeta.name) console.log('argsMeta', argsMeta)
-    const argsName = normalizeInputSchemaName(argsMeta.name!, 'input')
+    const argsName = normalizeSchemaName(argsMeta.name!, 'input')
     const argDef = hasArgs ? `(args: ${argsName}${nullableToken})` : ''
     // Return resolver definition
     return `${resolverName}${argDef}: ${resMeta.name}`
@@ -94,7 +94,7 @@ export const createSchemaDefinition = (
                 schemaDefinitions = [...schemaDefinitions, ...createSchemaDefinition(fieldMeta)]
                 // Add the definition line for the schema itself
                 if (!schema.name) console.log('schema', schema)
-                const schemaName = normalizeInputSchemaName(fieldMeta?.name!, prefix)
+                const schemaName = normalizeSchemaName(fieldMeta?.name!, prefix)
                 return `${optionalDescription}${schemaKey}: ${schemaName}${nullableToken}`
             }
 
@@ -102,7 +102,7 @@ export const createSchemaDefinition = (
             if (graphqlType === 'Array') {
                 // Determine the array element type
                 const primitiveElement = SCHEMA_PRIMITIVES_LOOKUP[fieldMeta.schema.baseType as keyof typeof SCHEMA_PRIMITIVES_LOOKUP] // prettier-ignore
-                const arrayElementType = primitiveElement || normalizeInputSchemaName(fieldMeta.schema.name!, prefix) // prettier-ignore
+                const arrayElementType = primitiveElement || normalizeSchemaName(fieldMeta.schema.name!, prefix) // prettier-ignore
                 // If the array is a schema, we should add that schema's definitions as well
                 if (!primitiveElement && fieldMeta.schema.schema) {
                     schemaDefinitions = [
@@ -132,10 +132,9 @@ export const createSchemaDefinition = (
     })
 
     // Transform schema meta into graphql definitions - e.g. `type SomeType { someKey: String! }`
-    const finalSchemaName = normalizeInputSchemaName(schema.name!, prefix)
-    const finalPrefix = finalSchemaName.includes('Input') ? 'input' : prefix
+    const finalSchemaName = normalizeSchemaName(schema.name!, prefix)
     const fullSchemaDef = `
-        ${finalPrefix} ${finalSchemaName} {
+        ${prefix} ${finalSchemaName} {
             ${Object.values(schemaMap).filter(Boolean).join('\n        ')}
         }
     `
