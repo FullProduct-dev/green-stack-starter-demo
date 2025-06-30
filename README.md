@@ -5,7 +5,7 @@
 > This project with built with [FullProduct.dev](https://fullproduct.dev?v=gh-demo-readme) ❇️ A starterkit for building truly universal apps with Expo (iOS / Android) and Next.js (Web + SSR) - Providing a familiar but optimized, write-once, app router experience.
 
 > [!NOTE]  
-> FullProduct.dev is still in beta, consider this an early preview of the project that will still be improved.
+> FullProduct.dev is still in beta and awaiting official release. Consider this an early preview of the project that will still be improved.
 
 ---
 
@@ -20,36 +20,41 @@
 
 - **Universal from the Start 🙌 + Write-once UI:**
   - Build for web, iOS, and Android with a single codebase.
-  - No more writing features twice / 3x - 90%+ of your UI and logic = shared across platforms.
-  - Use React Native primitives (`View`, `Text`, `Image`) + NativeWind for max portability while still styling your universal UI with Tailwind.
+  - No more writing features at 2x / 3x the time, resources or cost.
+  - 90%+ of your UI and logic = shared across platforms.
+  - Use React Native primitives (`View`, `Text`, `Image`) + NativeWind for max portability
+  - ... while still styling your universal UI with Tailwind.
 
 ![Write once + Universal UI](https://fullproduct.dev/blog-assets/imgs/write-once-universal-ui.jpg)
 
 - **The GREEN Stack ✅ for an *Evergreen* project setup:**
   - **G**raphQL, **R**eact-Native, **E**xpo, **N**ext.js.
-  - Designed to be powerful, future-proof, flexible, and easy to evolve as your project grows.
+  - Designed to be powerful, future-proof, flexible
+  - Easy to evolve as your project grows
 
 ![Code colocation comparison, a vertical versus a horizontal split](https://fullproduct.dev/blog-assets/imgs/horizontal-vs-vertical-split.jpg)
 
 - **Copy-Pasteable 📂 - Monorepo Architecture:**
   - Turborepo config already set up for you.
-  - Features are organized by domain, not by front-end/back-end split. This makes it easy to copy, reuse, and scale features between projects.
-  - Each feature workspace is self-contained: UI, API, models, schemas, utils, and more... All co-located in portable workspace packages.
+  - Features are organized by domain, not by front-end/back-end split.
+  - This makes it easy to copy, reuse, and scale features between projects.
+  - Each feature workspace is self-contained: UI, API, models, schemas, utils, and more...
+  - All of it co-located in portable workspace packages.
 
 ---
 
 <details>
-<summary>What does that look like?</summary>
+<summary>What does that look like? 💡</summary>
 
 ---
 
 ![Example Workspace Architecture](https://fullproduct.dev/blog-assets/imgs/colocate-by-feature-workspaces.jpg)
 
-The idea is that each feature is a self-contained workspace, that defines its own UI, APIs, schemas, models, etc. and have automation scripts re-export them to the right places.
+The idea is that each feature is a self-contained workspace, that defines its own UI, APIs, schemas, models, etc. and has automation scripts re-export them to the right places.
 
 ![](https://fullproduct.dev/blog-assets/imgs/feature-routes-to-universal-links.jpg)
 
-This allows you to copy-paste features between projects, without the need for manual linking like you'd usually have to do without this architecture.
+This allows you to copy-paste **"feature folders"** between projects, without the need for manual linking like you'd typically have to do without this architecture.
 
 </details>
 
@@ -58,7 +63,8 @@ This allows you to copy-paste features between projects, without the need for ma
 ![Matt Pocock - The right abstraction, found at the right time, can save you weeks of work. It's often worth putting the time in](https://fullproduct.dev/blog-assets/imgs/matt-pocock-right-abstractions.jpg)
 
 - **Single Sources of Truth 💎 - The Right Abstractions**
-  - Define your data shape once using Zod schemas, and derive or (auto-)generate types, validation, docs, db models, and more from them.
+  - Define your data shape once using Zod schema
+  - Derive or (auto-)generate types, validation, docs, db models, and more from them.
   - Avoid bugs and wasted time by keeping your types, validation, and docs in sync automatically.
 
 ![Universal Data Fetching](https://fullproduct.dev/blog-assets/imgs/universal-data-fetching.jpg)
@@ -66,20 +72,23 @@ This allows you to copy-paste features between projects, without the need for ma
 - **Universal Data Fetching 🔀 - For Expo and Next.js**
   - GraphQL + React Query for type-safe, cross-platform data fetching.
   - Fetch data the same way on server, browser, and mobile.
+  - Derive all GraphQL definitions and queries from Zod schemas.
+  - Use `react-query` to fetch serverside, in the browser and on mobile.
 
 ![Generators vs AI Codegen](https://fullproduct.dev/blog-assets/imgs/generators-vs-ai.jpg)
 
 - **Modern DX & Codegen ⚙️ - Beyond just the Setup**
   - Built-in code generators for schemas, resolvers, forms, and more.
   - Fast monorepo setup with Turborepo (or use standalone if you prefer).
+  - Includes a generator to quickly add new generators and scripts.
 
 [![Rich Interactive docs example](https://fullproduct.dev/blog-assets/imgs/nextra-url-docs-example.jpg)](https://fullproduct.dev/docs/@app-core/components/Button?showCode=true)
 
 - **Rich Interactive Docs 📚 - Automatically grow with your project**
-  - Full documentation at [fullproduct.dev/docs](https://fullproduct.dev/docs?v=gh-demo-readme)
+  - Full documentation at [fullproduct.dev/docs](https://fullproduct.dev/docs?v=gh-prfl)
   - Best practices and guides included in the built-in docs
   - Automatic UI, API and Types docs generation from Zod schemas [(e.g.)](https://fullproduct.dev/docs/@app-core/components/Button?showCode=true)
-  - Easy Onboardings / Handovers, *Great Context for LLMs*
+  - Easy Onboardings / Handovers + *Great Context for LLMs*
 
 ## ❇️ The GREEN stack:
 
@@ -116,7 +125,7 @@ These are proven and widely supported technologies.
 
 ![What about reusing web code?](https://fullproduct.dev/blog-assets/imgs/reusing-web-code.jpg)
 
-> Just use Expo's new `"use dom"` directive [(here's how)](https://docs.expo.dev/guides/dom-components/)
+> Just use Expo's new `"use dom"` directive [(here's how)](https://docs.expo.dev/guides/dom-components/?utm_source=fullproduct.dev&utm_medium=readme)
 
 ...
 
@@ -147,25 +156,38 @@ These are proven and widely supported technologies.
 
 ![Timeline comparison to when I started experimenting with these universal app concepts vs. the releases Expo did, and the Web-Only boilerplate that have skyrocketed](https://fullproduct.dev/blog-assets/imgs/cross-platform-experimentation.jpg)
 
+> Hi 👋 I'm Thorr, creator of the **❇️ [FullProduct.dev](https://fullproduct.dev)** - *Universal App Starter kit*
+
 This stack and kit are the result of years of experimentation building both web and mobile apps in startups, agencies, and as a freelancer + solopreneur.
 
-It's a collection of best practices, patterns and tools I had or wish I has during [my career](https://codinsonn.dev/resume?v=gh-demo-readme). Now, I hope to share it with you so you can build your own universal apps faster, with less manual boilerplate, and more reusable than ever before.
+It's become a collection of best practices, patterns & tools I wish I had during **[my career ↗️](https://codinsonn.dev/resume?v=gh-demo-readme)**
+
+- <img src="https://img.shields.io/badge/Studies-white" alt="Studies"> <img src="https://img.shields.io/badge/- Design -- Development -- Motion Graphics -- JS / TS -grey" alt="Design, Development, Motion Graphics"> 
+- <img src="https://img.shields.io/badge/Agencies-white" alt="Agencies"> <img src="https://img.shields.io/badge/- B2B -- MVPs -- React SSR -- Automatic Docgen -- Expo EAS -grey" alt="B2B, MVPs, React SSR, Automatic Docgen, Expo EAS"> 
+- <img src="https://img.shields.io/badge/Startups-white" alt="Startups"> <img src="https://img.shields.io/badge/- Web -- App Stores -- Deeplinks -- Drivers -- Zod -- AI -- Stripe -grey" alt="Web, Mobile, Deeplinks, Drivers, Zod, AI"> 
+- <img src="https://img.shields.io/badge/Freelance-white" alt="Freelance"> <img src="https://img.shields.io/badge/- Onboardings -- Demos -- API -- Team Lead -- Docs -- Handovers -grey" alt="Onboardings, Demos, Team Lead, Docs, Handovers"> 
+- <img src="https://img.shields.io/badge/SaaS-white" alt="SaaS"> <img src="https://img.shields.io/badge/- Building Apps -- Auth & Payments -- Portability -- Marketing -grey" alt=""> 
+
+Across a number of international projects, countries and industries:
+
+<img src="https://img.shields.io/badge/🇬🇧 Healthcare-black" alt="UK, Healthcare"> <img src="https://img.shields.io/badge/🇪🇺 B2B -- ECommerce-black" alt="Europe, B2B, ECommerce"> <img src="https://img.shields.io/badge/🇺🇸 Retail -- Incubator -- MVP -black" alt="US Retail, Incubator, MVP"> 
+
+Now, I'm glad to share my learnings to help others build their own universal apps faster, with less manual boilerplate, and more code reusability than ever before.
 
 [![Timeline of my professional experience, contemplating why I have to rebuild the same feature for the 6th time](https://fullproduct.dev/blog-assets/imgs/why-are-features-not-reusable.jpg)](https://codinsonn.dev/resume?v=gh-demo-readme)
 
-> **Support the project or spread the word by keeping this entire collapsible section intact** 🙏
+> **Support the project** - *Please keep this entire collapsible section in your README* 🙏
 
-- [FullProduct.dev Docs](https://fullproduct.dev/docs?v=gh-demo-readme) - to peruse / send to your lead architect
-- [FullProduct.dev Landing Page](https://fullproduct.dev?v=gh-demo-readme) - to send to your boss
-- [Read + Share the Blog](https://fullproduct.dev/blog?v=gh-demo-readme) or [Sponsor me](https://github.com/sponsors/codinsonn)
+- [FullProduct.dev Docs 📚](https://fullproduct.dev/docs?v=gh-demo-readme) - to learn / send to your lead architect
+- [FullProduct.dev Landing Page](https://fullproduct.dev?v=gh-demo-readme) - upgrade / send to your boss
+- [Read + Share the Blog](https://fullproduct.dev/blog?v=gh-demo-readme) or [Sponsor me](https://github.com/sponsors/codinsonn) 💚
 
 [![Picture of me giving a talk on maximising efficiency by building universal apps](https://fullproduct.dev/blog-assets/imgs/maximise-efficiency-tech-talk-header.jpg)](https://fullproduct.dev/blog/maximize-efficiency-building-universal-apps?v=gh-demo-readme)
 
 > ⭐️ Follow me for updates, tips and tricks:
 
 - [codinsonn.dev](https://codinsonn.dev?v=gh-demo-readme) - Personal Website + social links
-- Find me as [@codinsonn](https://twitter.com/codinsonn) - e.g. [GitHub](https://github.com/codinsonn) / [Twitter](https://twitter.com/codinsonn)
-- Or as Thorr on other socials - e.g. [LinkedIn](https://www.linkedin.com/in/thorr-stevens/)
+- Find me as [@codinsonn](https://twitter.com/codinsonn) - e.g. [GitHub](https://github.com/codinsonn) / [Twitter](https://twitter.com/codinsonn) / [LinkedIn](https://www.linkedin.com/in/thorr-stevens/)
 
 </details>
 
