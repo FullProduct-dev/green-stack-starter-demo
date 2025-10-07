@@ -23,6 +23,7 @@
   "scripts": {
     "dev": "npm run dev:apps",
     "dev:apps": "npx turbo run @app/next#dev @app/expo#dev",
+    "dev:sim": "npx turbo run @app/next#dev ios",
     "dev:web": "npx turbo run @app/next#dev",
     "dev:mobile": "npx turbo run @app/expo#dev",
     "android": "npx turbo run android",
