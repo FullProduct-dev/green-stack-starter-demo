@@ -7,9 +7,8 @@ import { cn } from '../utils/styleUtils'
 
 /* --- <Link/> --------------------------------------------------------------------------------- */
 
-export const Link = <
-    HREF extends KnownRoutes
->(props: UniversalLinkProps<HREF>) => {
+export const Link = <HREF extends KnownRoutes>(props: UniversalLinkProps<HREF>) => {
+
     // Props
     const {
         children,
@@ -53,7 +52,8 @@ export const Link = <
             href={finalHref}
             id={nativeID}
             className={cn(className, nativeWindClassName)}
-            style={finalStyle as unknown as ComponentProps<typeof NextLink>['style']}
+            style={finalStyle as unknown as ComponentProps<typeof NextLink>['style']} 
+            // @ts-ignore
             onClick={onPress}
             target={target}
             replace={replace}

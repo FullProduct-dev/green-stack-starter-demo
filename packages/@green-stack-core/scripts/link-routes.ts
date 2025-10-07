@@ -30,8 +30,8 @@ const linkRoutes = () => {
         const routeManifest = {} as ObjectType<any$Todo>
 
         // Get all route paths in the features & package folders
-        const packageRoutePaths = globRel('../../packages/**/routes/**/*.{ts,tsx}').filter(excludeDirs)
-        const featureRoutePaths = globRel('../../features/**/routes/**/*.{ts,tsx}').filter(excludeDirs)
+        const packageRoutePaths = globRel('../../packages/**/routes/**/*.{ts,tsx,native.tsx,web.tsx}').filter(excludeDirs)
+        const featureRoutePaths = globRel('../../features/**/routes/**/*.{ts,tsx,native.tsx,web.tsx}').filter(excludeDirs)
         const allRoutePaths = [...packageRoutePaths, ...featureRoutePaths]
 
         // Get all image paths in the features & package folders
@@ -48,9 +48,9 @@ const linkRoutes = () => {
         const opengraphImageRoutes = allRoutePaths.filter((pth) => pth.includes('opengraph-image.ts')) // e.g. "/**/not-found.tsx"
         const twitterImageRoutes = allRoutePaths.filter((pth) => pth.includes('twitter-image.ts')) // e.g. "/**/not-found.tsx"
         const apiRoutes = allRoutePaths.filter((pth) => pth.includes('route.ts')) // e.g. "/**/route.tsx"
-        const indexRoutes = allRoutePaths.filter((pth) => pth.includes('index.ts')) // e.g. "/**/index.tsx"
+        const indexRoutes = allRoutePaths.filter((pth) => pth.includes('index.')) // e.g. "/**/index.tsx" | "/**/index.native.tsx"
         const headRoutes = allRoutePaths.filter((pth) => pth.includes('head.ts')) // e.g. "/**/head.tsx"
-        const paramRoutes = allRoutePaths.filter((pth) => pth.includes('].ts')) // e.g. "/**/[slug].tsx"
+        const paramRoutes = allRoutePaths.filter((pth) => pth.includes('].')) // e.g. "/**/[slug].tsx" | "/**/[...slug].web.tsx"
 
         // Figure out import paths from each workspace
         const { workspaceImports } = parseWorkspaces()
@@ -59,6 +59,8 @@ const linkRoutes = () => {
         const parsePath = (pth: string, autoDefault = true) => {
             let screenComponentName = ''
             let isRSC = false
+            let isExpoOnly = pth.includes('.native.ts')
+            let isNextOnly = pth.includes('.web.ts')
             // Figure out the workspace import
             const [packageParts, routeParts] = pth.split('/routes') as [string, string]
             const workspaceMatcher = packageParts.replace('../../', '')
@@ -102,7 +104,7 @@ const linkRoutes = () => {
                 if (routeFile.includes('export const size')) nextExports.push('size')
             }
             // Return everything
-            return { workspacePackageName, routeParts, nextExports, expoExports, screenComponentName, isRSC }
+            return { workspacePackageName, routeParts, nextExports, expoExports, screenComponentName, isRSC, isExpoOnly, isNextOnly }
         }
         // Clear previous generated route files
         fs.mkdirSync('../../apps/expo/app/(generated)', { recursive: true }) // create empty folder if it doesn't exist
@@ -115,40 +117,44 @@ const linkRoutes = () => {
 
         // Reexport fs based index routing in next & expo app dirs
         indexRoutes.forEach((pth) => {
-            const { workspacePackageName, routeParts, nextExports, expoExports, screenComponentName, isRSC } = parsePath(pth) // prettier-ignore
-            const routeSegments = routeParts.split('index.ts')[0]
+            const { workspacePackageName, routeParts, nextExports, expoExports, screenComponentName, isRSC, isExpoOnly, isNextOnly } = parsePath(pth) // prettier-ignore
+            const routeSegments = routeParts.split('index.')[0]
             if (screenComponentName) routeManifest[routeSegments] = screenComponentName
-            const importPath = `${workspacePackageName}/routes${routeSegments}index`
+            let importPath = `${workspacePackageName}/routes${routeSegments}index`
+            if (isExpoOnly) importPath = `${importPath}.native`
+            if (isNextOnly) importPath = `${importPath}.web`
             const expoExportLine = `${genMsg}\nexport { ${expoExports.join(', ')} } from '${importPath}'\n` // prettier-ignore
             const directive = isRSC ? '' : `"use client"\n`
             const nextExportLine = `${directive}export { ${nextExports.join(', ')} } from '${importPath}'\n` // prettier-ignore
-            fs.mkdirSync(`../../apps/expo/app/(generated)${routeSegments}`, { recursive: true })
-            fs.writeFileSync(`../../apps/expo/app/(generated)${routeSegments}index.tsx`, expoExportLine, {}) // prettier-ignore
+            if (!isNextOnly) fs.mkdirSync(`../../apps/expo/app/(generated)${routeSegments}`, { recursive: true })
+            if (!isNextOnly) fs.writeFileSync(`../../apps/expo/app/(generated)${routeSegments}index.tsx`, expoExportLine, {}) // prettier-ignore
             console.log(` ${a.bold(a.green('✔'))} ${routeSegments}   ${a.muted(`-- Generated from "${pth}"`)}`)
-            console.log(a.muted(`      └── /apps/expo/app/(generated)${routeSegments}index.tsx`))
-            fs.mkdirSync(`../../apps/next/app/(generated)${routeSegments}`, { recursive: true })
-            fs.writeFileSync(`../../apps/next/app/(generated)${routeSegments}page.tsx`, nextExportLine)
-            console.log(a.muted(`      └── /apps/next/app/(generated)${routeSegments}page.tsx`))
+            if (!isNextOnly) console.log(a.muted(`      └── /apps/expo/app/(generated)${routeSegments}index.tsx`))
+            if (!isExpoOnly) fs.mkdirSync(`../../apps/next/app/(generated)${routeSegments}`, { recursive: true })
+            if (!isExpoOnly) fs.writeFileSync(`../../apps/next/app/(generated)${routeSegments}page.tsx`, nextExportLine)
+            if (!isExpoOnly) console.log(a.muted(`      └── /apps/next/app/(generated)${routeSegments}page.tsx`))
         })
 
         // Reexport fs based slug routing in next & expo app dirs
         paramRoutes.forEach((pth) => {
-            const { workspacePackageName, routeParts, nextExports, expoExports, screenComponentName, isRSC } = parsePath(pth) // prettier-ignore
-            const fileName = routeParts.split('/').pop() as string // e.g. "[slug].tsx"
-            const routeParam = fileName.split('.ts')[0] // e.g. "[slug]"
+            const { workspacePackageName, routeParts, nextExports, expoExports, screenComponentName, isRSC, isExpoOnly, isNextOnly } = parsePath(pth) // prettier-ignore
+            const fileName = routeParts.split('/').pop() as string // e.g. "[slug].tsx" | "[...slug].web.tsx"
+            const routeParam = fileName.split('.')[0] // e.g. "[slug]" | "[[...slug]]"
             const routeSegments = routeParts.split(fileName)[0]
             if (screenComponentName) routeManifest[routeSegments] = screenComponentName
-            const importPath = `${workspacePackageName}/routes${routeSegments}${routeParam}`
+            let importPath = `${workspacePackageName}/routes${routeSegments}${routeParam}`
+            if (isExpoOnly) importPath = `${importPath}.native`
+            if (isNextOnly) importPath = `${importPath}.web`
             const expoExportLine = `export { ${expoExports.join(', ')} } from '${importPath}'\n`
             const directive = isRSC ? '' : `"use client"\n`
             const nextExportLine = `${directive}${genMsg}\nexport { ${nextExports.join(', ')} } from '${importPath}'\n` // prettier-ignore
-            fs.mkdirSync(`../../apps/expo/app/(generated)${routeSegments}${routeParam}`, { recursive: true }) // prettier-ignore
-            fs.writeFileSync(`../../apps/expo/app/(generated)${routeSegments}${routeParam}/index.tsx`, expoExportLine) // prettier-ignore
+            if (!isNextOnly) fs.mkdirSync(`../../apps/expo/app/(generated)${routeSegments}${routeParam}`, { recursive: true }) // prettier-ignore
+            if (!isNextOnly) fs.writeFileSync(`../../apps/expo/app/(generated)${routeSegments}${routeParam}/index.tsx`, expoExportLine) // prettier-ignore
             console.log(` ${a.bold(a.green('✔'))} ${routeSegments}${routeParam}/   ${a.muted(`-- Generated from "${pth}"`)}`)
-            console.log(a.muted(`      └── /apps/expo/app/(generated)${routeSegments}${routeParam}/index.tsx`))
-            fs.mkdirSync(`../../apps/next/app/(generated)${routeSegments}${routeParam}`, { recursive: true }) // prettier-ignore
-            fs.writeFileSync(`../../apps/next/app/(generated)${routeSegments}${routeParam}/page.tsx`, nextExportLine) //  prettier-ignore
-            console.log(a.muted(`      └── /apps/next/app/(generated)${routeSegments}${routeParam}/page.tsx`))
+            if (!isNextOnly) console.log(a.muted(`      └── /apps/expo/app/(generated)${routeSegments}${routeParam}/index.tsx`))
+            if (!isExpoOnly) fs.mkdirSync(`../../apps/next/app/(generated)${routeSegments}${routeParam}`, { recursive: true }) // prettier-ignore
+            if (!isExpoOnly) fs.writeFileSync(`../../apps/next/app/(generated)${routeSegments}${routeParam}/page.tsx`, nextExportLine) //  prettier-ignore
+            if (!isExpoOnly) console.log(a.muted(`      └── /apps/next/app/(generated)${routeSegments}${routeParam}/page.tsx`))
         })
 
         if (layoutRoutes.length || templateRoutes.length || headRoutes.length) console.log('--- \n')
