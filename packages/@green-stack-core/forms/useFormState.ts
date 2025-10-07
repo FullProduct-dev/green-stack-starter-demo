@@ -19,6 +19,7 @@ export const useFormState = <
         syncFromPropsKey?: string,
     } = {},
 ) => {
+
     // Props
     const { validateOnBlur, validateOnChange, syncFromPropsKey = 'none' } = options
     const initialValues = (options.initialValues || {}) as T
@@ -137,6 +138,15 @@ export const useFormState = <
         }
     }
 
+    const getCheckableInputProps = <KEY extends K>(key: KEY) => {
+        const { onChange, value, ...inputProps } = getInputProps(key)
+        return {
+            ...inputProps,
+            checked: !!value,
+            onCheckedChange: (checked: boolean) => onChange(checked as T[KEY]),
+        }
+    }
+
     // -- Flags --
 
     const isValid = validate(false)
@@ -198,6 +208,8 @@ export const useFormState = <
         getNumberTextInputProps,
         /** -i- The props to add to a select input to manage its state */
         getSelectInputProps,
+        /** -i- The props to add to a toggle / radio / checkbox input to manage its state, uses `onCheckedChange` instead */
+        getCheckableInputProps,
         /** -i- The key of the current form values, good for use in hook dependencies to trigger recalculations */
         valuesKey,
     }
