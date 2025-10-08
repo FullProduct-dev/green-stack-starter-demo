@@ -1,69 +1,70 @@
 {
-  "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+    "compilerOptions": {
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"
+        ],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "noEmit": true,
+        "incremental": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "allowImportingTsExtensions": true,
+        "jsx": "preserve",
+        "plugins": [
+            {
+                "name": "@0no-co/graphqlsp",
+                "schema": "./graphql/schema.graphql",
+                "tadaOutputLocation": "./graphql-env.d.ts"
+            }
+        ],
+        "types": ["node", "glob"],
+        "paths": {
+            "@app/kit": ["../../packages/@green-stack-core/*"],
+            "@app/config": ["../../features/@app-core/appConfig.ts"],
+            "@app/schemas/*": ["../../features/@app-core/schemas/*"],
+            "@app/utils/*": ["../../features/@app-core/utils/*"],
+            "@app/hooks/*": ["../../features/@app-core/hooks/*"],
+            "@app/primitives": ["../../features/@app-core/components/styled.tsx"],
+            "@app/components/*": ["../../features/@app-core/components/*"],
+            "@app/forms/*": ["../../features/@app-core/forms/*"],
+            "@app/screens/*": ["../../features/@app-core/screens/*"],
+            "@app/assets/*": ["../../features/@app-core/assets/*"],
+            "@app/resolvers/*": ["../../features/@app-core/resolvers/*"],
+            "@app/middleware/*": ["../../features/@app-core/middleware/*"],
+            "@green-stack/schemas": ["../../packages/@green-stack-core/schemas"],
+            "@green-stack/schemas/*": ["../../packages/@green-stack-core/schemas/*"],
+            "@green-stack/navigation": ["../../packages/@green-stack-core/navigation/index.ts"],
+            "@green-stack/navigation/*": ["../../packages/@green-stack-core/navigation/*"],
+            "@green-stack/utils/*": ["../../packages/@green-stack-core/utils/*"],
+            "@green-stack/hooks/*": ["../../packages/@green-stack-core/hooks/*"],
+            "@green-stack/components/*": ["../../packages/@green-stack-core/components/*"],
+            "@green-stack/styles": ["../../packages/@green-stack-core/styles/index.tsx"],
+            "@green-stack/styles/*": ["../../packages/@green-stack-core/styles/*"],
+            "@green-stack/forms/*": ["../../packages/@green-stack-core/forms/*"],
+            "@green-stack/context/*": ["../../packages/@green-stack-core/context/*"],
+            "@green-stack/scripts/*": ["../../packages/@green-stack-core/scripts/*"],
+            "@green-stack/svg": ["../../packages/@green-stack-core/svg/svg.primitives.tsx"],
+            "@db/models": ["../../packages/@db-driver/models.ts"],
+            "@db/mock": ["../../packages/@db-driver/drivers/mock.db.ts"]
+        }
+    },
+    "include": [
+        "../../apps/next/next-env.d.ts",
+        "../../packages/@green-stack-core/global.d.ts",
+        "../../features/@app-core/nativewind-env.d.ts",
+        "../../features/@app-core/appConfig.ts",
+        "**/*.ts",
+        "**/*.tsx"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "incremental": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "allowImportingTsExtensions": true,
-    "jsx": "preserve",
-    "plugins": [
-      {
-        "name": "@0no-co/graphqlsp",
-        "schema": "./graphql/schema.graphql",
-        "tadaOutputLocation": "./graphql-env.d.ts"
-      }
+    "exclude": [
+        "node_modules"
     ],
-    "types": ["node", "glob"],
-    "paths": {
-      "@app/config": ["../../features/@app-core/appConfig.ts"],
-      "@app/schemas/*": ["../../features/@app-core/schemas/*"],
-      "@app/utils/*": ["../../features/@app-core/utils/*"],
-      "@app/hooks/*": ["../../features/@app-core/hooks/*"],
-      "@app/primitives": ["../../features/@app-core/components/styled.tsx"],
-      "@app/components/*": ["../../features/@app-core/components/*"],
-      "@app/forms/*": ["../../features/@app-core/forms/*"],
-      "@app/screens/*": ["../../features/@app-core/screens/*"],
-      "@app/assets/*": ["../../features/@app-core/assets/*"],
-      "@app/resolvers/*": ["../../features/@app-core/resolvers/*"],
-      "@app/middleware/*": ["../../features/@app-core/middleware/*"],
-      "@green-stack/schemas": ["../../packages/@green-stack-core/schemas"],
-      "@green-stack/schemas/*": ["../../packages/@green-stack-core/schemas/*"],
-      "@green-stack/navigation": ["../../packages/@green-stack-core/navigation/index.ts"],
-      "@green-stack/navigation/*": ["../../packages/@green-stack-core/navigation/*"],
-      "@green-stack/utils/*": ["../../packages/@green-stack-core/utils/*"],
-      "@green-stack/hooks/*": ["../../packages/@green-stack-core/hooks/*"],
-      "@green-stack/components/*": ["../../packages/@green-stack-core/components/*"],
-      "@green-stack/styles": ["../../packages/@green-stack-core/styles/index.tsx"],
-      "@green-stack/styles/*": ["../../packages/@green-stack-core/styles/*"],
-      "@green-stack/forms/*": ["../../packages/@green-stack-core/forms/*"],
-      "@green-stack/context/*": ["../../packages/@green-stack-core/context/*"],
-      "@green-stack/scripts/*": ["../../packages/@green-stack-core/scripts/*"],
-      "@green-stack/svg": ["../../packages/@green-stack-core/svg/svg.primitives.tsx"],
-      "@db/models": ["../../packages/@db-driver/models.ts"],
-      "@db/mock": ["../../packages/@db-driver/drivers/mock.db.ts"]
-    }
-  },
-  "include": [
-    "../../apps/next/next-env.d.ts",
-    "../../packages/@green-stack-core/global.d.ts",
-    "../../features/@app-core/nativewind-env.d.ts",
-    "../../features/@app-core/appConfig.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "extends": "expo/tsconfig.base"
+    "extends": "expo/tsconfig.base"
 }

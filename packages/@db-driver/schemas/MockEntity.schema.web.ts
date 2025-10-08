@@ -1,10 +1,6 @@
 // @ts-ignore
+import { v4 as uuidV4 } from 'uuid'
 import { z, schema } from '@green-stack/schemas'
-
-/* --- Why? ------------------------------------------------------------------------------------ */
-
-// -i- This is an Expo decoy copy until we figure out why `uuid` doesn't work in Expo
-// -i- The real one is in `MockEntity.schema.web.ts` in the same folder
 
 /* --- Schema ---------------------------------------------------------------------------------- */
 
@@ -12,6 +8,7 @@ export const MockDBEntity = schema('MockDBEntity', {
     id: z
         .string()
         .uuid()
+        .default(() => uuidV4())
         .describe('Provided or auto-generated UUID (V4)'),
     createdAt: z
         .date()

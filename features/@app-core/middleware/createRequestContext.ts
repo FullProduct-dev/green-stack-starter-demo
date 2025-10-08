@@ -18,6 +18,7 @@ export type RequestContext = {
     info?: unknown,
     // -i- Anything else you might want to attach as context through middleware, e.g.
     userId?: string,
+    orgId?: string,
     sessionId?: string,
     authToken?: string,
     // ...
