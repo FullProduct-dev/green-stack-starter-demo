@@ -2,7 +2,7 @@ import { useState, useEffect, ReactNode } from 'react'
 import type { KnownRoutes } from '@app/registries/routeManifest.generated'
 import type { UniversalLinkProps, RequireParamsIfDynamic } from '@green-stack/navigation/Link.types'
 import type { PressableProps } from 'react-native'
-import { cn, Pressable, View, Text, Link } from './styled'
+import { cn, Pressable, View, Text, Image, Link } from './styled'
 import { z, schema } from '@green-stack/schemas'
 import { Icon, UniversalIconProps } from '@green-stack/components/Icon'
 import { useRouter } from '@green-stack/navigation'
@@ -31,9 +31,12 @@ export const ButtonProps = schema('ButtonProps', {
     push: z.boolean().optional(),
 })
 
-export type ButtonProps<HREF extends KnownRoutes | never = never> = z.input<typeof ButtonProps> & {
+export type ButtonProps<HREF extends KnownRoutes | never = never> = Omit<z.input<typeof ButtonProps>, 'iconLeft' | 'iconRight'> & {
     children?: ReactNode,
     style?: PressableProps['style'] | UniversalLinkProps['style'],
+    // - Icons -
+    iconLeft?: z.infer<typeof ButtonProps>['iconLeft'] | `https://${string}`,
+    iconRight?: z.infer<typeof ButtonProps>['iconRight'] | `https://${string}`,
     // - Pressable Props -
     onPress?: PressableProps['onPress'] | UniversalLinkProps['onPress'],
     onPressIn?: PressableProps['onPressIn'],
@@ -50,7 +53,8 @@ export type ButtonProps<HREF extends KnownRoutes | never = never> = z.input<type
 /* --- <Button/> ------------------------------------------------------------------------------- */
 
 export const Button = <HREF extends KnownRoutes | never = never>(rawProps: ButtonProps<HREF>) => {
-    // Props
+
+    // @ts-ignore
     const props = ButtonProps.applyDefaults(rawProps)
     const { text, children } = props
 
@@ -69,6 +73,8 @@ export const Button = <HREF extends KnownRoutes | never = never>(rawProps: Butto
     const hasLabel = !!buttonText || !!children
     const hasLeftIcon = !!props.iconLeft
     const hasRightIcon = !!props.iconRight
+    const isLeftIconImg = props.iconLeft?.startsWith('http')
+    const isRightIconImg = props.iconRight?.startsWith('http')
 
     // -- Styles --
 
@@ -83,7 +89,7 @@ export const Button = <HREF extends KnownRoutes | never = never>(rawProps: Butto
         props.type === 'danger' && 'bg-danger web:hover:opacity-90 active:opacity-90',
         props.type === 'info' && 'bg-info web:hover:opacity-90 active:opacity-90',
         props.type === 'success' && 'bg-success web:hover:opacity-90 active:opacity-90',
-        props.size === 'sm' && 'p-2',
+        props.size === 'sm' && 'py-2 px-3',
         props.size === 'md' && 'p-3',
         props.size === 'lg' && 'p-4',
         props.type === 'link' && 'p-0 justify-start',
@@ -149,6 +155,8 @@ export const Button = <HREF extends KnownRoutes | never = never>(rawProps: Butto
         if (props.disabled) return
         // Call event handler?
         props.onPress?.(evt)
+        // If link behaviour is already handled by the Link component, skip it here
+        if (asLink) return
         // Open in new tab?
         const isWebBlankLink = isWeb && props.href && props.target === '_blank'
         if (isWebBlankLink) return window.open(props.href, '_blank')
@@ -168,12 +176,20 @@ export const Button = <HREF extends KnownRoutes | never = never>(rawProps: Butto
         <>
             {hasLeftIcon && (
                 <View className="justify-center">
-                    <Icon
-                        name={props.iconLeft!}
-                        className={iconClassNames}
-                        size={iconSize}
-                        color={iconColor}
-                    />
+                    {isLeftIconImg ? (
+                        <Image
+                            src={props.iconLeft!}
+                            style={{ width: iconSize, height: iconSize, tintColor: iconColor }}
+                            contentFit="contain"
+                        />
+                    ) : (
+                        <Icon
+                            name={props.iconLeft!}
+                            className={iconClassNames}
+                            size={iconSize}
+                            color={iconColor}
+                        />
+                    )}
                 </View>
             )}
             {hasLabel && (
@@ -189,12 +205,20 @@ export const Button = <HREF extends KnownRoutes | never = never>(rawProps: Butto
             )}
             {hasRightIcon && (
                 <View className="justify-center">
-                    <Icon
-                        name={props.iconRight!}
-                        className={iconClassNames}
-                        size={iconSize}
-                        color={iconColor}
-                    />
+                    {isRightIconImg ? (
+                        <Image
+                            src={props.iconRight!}
+                            style={{ width: iconSize, height: iconSize, tintColor: iconColor }}
+                            contentFit="contain"
+                        />
+                    ) : (
+                        <Icon
+                            name={props.iconRight!}
+                            className={iconClassNames}
+                            size={iconSize}
+                            color={iconColor}
+                        />
+                    )}
                 </View>
             )}
         </>
@@ -213,9 +237,9 @@ export const Button = <HREF extends KnownRoutes | never = never>(rawProps: Butto
                 target={props.target}
                 replace={props.replace}
                 push={props.push}
-                onPress={onButtonPress as UniversalLinkProps['onPress']}
-                disabled={props.disabled}
-                hitSlop={props.hitSlop}
+                onPress={props.onPress ? (onButtonPress as UniversalLinkProps['onPress']) : undefined}
+                // disabled={props.disabled}
+                // hitSlop={props.hitSlop}
                 asChild
             >
                 <Pressable className="flex flex-row">

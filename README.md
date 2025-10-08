@@ -197,7 +197,7 @@ Now, I'm glad to share my learnings to help others build their own universal app
 
 ## 🛠 Getting Started
 
-Use **`git clone`**, or the GitHub UI to ❇️ **[generate a new project](https://github.com/new?template_name=green-stack-starter-demo&template_owner=FullProduct-dev)** from our **[template repo](https://github.com/FullProduct-dev/green-stack-starter-demo)**, then run:
+Use **`git clone`**, or the GitHub UI to ❇️ **[generate a new project](https://github.com/new?template_name=green-stack-starter-demo&template_owner=FullProduct-dev&visibility=private&use_v2_form=true&description=🚧%20Make%20sure%20to%20run%20`npx%20@fullproduct/universal-app%20sync`%20to%20attach%20the%20starterkit%27s%20git%20history%20💡%20Run%20`npx%20@fullproduct/universal-app%20install%20plugins`%20afterwards%20to%20expand%20your%20setup)** from our **[template repo](https://github.com/FullProduct-dev/green-stack-starter-demo)**, then run:
 
 ```bash
 npm install

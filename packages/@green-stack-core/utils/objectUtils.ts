@@ -86,6 +86,7 @@ export const createKey = (obj: ObjectType<any$Unknown> = {}, separator = '-'): s
             if (itemType === 'object') value = value.map((v) => createKey(v))
             value = value.join(separator)
         }
+        if (Array.isArray(obj)) return `${value || 'x'}`
         return `${key}${separator}${value || 'x'}`
     })
     return valueKeys.sort().join(separator)

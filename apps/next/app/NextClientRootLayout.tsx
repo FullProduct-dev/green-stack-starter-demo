@@ -23,6 +23,7 @@ type NextClientRootLayoutProps = {
 /* --- <NextClientRootLayout/> ---------------------------------------------------------------- */
 
 const NextClientRootLayout = ({ children, requestContext }: NextClientRootLayoutProps) => {
+    
     // Navigation
     const nextContextRouter = useNextContextRouter()
 

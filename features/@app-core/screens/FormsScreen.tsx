@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { useColorScheme } from 'nativewind'
-import { View, Text, H1, H2, H3, Link, ScrollView, KeyboardAvoidingView, getThemeColor } from '../components/styled'
+import { View, Text, H1, H2, H3, Link, ScrollView, KeyboardAvoidingView, cn, getThemeColor } from '../components/styled'
 import BackButton from '../components/BackButton'
 import { TextInput } from '../forms/TextInput.styled'
 import { NumberStepper } from '../forms/NumberStepper.styled'
@@ -17,7 +17,7 @@ import { useScrollToFocusedInput } from '@green-stack/hooks/useScrollToFocusedIn
 import { TextArea } from '../forms/TextArea.styled'
 import { Button } from '../components/Button'
 import { removeSetItem } from '@green-stack/utils/arrayUtils'
-import { isWeb } from '../appConfig'
+import { isWeb, isDocs } from '@app/config'
 import { calculateEfficiency } from '../utils/calculateEfficiency'
 import { EfficiencyResults } from '../components/EfficiencyResults'
 import { FormScreenProps, IDENTITIES, FEATURES, PLUGINS } from './FormsScreen.types'
@@ -39,6 +39,7 @@ const CustomRadioGroup = RadioGroup.create<FormScreenProps['identifiesWith']>()
 /* --- <FormsScreen/> ------------------------------------------------------------------------- */
 
 export const FormsScreen = (props: FormScreenProps) => {
+
     // Nav
     const { setParams } = useRouter()
     const params = useRouteParams(props)
@@ -130,21 +131,46 @@ export const FormsScreen = (props: FormScreenProps) => {
     return (
         <KeyboardAvoidingView {...inputScrollUtils.avoidingViewProps}>
             <StatusBar style={scheme.colorScheme === 'light' ? 'dark' : 'light'} />
+
+            {/* Main Content */}
+
             <ScrollView
                 {...inputScrollUtils.scrollViewProps}
-                className="flex flex-1 min-h-screen bg-background"
+                className="flex flex-1 min-h-screen"
                 contentContainerClassName="min-h-screen"
             >
-                <View className="flex flex-1 justify-center items-center pt-28 pb-16">
+
+                {/* Start of Form */}
+
+                <View
+                    className={cn(
+                        "flex flex-1 justify-center items-center pt-28 pb-16",
+                        "bg-background",
+                    )}
+                >
                     <View className="flex flex-col w-full max-w-[500px] px-8">
 
                         <H1 onPress={() => scheme.setColorScheme(scheme.colorScheme !== 'dark' ? 'dark' : 'light')}>
-                            {`Universal Forms Demo`}
+                            ROI Calculator
                         </H1>
+
+                        <View className="h-2" />
+
+                        <H2 className="text-gray-500">
+                            A handy demo for 'Universal Forms'
+                        </H2>
+
+                        <View className="h-6" />
+
+                        <View className="h-1 w-12 my-6 bg-slate-300" />
 
                         <View className="h-4" />
 
                         {/* -- TextInput -- */}
+
+                        <Text className="text-sm text-secondary mb-2">
+                            Email
+                        </Text>
 
                         <TextInput
                             placeholder="e.g. thorr@fullproduct.dev"
@@ -152,13 +178,13 @@ export const FormsScreen = (props: FormScreenProps) => {
                             {...inputScrollUtils.registerInput(emailInputRef)}
                         />
 
-                        <Text className="text-sm text-secondary mt-2">
-                            Your email
-                        </Text>
-
                         <View className="h-4" />
 
                         {/* -- Stepper -- */}
+
+                        <Text className="text-sm text-secondary mb-2">
+                            Age
+                        </Text>
 
                         <NumberStepper
                             placeholder="e.g. 32"
@@ -169,10 +195,6 @@ export const FormsScreen = (props: FormScreenProps) => {
                             {...inputScrollUtils.registerInput(ageInputRef)}
                         />
 
-                        <Text className="text-sm text-secondary mt-2">
-                            Your age
-                        </Text>
-
                         <View className="h-6" />
 
                         {/* -- Checkbox -- */}
@@ -182,6 +204,8 @@ export const FormsScreen = (props: FormScreenProps) => {
                             checked={validateOnChange}
                             onCheckedChange={setValidateOnChange}
                         />
+
+                        <View className="h-4" />
 
                         <View className="h-1 w-12 my-6 bg-slate-300" />
 
@@ -341,7 +365,7 @@ export const FormsScreen = (props: FormScreenProps) => {
                                 <View className="h-2" />
 
                                 <Link
-                                    className="no-underline"
+                                    className="text-link no-underline"
                                     href="https://fullproduct.dev/docs/form-management"
                                     target="_blank"
                                 >
@@ -350,24 +374,28 @@ export const FormsScreen = (props: FormScreenProps) => {
 
                                 <View className="h-4" />
 
-                                <Text className="text-start">
-                                    {JSON.stringify({
-                                        ...formState,
-                                        metadata: {
-                                            currentSetupHoursPerProject,
-                                            setupHoursPerProject,
-                                            learningGapHours,
-                                            annualHoursSaved,
-                                            annualAvgEfficiencyBoost,
-                                            isWeb,
-                                            deliveryEfficiency,
-                                            finalEfficiencyRate,
-                                            results,
-                                        }
-                                    }, null, 2)}
-                                </Text>
+                                <View className="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                                    <Text className="text-start text-white leading-5 text-xs font-mono">
+                                        {JSON.stringify({
+                                            ...formState,
+                                            metadata: {
+                                                currentSetupHoursPerProject,
+                                                setupHoursPerProject,
+                                                learningGapHours,
+                                                annualHoursSaved,
+                                                annualAvgEfficiencyBoost,
+                                                isWeb,
+                                                deliveryEfficiency,
+                                                finalEfficiencyRate,
+                                                results,
+                                            }
+                                        }, null, 2)}
+                                    </Text>
+                                </View>
                             </>
                         )}
+
+                        <View className="h-12" />
 
                         {inputScrollUtils.keyboardPaddedView}
 
@@ -375,17 +403,35 @@ export const FormsScreen = (props: FormScreenProps) => {
                 </View>
 
             </ScrollView>
-            <BackButton
-                backLink="/subpages/Universal%20Nav"
-                color={getThemeColor('--primary')}
-            />
+
+            {!isDocs && (
+                <BackButton
+                    backLink="/subpages/Universal%20Nav"
+                    color={getThemeColor('--primary', 'dark')}
+                />
+            )}
+
+            {!isDocs && (
+                <Link
+                    className="absolute top-12 web:top-5 right-5 pointer-events-box-only"
+                    href="https://fullproduct.dev/docs/form-management"
+                    target="_blank"
+                >
+                    <View className="flex flex-row bg-stone-900 w-[44px] h-[44px] items-center pointer-events-none rounded-full border border-muted opacity-80 hover:opacity-100 z-0">
+                        <Text className="w-full text-lg text-center">
+                            {`📚`}
+                        </Text>
+                    </View>
+                </Link>
+            )}
+
         </KeyboardAvoidingView>
     )
 }
 
 /* --- Documentation --------------------------------------------------------------------------- */
 
-export const getDocumentationProps = FormScreenProps.documentationProps('FormScreen')
+// export const getDocumentationProps = FormScreenProps.documentationProps('FormScreen')
 
 /* --- Exports --------------------------------------------------------------------------------- */
 

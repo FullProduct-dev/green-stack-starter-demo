@@ -111,7 +111,7 @@ export const createDivider = (title: string, isDocDivider = false) => {
 /** -i- Checks if file content has opt-out patterns so we know to ignore the file when present */
 export const hasOptOutPatterns = (fileContents: string) => {
     const hasOptOutExport = fileContents.includes('export const optOut = true')
-    const hasOptOutComment = fileContents.includes('@automation optOut = true')
+    const hasOptOutComment = fileContents.includes('@automation optOut')
     return hasOptOutExport || hasOptOutComment
 }
 
@@ -154,6 +154,7 @@ export const parseWorkspaces = (
     folderLevel = '../../',
     includeApps = false,
 ) => {
+    
     // Get all workspace package.json paths
     const appConfigPaths = includeApps ? globRel(`${folderLevel}apps/**/package.json`).filter(excludeModules) : [] // prettier-ignore
     const packageConfigPaths = globRel(`${folderLevel}packages/**/package.json`).filter(excludeModules) // prettier-ignore

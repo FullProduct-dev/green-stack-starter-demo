@@ -53,13 +53,19 @@ export const P = styled(RNText, 'text-primary text-base')
 /* --- Fix for Next Link ----------------------------------------------------------------------- */
 
 export const Link = <HREF extends KnownRoutes>(props: UniversalLinkProps<HREF>) => {
-    const StyledLink = styled(UniversalLink, 'text-link underline') // @ts-ignore
+    const StyledLink = styled(UniversalLink, '') // @ts-ignore
     return <StyledLink {...props} />
 }
 
 export const LinkText = styled(RNText, 'text-link underline')
 
-export const TextLink = (props: Omit<React.ComponentProps<typeof UniversalLink>, 'className'> & { className?: string }) => {
+/* --- Text Links ------------------------------------------------------------------------------ */
+
+export type TextLinkProps = Omit<React.ComponentProps<typeof UniversalLink<string>>, 'className'> & {
+    className?: string
+}
+
+export const TextLink = (props: TextLinkProps) => {
     const { className, style, children, ...universalLinkProps } = props
     return (
         <LinkText className={className} style={style}>
