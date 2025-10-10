@@ -4,8 +4,8 @@ import { LayoutChangeEvent, LayoutRectangle, MeasureOnSuccessCallback } from 're
 /* --- Types ----------------------------------------------------------------------------------- */
 
 type LayoutInfo = LayoutRectangle & {
-  pageX?: number
-  pageY?: number
+    pageX?: number
+    pageY?: number
 }
 
 /** --- useLayoutInfo() ------------------------------------------------------------------------ */
@@ -20,42 +20,44 @@ type LayoutInfo = LayoutRectangle & {
  *      const viewHeight = layoutInfo.MyCustomView?.height
  * ``` */
 export const useLayoutInfo = () => {
-  // State
-  const [layoutInfo, setLayoutInfo] = useState<{ [componentKey: string]: LayoutInfo }>({}) // prettier-ignore
 
-  // -- Handlers --
+    // State
+    const [layoutInfo, setLayoutInfo] = useState<{ [componentKey: string]: LayoutInfo }>({}) // prettier-ignore
 
-  const measureOnLayout =
-    (componentKey: string, callback?: (measurements: LayoutInfo) => void) =>
-    ({ nativeEvent }: LayoutChangeEvent) => {
-      const { layout } = nativeEvent
-      const { x, y, width, height } = layout
-      const layoutMeasurements = {
-        ...layoutInfo[componentKey], // preserve 'pageX' & 'pageY' if available
-        x,
-        y,
-        width,
-        height,
-      }
-      setLayoutInfo({ ...layoutInfo, [componentKey]: layoutMeasurements })
-      if (callback) callback(layoutMeasurements)
-    }
+    // -- Handlers --
 
-  const measureRef =
-    (componentKey: string, callback?: (measurements: LayoutInfo) => void) =>
-    (...measurements: Parameters<MeasureOnSuccessCallback>) => {
-      const [x, y, width, height, pageX, pageY] = measurements
-      const refMeasurements: LayoutInfo = { x, y, width, height, pageX, pageY }
-      setLayoutInfo({
-        ...layoutInfo,
-        [componentKey]: refMeasurements,
-      })
-      if (callback) callback(refMeasurements)
-    }
+    const measureOnLayout =
+        (componentKey: string, callback?: (measurements: LayoutInfo) => void) =>
+        ({ nativeEvent }: LayoutChangeEvent) => {
+            const { layout } = nativeEvent
+            const { x, y, width, height } = layout
+            const layoutMeasurements = {
+                ...layoutInfo[componentKey], // preserve 'pageX' & 'pageY' if available
+                x,
+                y,
+                width,
+                height,
+            }
 
-  // -- Return --
+            setLayoutInfo({ ...layoutInfo, [componentKey]: layoutMeasurements })
+            if (callback) callback(layoutMeasurements)
+        }
 
-  return { layoutInfo, measureOnLayout, measureRef }
+    const measureRef =
+        (componentKey: string, callback?: (measurements: LayoutInfo) => void) =>
+        (...measurements: Parameters<MeasureOnSuccessCallback>) => {
+            const [x, y, width, height, pageX, pageY] = measurements
+            const refMeasurements: LayoutInfo = { x, y, width, height, pageX, pageY }
+            setLayoutInfo({
+                ...layoutInfo,
+                [componentKey]: refMeasurements,
+            })
+            if (callback) callback(refMeasurements)
+        }
+
+    // -- Return --
+
+    return { layoutInfo, measureOnLayout, measureRef }
 }
 
 /* --- Export ---------------------------------------------------------------------------------- */

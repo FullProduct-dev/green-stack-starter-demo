@@ -5,6 +5,7 @@ import type { UniversalImageProps, UniversalImageMethods } from './Image.types'
 /* --- <Image/> --------------------------------------------------------------------------------- */
 
 const Image = ((props: UniversalImageProps) => {
+
     // Context
     const { contextImage: ContextImage } = React.useContext(CoreContext)
 
@@ -16,6 +17,7 @@ const Image = ((props: UniversalImageProps) => {
 
     // Render
     return <ContextImage {...props} />
+
 }) as ((props: UniversalImageProps) => JSX.Element) & UniversalImageMethods
 
 /* --- Exports --------------------------------------------------------------------------------- */

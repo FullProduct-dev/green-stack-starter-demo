@@ -3,7 +3,7 @@ import { Dimensions } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { HydratedRouteProps, createQueryBridge } from '@green-stack/navigation'
 import { Pressable, ScrollView, View, Link, Image, P, H1, H3, Text, H2, cn } from '../components/styled'
-import { healthCheckFetcher } from '../resolvers/healthCheck.query'
+import { healthCheckFetcher } from '@app/core/resolvers/healthCheck.query'
 import { Icon } from '@green-stack/components/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { isMobile } from '@app/config'
@@ -19,22 +19,17 @@ import { isMobile } from '@app/config'
 export const queryBridge = createQueryBridge({
     routeDataFetcher: healthCheckFetcher,
     routeParamsToQueryKey: (routeParams) => ['healthCheck', routeParams.echo],
-    routeParamsToQueryInput: (routeParams) => ({
-        healthCheckArgs: {
-            echo: routeParams.echo,
-            verbose: routeParams.verbose,
-        },
-    }),
+    routeParamsToQueryInput: (routeParams) => ({ healthCheckArgs: { echo: routeParams.echo, verbose: true } }),
     fetcherDataToProps: (fetcherData) => ({ serverHealth: fetcherData?.healthCheck }),
 })
 
 /* --- Types ----------------------------------------------------------------------------------- */
 
-type HomeScreenProps = HydratedRouteProps<typeof queryBridge>
+type DemoScreenProps = HydratedRouteProps<typeof queryBridge>
 
-/* --- <HomeScreen/> --------------------------------------------------------------------------- */
+/* --- <DemoScreen/> --------------------------------------------------------------------------- */
 
-const HomeScreen = (props: HomeScreenProps) => {
+const DemoScreen = (props: DemoScreenProps) => {
     // Props
     const { serverHealth } = props
 
@@ -88,7 +83,7 @@ const HomeScreen = (props: HomeScreenProps) => {
                         <View className="w-[57px] h-[98px] lg:w-[114px] lg:h-[197px]">
                             <Image
                                 src={require('../assets/automagic-api-gen-icons.png')}
-                                alt="FullProduct.dev Starterkit Logo"
+                                alt="Automagic API Generation Icons"
                                 quality={100}
                                 fill
                             />
@@ -96,7 +91,7 @@ const HomeScreen = (props: HomeScreenProps) => {
                         <View className="w-[81px] h-[116px] lg:w-[162px] lg:h-[233px]">
                             <Image
                                 src={require('../assets/cross-platform-icons.png')}
-                                alt="FullProduct.dev Starterkit Logo"
+                                alt="Cross Platform Icons"
                                 quality={100}
                                 fill
                             />
@@ -148,7 +143,7 @@ const HomeScreen = (props: HomeScreenProps) => {
                         <InfoSection
                             title="Docs 📚"
                             summary="Documentation that grows as you build or paste app features"
-                            href="https://fullproduct.dev/docs/quickstart"
+                            href="https://fullproduct.dev/docs"
                             isBlank
                         />
                         <View className="w-0 h-8 lg:w-16 lg:h-0" />
@@ -170,7 +165,7 @@ const HomeScreen = (props: HomeScreenProps) => {
                                 />
                             )}
                             summary="Test universal navigation for Web & Mobile, and share up to 90% UI code"
-                            href="/subpages/Universal%20Nav"
+                            href="/subpages/Universal%20Navigation"
                         />
                         <View className="w-0 h-8 lg:w-16 lg:h-0" />
                         <InfoSection
@@ -259,7 +254,7 @@ const GettingStarted = () => {
                     <Text className="text-white">Start from </Text>
                     <Text className="text-white font-bold">@app/core</Text>
                     <Text className="text-white">{` → `}</Text>
-                    <Text className="text-white font-bold">HomeScreen.tsx</Text>
+                    <Text className="text-white font-bold">DemoScreen.tsx</Text>
                 </Text>
             </P>
         </View>
@@ -271,9 +266,10 @@ const GettingStarted = () => {
 const InfoSection = (props: {
     title: string,
     titleIcon?: any,
-    summary: string,
+    summary?: string,
     href: string,
     isBlank?: boolean,
+    children?: React.ReactNode
 }) => (
     <View className="flex flex-col flex-1 w-full max-w-[420px]">
         <Link
@@ -294,12 +290,18 @@ const InfoSection = (props: {
                 )}
             </Pressable>
         </Link>
-        <P className="text-center lg:text-left text-lg text-gray-500">
-            {props.summary}
-        </P>
+        {props.summary ? (
+            <P className="text-center lg:text-left text-lg text-gray-500">
+                {props.summary}
+            </P>
+        ) : (
+            <P className="text-center lg:text-left text-lg text-gray-500">
+                {props.children || 'No summary provided.'}
+            </P>
+        )}
     </View>
 )
 
 /* --- Exports --------------------------------------------------------------------------------- */
 
-export default HomeScreen
+export default DemoScreen

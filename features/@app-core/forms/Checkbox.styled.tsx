@@ -19,7 +19,9 @@ export const CheckboxProps = schema('CheckboxProps', {
     hitSlop: z.number().default(6),
 })
 
-export type CheckboxProps = PropsOf<typeof CheckboxRoot, typeof CheckboxProps>
+export type CheckboxProps = PropsOf<typeof CheckboxRoot, typeof CheckboxProps> & {
+    children?: React.ReactNode
+}
 
 /* --- <Checkbox/> ----------------------------------------------------------------------------- */
 
@@ -30,7 +32,8 @@ export const Checkbox = forwardRef<
     
     // Props
     const props = CheckboxProps.applyDefaults(rawProps)
-    const { checked, disabled, label, hasError, onCheckedChange } = props
+    const { checked, disabled, hasError, onCheckedChange } = props
+    const label = props.label || props.children
 
     // Vars
     const nativeID = props.id || props.nativeID

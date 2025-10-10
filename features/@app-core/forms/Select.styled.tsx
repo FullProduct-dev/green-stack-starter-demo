@@ -191,7 +191,6 @@ export const SelectContent = forwardRef<
                                 )}
                                 style={{
                                     maxWidth: Math.min(400, Dimensions.get('window').width - 40),
-                                    backgroundColor: getThemeColor('--popover'),
                                 }}
                                 asChild
                             >
@@ -390,7 +389,7 @@ export const SelectProps = schema('SelectProps', {
     className: z.string().optional(),
     triggerClassName: z.string().optional(),
     valueClassName: z.string().optional(),
-    contentClassName: z.string().default('w-full bg-white'),
+    contentClassName: z.string().default('w-full'),
 })
 
 export type SelectProps<T extends string = string> = Omit<
@@ -399,6 +398,7 @@ export type SelectProps<T extends string = string> = Omit<
 > & {
     value: T,
     children?: ReactNode,
+    selectTriggerRef?: LegacyRef<ElementRef<typeof SP.SelectTrigger>>,
     onChange: (value: T) => void,
 }
 
@@ -461,6 +461,7 @@ export const createSelectComponent = <T extends string = string>() => Object.ass
             >
                 <View>
                     <SelectTrigger
+                        ref={props.selectTriggerRef}
                         key={`select-trigger-${selectValueKey}`}
                         className={cn('w-full', props.triggerClassName)}
                         disabled={disabled}

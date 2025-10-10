@@ -35,15 +35,12 @@ const BackButton = (props: BackButtonProps) => {
     // -- Prerender --
 
     const innerBackButton = (
-        <View className="flex flex-row p-4 items-center">
+        <View className="flex flex-row bg-stone-900 p-2 items-center pointer-events-none rounded-md border border-muted opacity-90 hover:opacity-100 z-0">
             <Icon name="ArrowLeftFilled" color={color} size={iconSize} />
             {!!backText && (
                 <>
                     <View className="w-[5px]" />
-                    <Text
-                        className={`text-xl text-[${color}]`}
-                        style={{ color }}
-                    >
+                    <Text className={`text-xl text-[${color}]`} style={{ color }}>
                         {`Back`}
                     </Text>
                 </>
@@ -55,14 +52,14 @@ const BackButton = (props: BackButtonProps) => {
 
     return showBackButton ? (
         <Pressable
-            className={`absolute top-8 web:top-0 left-0`} // @ts-ignore
+            className="absolute top-12 web:top-5 left-5 pointer-events-box-only" // @ts-ignore
             onPress={back}
         >
             {innerBackButton}
         </Pressable>
     ) : (
         <Link
-            className={`absolute top-8 web:top-0 left-0 text-[${color}] no-underline`}
+            className={`absolute top-12 web:top-5 left-5 text-[${color}] no-underline`}
             href={backLink}
         >
             {innerBackButton}

@@ -1,12 +1,12 @@
 import { UniversalRouteScreen } from '@green-stack/core/navigation/UniversalRouteScreen'
-import HomeScreen, { queryBridge } from '../screens/HomeScreen'
+import DemoScreen, { queryBridge } from '../screens/DemoScreen'
 
 /* --- / --------------------------------------------------------------------------------------- */
 
 export default (props: any) => (
     <UniversalRouteScreen
         {...props}
-        routeScreen={HomeScreen}
+        routeScreen={DemoScreen}
         queryBridge={queryBridge}
     />
 )

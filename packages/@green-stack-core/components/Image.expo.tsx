@@ -14,8 +14,10 @@ const StyledExpoImage = cssInterop(ExpoImage, {
 /* --- <Image/> -------------------------------------------------------------------------------- */
 
 const Image = (props: UniversalImageProps): JSX.Element => {
+
     // Props
     const {
+
         /* - Universal - */
         src,
         alt,
@@ -26,11 +28,14 @@ const Image = (props: UniversalImageProps): JSX.Element => {
         priority,
         onError,
         onLoadEnd,
+
         /* - Split - */
         expoPlaceholder,
+
         /* - Next.js - */
         onLoad,
         fill,
+
         /* - Expo - */
         accessibilityLabel,
         accessible,
@@ -47,6 +52,7 @@ const Image = (props: UniversalImageProps): JSX.Element => {
         placeholderContentFit,
         recyclingKey,
         responsivePolicy,
+        
     } = props
 
     // -- Nativewind --
