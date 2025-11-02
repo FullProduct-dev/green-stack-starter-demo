@@ -313,7 +313,7 @@ export const getAvailableSchemas = (
     const packageSchemaPaths = globRel(`${folderLevel}packages/**/schemas/[A-Z]*.ts`).filter(excludeModules)
     const featureSchemaPaths = globRel(`${folderLevel}features/**/schemas/[A-Z]*.ts`).filter(excludeModules)
     const allSchemaPaths = [...packageSchemaPaths, ...featureSchemaPaths].filter((pth) => {
-        return !['@green-stack-core/schemas/', 'createSchema', '.bridge', '.resolver', '.enum'].some((excluded) => pth.includes(excluded))
+        return !['@green-stack-core/schemas/', 'createSchema', '.bridge', '.resolver', '.enum', '.partial'].some((excluded) => pth.includes(excluded))
     })
   
     // Map to build list of available resolvers to integrate with

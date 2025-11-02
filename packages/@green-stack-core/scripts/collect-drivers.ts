@@ -15,6 +15,8 @@ type DriverConfig = {
             driverTypeExportKey: string,
             driverTypeEntryLines: string[],
             driverConfigTypeEnumLines: string[],
+            driverImportLines: string[],
+            driverEntryLines: string[],
         }
     }
 }
@@ -70,11 +72,11 @@ const createDriverTypeExportsSection = (ctx: {
     driverTypeEntryLines: string[],
 }) => [
 
-    `${createDivider(ctx.driverType)}\n`,
+    `${createDivider(uppercaseFirstChar(ctx.driverType))}\n`,
 
     `export const ${ctx.driverTypeExport} = {`,
         ctx.driverTypeEntryLines.join('\n'), // prettier-ignore
-    `}`,
+    `}\n`,
 
 ].join('\n')
 
@@ -89,13 +91,7 @@ const createDriversFileContent = (ctx: {
     `// -i- Auto generated with "npx turbo run @green-stack/core#collect-drivers"`,
     `${ctx.driverImports}\n`,
 
-    `${ctx.driverTypeExports}\n`,
-
-    `${createDivider('All Drivers')}\n`,
-
-    `export const drivers = {`,
-        ctx.driverEntryLines,
-    `}\n`,
+    `${ctx.driverTypeExports}`,
 
 ].join('\n')
 
@@ -116,7 +112,9 @@ const collectDrivers = () => {
 
             // Skip if not a valid driver
             const driverFileContents = fs.readFileSync(driverFilePath, 'utf-8')
-            const isValidDriver = driverFileContents.includes('export const driver = validateDriver(')
+            let isValidDriver = driverFileContents.includes('export const driver = validate')
+            const driverExportLine = driverFileContents.split('\n').find((line) => line.includes('export const driver ='))
+            isValidDriver = !!driverExportLine?.includes('Driver(')
             if (!isValidDriver) return acc
 
             // Figure out workspace info
@@ -150,6 +148,7 @@ const collectDrivers = () => {
                 driverEntryLines: addSetItem(acc.driverEntryLines, driverEntryLine),
                 driverConfigTypeLines: addSetItem(acc.driverConfigTypeLines, driverConfigTypeLine),
                 drivers: {
+                    ...acc.drivers,
                     [driverType]: {
                         driverType,
                         driverTypeKey,
@@ -161,7 +160,10 @@ const collectDrivers = () => {
                         driverConfigTypeEnumLines: addSetItem(
                             acc.drivers?.[driverType]?.driverConfigTypeEnumLines,
                             driverConfigTypeEnumLine,
-                        )
+                        ),
+                        // Deduped for 1 file per driver
+                        driverImportLines: addSetItem(acc.drivers?.[driverType]?.driverImportLines, driverImportLine),
+                        driverEntryLines: addSetItem(acc.drivers?.[driverType]?.driverEntryLines, driverEntryLine),
                     }
                 }
             }
@@ -171,35 +173,37 @@ const collectDrivers = () => {
         const configTypeSections = Object.values(driverConfig.drivers).map((driverData) => {
             const { driverType, driverConfigTypeEnumLines } = driverData
             return createDriverTypeEntries({ driverType, driverConfigTypeEnumLines })
-        }).join('\n')
+        }).join(',\n')
 
         // Build drivers.config.ts file
-        const driverTypes = driverConfig.driverConfigTypeLines.join('\n')
+        const driverTypes = driverConfig.driverConfigTypeLines.join(',\n')
         const driverConfigContent = createDriverConfigContent({
             driverTypeEntries: configTypeSections,
             driverTypes,
         })
         fs.writeFileSync('../../packages/@registries/drivers.config.ts', driverConfigContent)
 
-        // Build drivers.generated.ts subtype exports
-        const driverTypeExports = Object.values(driverConfig.drivers).map((driverData) => {
-            const { driverTypeKey, driverTypeExportKey, driverTypeEntryLines } = driverData
-            return createDriverTypeExportsSection({
+        // For each type of driver, build its own {type}.drivers.ts file
+        Object.keys(driverConfig.drivers).forEach((driverType) => {
+
+            // Build drivers.generated.ts subtype exports
+            const driverData = driverConfig.drivers[driverType]
+            const { driverTypeKey, driverTypeExportKey, driverTypeEntryLines, driverImportLines, driverEntryLines } = driverData
+            const driverTypeExports = createDriverTypeExportsSection({
                 driverType: driverTypeKey,
                 driverTypeExport: driverTypeExportKey,
                 driverTypeEntryLines,
             })
-        }).join('\n')
 
-        // Build drivers.generated.ts file
-        const driverEntryLines = driverConfig.driverEntryLines.join('\n')
-        const driverImports = driverConfig.driverImportLines.join('\n')
-        const driversFileContent = createDriversFileContent({
-            driverImports,
-            driverTypeExports,
-            driverEntryLines,
+            // Build drivers.generated.ts file
+            const driversFileContent = createDriversFileContent({
+                driverImports: driverImportLines.join('\n'),
+                driverTypeExports,
+                driverEntryLines: driverEntryLines.join('\n'),
+            })
+            fs.writeFileSync(`../../packages/@registries/drivers/${driverType}.drivers.generated.ts`, driversFileContent)
+
         })
-        fs.writeFileSync('../../packages/@registries/drivers.generated.ts', driversFileContent)
 
     } catch (err) {
         console.log(err)

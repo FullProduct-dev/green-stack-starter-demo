@@ -11,15 +11,26 @@ import * as workspaceGenerators from '../../packages/@registries/generators.gene
 // -i- Learn more about Turborepo Generators at:
 // -i- https://turbo.build/repo/docs/core-concepts/monorepos/code-generation
 
-// -i- Skipping Deprecation Warnings because: not caused by us, don't break anything, adds noise
+// -i- Skipping Deprecation Warnings because: not caused by us + doesn't break anything + adds noise
 // -i- We may fix this with a version bump in the future, but for now we just want to skip them
-const originalEmit = process.emit
+
+const originalEmit = process.emit // @ts-ignore
 process.emit = (name, ...args) => {
-    const [data] = args
+    const [data] = args // @ts-ignore
     const isNamedWarning = name === 'warning' && typeof data === 'object' && data.name
-    const SKIPPED_WARNINGS = ['DeprecationWarning']
-    if (isNamedWarning && SKIPPED_WARNINGS.includes(data.name)) return false
+    const SKIPPED_WARNINGS = ['DeprecationWarning'] // @ts-ignore
+    if (isNamedWarning && SKIPPED_WARNINGS.includes(data.name)) return false // @ts-ignore
     return originalEmit.call(process, name, ...args)
+}
+
+const originalEmitWarning = process.emitWarning
+process.emitWarning = (warning, ...args) => {
+    const [warningType] = args
+    const SKIPPED_WARNINGS = ['DeprecationWarning', 'ExperimentalWarning', 'deprecated']
+    const isSkippedWarningType = typeof warningType === 'string' && SKIPPED_WARNINGS.includes(warningType)
+    const isSkippedWarningMsg = typeof warning === 'string' && SKIPPED_WARNINGS.some((w) => warning.includes(w))
+    if (isSkippedWarningType || isSkippedWarningMsg) return false // @ts-ignore
+    return originalEmitWarning.call(process, warning, ...args)
 }
 
 // -i- Turborepo & Plop don't play well with CommonJS modules like custom inquirer prompts
@@ -79,7 +90,7 @@ export default function (plop: PlopTypes.NodePlopAPI) {
                             const numSpaces = packageJsonLines[1].indexOf('"')
                             const packageData = JSON.parse(packageJson)
                             let strategy = !scriptPrefix ? 'append-last' : 'append-last-prefix'
-                            let scriptLineIndex = 0
+                            let scriptLineIndex = 0 // @ts-ignore
                             if (scriptPrefix) scriptLineIndex = packageJsonLines.findLastIndex((line) => line.includes(`"${scriptPrefix}:`))
                             if (scriptLineIndex <= 0) strategy = 'append-last'
                             if (strategy === 'append-last') {
@@ -120,7 +131,7 @@ export default function (plop: PlopTypes.NodePlopAPI) {
                             const turboConfig = JSON.parse(turboJson)
                             const spaces = ' '.repeat(numSpaces)
                             const indent = spaces.repeat(2)
-                            const pkgMatch = `${indent}"${workspacePkg}#`
+                            const pkgMatch = `${indent}"${workspacePkg}#` // @ts-ignore
                             const lastPkgScriptIndex = turboJsonLines.findLastIndex((line) => line.startsWith(pkgMatch))
                             const strategy = lastPkgScriptIndex > 0 ? 'append-last-pkg-script' : 'append-last'
                             if (strategy === 'append-last') {
