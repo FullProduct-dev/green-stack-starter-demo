@@ -26,7 +26,6 @@
         ],
         "types": ["node", "glob"],
         "paths": {
-            "@app/kit": ["../../packages/@green-stack-core/*"],
             "@app/config": ["../../features/@app-core/appConfig.ts"],
             "@app/schemas/*": ["../../features/@app-core/schemas/*"],
             "@app/utils/*": ["../../features/@app-core/utils/*"],
