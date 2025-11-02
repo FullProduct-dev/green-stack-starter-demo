@@ -1,4 +1,4 @@
-import { validateDriver } from '../utils/validateDriver.db.ts'
+import { validateDbDriver } from '@db/driver/utils/validateDbDriver.db.ts'
 
 /* --- Import Driver Methods ------------------------------------------------------------------- */
 
@@ -7,8 +7,7 @@ import { MockDBEntity } from '../schemas/MockEntity.schema.ts'
 
 /* --- Driver Validation ----------------------------------------------------------------------- */
 
-export const driver = validateDriver({
+export const driver = validateDbDriver({
     createSchemaModel,
-    // - Schema Helpers -
     DBEntity: MockDBEntity,
 })

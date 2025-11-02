@@ -170,6 +170,57 @@ const params = extractPathParams('/api/user/[slug]/posts/[id]')
 // => ['slug', 'id']
 ```
 
+### `guessNameFromEmail()`
+
+Guesses the (full?) name from a provided email address.
+
+Handy for sending out emails / suggesting data for newly signed up users.
+
+```ts
+guessNameFromEmail('thorr@fullproduct.dev') // → 'Thorr'
+
+guessNameFromEmail('john-doe@hotmail.com') // → 'John Doe'
+guessNameFromEmail('john-s-doe-1@gmail.com') // → 'John Doe'
+
+guessNameFromEmail('john.doe@gmail.com') // → 'John Doe'
+guessNameFromEmail('johndoe+something-else@gmail.com') // → 'Johndoe'
+
+guessNameFromEmail('notAnEmail') // → ''
+guessNameFromEmail('') // → ''
+```
+
+### `guessDisplayName()`
+
+Attempts to extract a user's full or display name, based on partial user or userlike metadata objects.
+
+Checks in each potential source (function args) in the following order:  
+→ `fullName`? → `name`? → `firstName`? → `username`? → Guess from `email`? → `''`
+
+Handy for sending out emails / suggesting data for newly signed up users.
+
+```ts
+// Each source arg should be an object that could have any one of these keys
+type Userlike = {
+    name?: string | null,
+    username?: string | null,
+    fullName?: string | null,
+    firstName?: string | null,
+    lastName?: string | null,
+    email?: string | null,
+}
+
+guessDisplayName({ fullName: 'John Doe' }) // → 'John Doe'
+guessDisplayName({ ... }, { name: 'John Doe' }) // → 'John Doe'
+
+guessDisplayName({ firstName: 'John', lastName: 'Doe' }) // → 'John Doe'
+guessDisplayName({ firstName: 'John' }) // → 'John'
+guessDisplayName({ lastName: 'Doe' }) // → ''
+
+guessDisplayName({ ... }, { email: 'john@fullproduct.dev' }) // → 'John'
+guessDisplayName({ email: 'john.doe@fullproduct.dev' }) // → 'John Doe'
+guessDisplayName({ email: 'john@doe.dev' }, { username: 'jondovi' }) // → 'jondovi'
+```
+
 <div className="h-8" />
 
 ## ANSI Terminal Formatting
