@@ -76,7 +76,7 @@ const linkRoutes = () => {
                 if (routeFile.includes('ScreenComponent')) screenComponentName = routeFile.split('ScreenComponent')[1].split('=')[1].split('\n')[0].trim() // prettier-ignore
                 if (screenComponentName.includes('.')) screenComponentName = screenComponentName.split('.').pop() as string
                 // Always check if there's a default export when autoDefault is false
-                if (!autoDefault && routeFile.includes('default')) nextExports.push('next')
+                if (!autoDefault && routeFile.includes('export default')) nextExports.push('default')
                 // Keep track of whether or not this is a server component
                 if (routeFile.includes('export const isServerComponent = true')) isRSC = true
                 if (routeFile.includes('export const isRSC = true')) isRSC = true
