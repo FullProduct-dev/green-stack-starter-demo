@@ -46,12 +46,11 @@ const collectSchemas = () => {
         if (isEmpty(allPartialSchemaPaths)) {
             fs.writeFileSync('../../packages/@registries/schemas.partials.ts', [
 
-                genMsg,
-                `import { z } from '@green-stack/schemas'`,
+                `${genMsg}import { z } from '@green-stack/schemas'\n`,
                 
-                createDivider('Exports'),
+                `${createDivider('Exports')}\n`,
                 
-                `export const partials = {} as Record<string, z.ZodRawShape>`,
+                `export const partials = {} as Record<string, z.ZodRawShape>\n`,
 
             ].join('\n'))
             return
