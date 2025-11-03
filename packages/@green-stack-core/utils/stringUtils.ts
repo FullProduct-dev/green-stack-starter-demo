@@ -1,5 +1,6 @@
 
 /* --- Case Utils ------------------------------------------------------------------------------ */
+
 export const snakeToCamel = (str: string) => str.replace(/(_\w)/g, (m) => m[1].toUpperCase())
 export const snakeToDash = (str: string) => str.replace(/_/g, '-')
 export const dashToCamel = (str: string) => str.replace(/(-\w)/g, (m) => m[1].toUpperCase())
@@ -69,8 +70,67 @@ export const includesAny = (source: string, words: string[]) => {
     return lowercasedWords.some((word) => lowercasedSource.includes(word))
 }
 
+/** --- guessNameFromEmail() ------------------------------------------------------------------- */
+/** -i- Guesses the (full?) name from a provided email address. */
+export const guessNameFromEmail = (email: string) => {
+    // Only proceed if email looks valid
+    if (!email || !email.includes('@')) return ''
+    // Strip the first part before the @, remove all numbers and special characters
+    let local = email.split('@')[0]
+    local = local.replace(/[0-9]/g, '') // Remove numbers
+    local = local.replace(/[\.\_\-\+]/g, ' ') // Replace special chars with spaces
+    // Split camelCase parts by inserting spaces
+    local = local.replace(/([a-z])([A-Z])/g, '$1 $2')
+    // Remove parts that are likely not names
+    const nonNameParts = ['info', 'contact', 'admin', 'user', 'mail', 'hello', 'no-reply', 'noreply']
+    let parts = local.split(' ').filter((part) => !nonNameParts.includes(part.toLowerCase()))
+    // Remove 1 letter parts
+    parts = parts.filter((part) => part.length > 1)
+    // If no parts remain, return empty
+    if (parts.length === 0) return ''
+    // Capitalize first letter of each part
+    parts = parts.map((part) => uppercaseFirstChar(part.toLowerCase()))
+    // Return full name
+    return parts.join(' ')
+}
+
+/** --- guessDisplayName() --------------------------------------------------------------------- */
+/** -i- Attempts to extract a user's full or display name, based on partial user or userlike metadata objects */
+export const guessDisplayName = <
+    Userlike extends {
+        name?: string | null,
+        username?: string | null,
+        fullName?: string | null,
+        firstName?: string | null,
+        lastName?: string | null,
+        email?: string | null,
+    }
+>(mainSource: Userlike, ...fallbackSources: Userlike[]) => {
+    // Combine sources
+    const sources = [mainSource, ...fallbackSources].filter(Boolean)
+    // Is there a 'fullName' field?
+    const fullName = sources.reduce((acc, src) => src.fullName || acc, '')
+    if (fullName) return fullName
+    // Is there a 'name' field?
+    const name = sources.reduce((acc, src) => src.name || acc, '')
+    if (name) return name
+    // Can we combine a 'firstName' and 'lastName' field?
+    const firstName = sources.reduce((acc, src) => src.firstName || acc, '')
+    const lastName = sources.reduce((acc, src) => src.lastName || acc, '')
+    const combinedName = [firstName, lastName].filter(Boolean).join(' ')
+    if (firstName) return combinedName
+    // Fall back to a 'username' field?
+    const username = sources.reduce((acc, src) => src.firstName || acc, '')
+    if (username) return username
+    // Guess the name from an 'email' field?
+    const email = sources.reduce((acc, src) => src.firstName || acc, '')
+    if (email) return guessNameFromEmail(email)
+    // Give up, return empty
+    return ''
+}
+
 /** --- slugify() ------------------------------------------------------------------------------ */
-/** -i- Converts a string to a slug */
+/** -i- Converts a string to a slug, @example `slugify('Some random Title')` -> `some-random-title` */
 export const slugify = (str: string) => {
     return str
         .toLowerCase()
@@ -80,7 +140,7 @@ export const slugify = (str: string) => {
 
 /** --- extractPathParams() -------------------------------------------------------------------- */
 /** -i- Extracts an array of potential params from a url, e.g. `'/api/user/[slug]/...' => ['slug']` */
-export const extractPathParams = (url: string) => {
+export const extractPathParams = (url: string = '') => {
     const pathSegments = url.split('/')
     const pathParams = pathSegments.filter((segment) => segment.startsWith('[') && segment.endsWith(']'))
     return pathParams.map((param) => param.slice(1, -1))
@@ -89,6 +149,7 @@ export const extractPathParams = (url: string) => {
 /** --- ansi ----------------------------------------------------------------------------------- */
 /** -i- Ansi constants for escape codes */
 export const ansi = {
+
     // Utility
     reset: "\x1b[0m",
     bold: "\x1b[1m",
@@ -119,11 +180,13 @@ export const ansi = {
     bgMagenta: "\x1b[45m",
     bgCyan: "\x1b[46m",
     bgWhite: "\x1b[47m"
+
 } as const
 
 /** --- ansi utils ----------------------------------------------------------------------------- */
 /** -i- Ansi helpers functions to format logs and terminal messages */
 export const a = {
+
     // Utility
     bold: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bold}${msg}${ansi.reset}`,
     muted: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.dim}${msg}${ansi.reset}`,
@@ -154,4 +217,5 @@ export const a = {
     bgMagenta: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgMagenta}${msg}${ansi.reset}`,
     bgCyan: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgCyan}${msg}${ansi.reset}`,
     bgWhite: <MSG extends string>(msg: MSG, clear = false) => `${clear ? ansi.reset : ''}${ansi.bgWhite}${msg}${ansi.reset}`,
+
 } as const

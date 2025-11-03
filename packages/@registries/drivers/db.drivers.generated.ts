@@ -6,9 +6,3 @@ import { driver as mockDbDriver } from '@db/driver/drivers/mock.db.ts'
 export const dbDrivers = {
     'mock-db': mockDbDriver,
 }
-
-/* --- All Drivers ----------------------------------------------------------------------------- */
-
-export const drivers = {
-    db: dbDrivers,
-}

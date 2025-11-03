@@ -18,6 +18,7 @@ export const createSchemaModel = <
     schema: z.ZodObject<S>,
     modelName?: string,
 ) => {
+    
     // Apply the schema name as the model key?
     const schemaMeta = schema.introspect()
     const modelKey = (modelName || schemaMeta.name) as string
@@ -423,6 +424,7 @@ export const createSchemaModel = <
         _createdAtField: createdAtField,
         _updatedAtField: updatedAtField,
         _softDeleteField: softDeleteField,
+        _dbDriverType: 'mock' as const,
     }
 
     return Object.assign(driver, {
