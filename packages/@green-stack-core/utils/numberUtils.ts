@@ -19,6 +19,30 @@ export const roundTo = (value: number | string, decimals = 0, roundFn: any = rou
 export const roundUpTo = (value: number | string, decimals = 0) => roundTo(value, decimals, ceil)
 export const roundDownTo = (value: number | string, decimals = 0) => roundTo(value, decimals, floor)
 
+/** --- formatPercent() ------------------------------------------------------------------------ */
+/** -i- Turn a decimal number into a percentage string, optionally rounding up / down to decimals */
+export const formatPercent = (decimalNum: number, decimals = 0, roundFn: any = roundTo): string => {
+    const percentNum = roundFn((decimalNum * 10000) / 100, decimals)
+    return `${percentNum}%`
+}
+
+/** --- formatMoney() -------------------------------------------------------------------------- */
+/** -i- Turn a float number into a formatted money string like `'$ 1,000,000.00'` */
+export const formatMoney = (
+    amount: number,
+    currencySymbol = '$',
+    decimals = 2,
+    useGrouping = true
+): string => {
+    const options: Intl.NumberFormatOptions = {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+        useGrouping,
+    }
+    const formattedAmount = amount.toLocaleString(undefined, options)
+    return `${currencySymbol} ${formattedAmount}`
+}
+
 /** --- hasLeadingZeroes() --------------------------------------------------------------------- */
 /** -i- Detect leading zeroes in "numbers" */
 export const hasLeadingZeroes = (numString: string | number): boolean => {

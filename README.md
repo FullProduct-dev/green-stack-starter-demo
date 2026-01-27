@@ -1,11 +1,19 @@
 # Built with [FullProduct.dev](https://fullproduct.dev?v=gh-demo-readme) 🚀
 
-[![FullProduct.dev Bento Slide](https://fullproduct.dev/full-product-dev-bento.jpg)](https://fullproduct.dev?v=gh-demo-readme)
+<a href="https://www.youtube.com/watch?v=wCNDcxYhRbg" target="_blank">
+  <img
+    src="https://github.com/user-attachments/assets/dd5bedc0-675c-4e81-82b1-63b0279a52b6"
+    alt="FullProduct.dev in 100 seconds on YouTube"
+    width="480"
+  />
+</a>
 
-> This project with built with [FullProduct.dev](https://fullproduct.dev?v=gh-demo-readme) ❇️ A starterkit for building truly universal apps with Expo (iOS / Android) and Next.js (Web + SSR) - Providing a familiar but optimized, write-once, app router experience.
+> This project is built with [FullProduct.dev](https://fullproduct.dev?v=gh-demo-readme) ✦ 
+
+> A universal starter kit for building apps with Expo (iOS / Android) and Next.js (Web + SSR) - Providing a familiar but optimized, write-once, app router experience.
 
 > [!NOTE]  
-> FullProduct.dev is still in beta and awaiting official release. Consider this an early preview of the project that will still be improved.
+> FullProduct.dev is still in early access. While the core is there, we are still actively adding worthwhile plugins.
 
 ---
 
@@ -13,6 +21,8 @@
 <summary>Why FullProduct.dev? ⚡️</summary>
 
 ---
+
+[![FullProduct.dev Bento Slide](https://fullproduct.dev/full-product-dev-bento.jpg)](https://fullproduct.dev?v=gh-demo-readme)
 
 ## The [FullProduct.dev](https://fullproduct.dev?v=gh-demo-readme) 🚀 Starterkit
 
@@ -207,15 +217,35 @@ npm run dev
 - Open [http://localhost:3000](http://localhost:3000) for the Next.js app (web)
 - Use [Expo Go](https://expo.io/client) or `npm run ios` / `npm run android` to test mobile
 
----
+> **All set** 🚀 >> Continue from the **📗 [FullProduct.dev Docs](https://fullproduct.dev/docs?v=gh-demo-readme)**
 
-**All set** 🚀 >> Continue from the **📗 [FullProduct.dev Docs](https://fullproduct.dev/docs?v=gh-demo-readme)**
-
-> ⚡️ [Quickstart Guide](https://fullproduct.dev/docs?v=gh-demo-readme) | 
+> ⚡️ [Quickstart](https://fullproduct.dev/docs?v=gh-demo-readme) | 
 💡 [Core Concepts](https://fullproduct.dev/docs/core-concepts?v=gh-demo-readme) | 
 📂 [Project Structure](https://fullproduct.dev/docs/project-structure?v=gh-demo-readme) | 
 ❇️ [Codegen](https://fullproduct.dev/docs/generators?v=gh-demo-readme)
 
+...
+
 ---
 
-...
+<details>
+    <summary>FullProduct.dev - License</summary>
+
+---
+
+## FullProduct.dev - License (Demo version)
+
+This free template repo is **source-available** under the **FullProduct.dev Demo Source-Available
+License**
+
+- Commercial use is allowed below the revenue threshold.
+- You may redistribute the demo code (demo-only) with attribution.
+- You may not privately distribute this starter/template/codebase without a paid license.
+- Attribution requirements may be waived with a paid license.
+
+Please see the full license text in [`LICENSE.md`](./LICENSE.md) and the [EULA](https://fullproduct.dev/eula?v=gh-demo-readme-license)
+for more details.
+
+</details>
+
+---

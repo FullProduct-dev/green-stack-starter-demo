@@ -32,6 +32,7 @@ export type CheckListOptionProps = z.input<typeof CheckListOptionProps>
 /* --- <CheckList.Option/> --------------------------------------------------------------------- */
 
 export const CheckListOption = (props: CheckListOptionProps) => {
+
     // Props
     const { value, label, ...restProps } = CheckListOptionProps.applyDefaults(props)
     const { className, checkboxClassName, indicatorClassName } = restProps
@@ -77,6 +78,7 @@ export type CheckListProps<T extends string[] = string[]> = z.input<typeof Check
 /* --- <CheckList/> ---------------------------------------------------------------------------- */
 
 const CheckListComponent = <T extends string[] = string[]>(rawProps: CheckListProps<T>) => {
+    
     // Props
     const props = CheckListProps.applyDefaults(rawProps)
     const { value: currentItems, options, children, onChange, ...restProps } = props
