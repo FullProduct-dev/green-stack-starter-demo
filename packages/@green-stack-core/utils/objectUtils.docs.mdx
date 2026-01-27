@@ -145,6 +145,50 @@ createKey({ id: 1, name: 'John' }, '_')
 // => 'id_1_name_John'
 ```
 
+### `stringifyMetadata()`
+
+Transforms all properties in a metadata object to string values only. Particularly useful for APIs like Stripe that only accept string values in metadata objects.
+
+```typescript
+// Basic types
+stringifyMetadata({
+    id: 123,           // => '123'
+    active: true,      // => 'true'
+    name: 'John'       // => 'John' (unchanged)
+})
+
+// Dates
+stringifyMetadata({
+    createdAt: new Date('2024-01-15')
+})
+// => { createdAt: '2024-01-15T00:00:00.000Z' }
+
+// Objects and arrays
+stringifyMetadata({
+    user: { id: 1, name: 'John' },
+    tags: ['tag1', 'tag2']
+})
+// => { 
+//      user: '{"id":1,"name":"John"}',
+//      tags: '["tag1","tag2"]'
+//    }
+
+// Null and undefined are omitted
+stringifyMetadata({
+    id: 123,
+    value: null,
+    other: undefined
+})
+// => { id: '123' }
+
+// Circular objects are skipped
+const obj = { id: 1 }
+obj.self = obj
+stringifyMetadata(obj)
+// => { id: '1' }
+// (self property is skipped)
+```
+
 <div className="h-8" />
 
 ## Dot Prop Utils

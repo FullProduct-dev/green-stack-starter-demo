@@ -91,3 +91,23 @@ export const createKey = (obj: ObjectType<any$Unknown> = {}, separator = '-'): s
     })
     return valueKeys.sort().join(separator)
 }
+
+/** --- stringifyMetadata() -------------------------------------------------------------------- */
+/** -i- Transforms properties in a metadata object to string values only */
+export const stringifyMetadata = <T extends Record<string, unknown>>(metadata: T): Partial<Record<keyof T, string>> => {
+    return Object.entries(metadata).reduce((acc, [key, value]) => {
+        if (value === null || value === undefined) return acc
+        if (typeof value === 'string') return { ...acc, [key]: value }
+        if (typeof value === 'number' || typeof value === 'boolean') return { ...acc, [key]: value.toString() }
+        if (value instanceof Date) return { ...acc, [key]: value.toISOString() }
+        if (typeof value === 'object') {
+            try {
+                return { ...acc, [key]: JSON.stringify(value) }
+            } catch (error) {
+                // Skip for circular or unserializable objects
+                return acc
+            }
+        }
+        return { ...acc, [key]: String(value) }
+    }, {} as Partial<Record<keyof T, string>>)
+}
