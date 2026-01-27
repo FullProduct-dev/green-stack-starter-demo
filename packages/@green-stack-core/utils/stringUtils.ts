@@ -104,8 +104,9 @@ export const guessDisplayName = <
         firstName?: string | null,
         lastName?: string | null,
         email?: string | null,
+        [key: string]: any,
     }
->(mainSource: Userlike, ...fallbackSources: Userlike[]) => {
+>(mainSource: Userlike, ...fallbackSources: (Userlike | Record<string, any>)[]) => {
     // Combine sources
     const sources = [mainSource, ...fallbackSources].filter(Boolean)
     // Is there a 'fullName' field?
