@@ -22,9 +22,9 @@
 
 ---
 
-[![FullProduct.dev Bento Slide](https://fullproduct.dev/full-product-dev-bento.jpg)](https://fullproduct.dev?v=gh-demo-readme)
+[![FullProduct.dev Bento Slide](https://fullproduct.dev/full-product-dev-bento.jpg)](https://fullproduct.dev?v=gh-premium-readme)
 
-## The [FullProduct.dev](https://fullproduct.dev?v=gh-demo-readme) 🚀 Starterkit
+## The [FullProduct.dev](https://fullproduct.dev?v=gh-premium-readme) 🚀 Starterkit
 
 ![It's a lot harder and costly to add a mobile app later than it is to start universally](https://fullproduct.dev/blog-assets/imgs/start-universally.jpg)
 
@@ -233,18 +233,14 @@ npm run dev
 
 ---
 
-## FullProduct.dev - License (Demo version)
+## FullProduct.dev - License (Premium version)
 
-This free template repo is **source-available** under the **FullProduct.dev Demo Source-Available
-License**
+This repository is proprietary and provided under the **FullProduct.dev Premium Starterkit
+Commercial License (EULA)** — see [`LICENSE.md`](./LICENSE.md).
 
-- Commercial use is allowed below the revenue threshold.
-- You may redistribute the demo code (demo-only) with attribution.
-- You may not privately distribute this starter/template/codebase without a paid license.
-- Attribution requirements may be waived with a paid license.
-
-Please see the full license text in [`LICENSE.md`](./LICENSE.md) and the [EULA](https://fullproduct.dev/eula?v=gh-demo-readme-license)
-for more details.
+- Access is limited to authorized users/seats under a paid license.
+- The starterkit and all derivatives must remain private (no public redistribution).
+- End Products may be shipped to clients/end users as permitted by the EULA.
 
 </details>
 

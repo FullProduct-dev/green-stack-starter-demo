@@ -1,163 +1,186 @@
-# FullProduct.dev Demo Source-Available License (FDSAL)
+# FullProduct.dev Premium Starterkit Commercial License (EULA)
 
-**Version 1.1 — 2026-01-27**
+**Version 1.0 — 2026-01-27**
 
-Copyright (c) 2025–2026 Aetherspace Digital (FullProduct.dev).  
-All rights reserved.
+This End User License Agreement (“Agreement” or “EULA”) governs your use of the
+FullProduct.dev premium/core starterkit, including all premium plugins, tooling,
+documentation, updates, and associated materials (collectively, the “Software”)
+provided by Aetherspace Digital (“Company”, “we”, “us”).
 
-This license governs use of the FullProduct.dev “GREEN Stack Starter Demo” repository
-(the “Software”). By using, copying, modifying, or distributing the Software, you agree
-to this license.
+By accessing, cloning, downloading, or using the Software, you (“Licensee”, “you”)
+agree to be bound by this Agreement. If you do not accept these terms, do not access
+or use the Software.
 
-## Definitions
+## 1. License Grant
 
-- **End Product**: a specific web and/or mobile application you build using the Software.
-- **Starter/Template**: a generalized or reusable codebase intended to be used as a
-  starting point for multiple different End Products by you or others.
-- **Third party**: any person or entity other than you; however, for purposes of Sections
-  5(c) and 5(d), a client and that client’s employees/contractors working on the same End
-  Product are permitted recipients of an End Product codebase.
+Subject to payment of applicable fees and continuous compliance with this Agreement,
+Company grants Licensee a non-exclusive, non-transferable license to:
 
-## Paid License Override (Order of Precedence)
+- access and use the Software for internal development;
+- copy and modify the Software to build web and mobile applications and services
+  (“End Products”) for Licensee and/or Licensee’s clients;
+- create private derivative works of the Software (“Private Starters”) for Licensee’s
+  internal use and for permitted client End Product delivery (see **Section 5**); and
+- distribute End Products to end users and/or clients in object code and/or deployed form.
 
-If you have purchased a valid paid FullProduct.dev license, then:
+This is a license, not a sale. Company retains all right, title, and interest in and to
+the Software and all Company intellectual property embodied in it.
 
-- the restrictions in **Section 5** (No Private Redistribution of the Starter), and
-- the attribution requirements in **Section 6**
+## 2. Lifetime License and Update Access
 
-may be waived, but only to the extent permitted by your paid license/EULA.
+### 2.1 Lifetime Use
 
-In case of conflict, the paid license/EULA controls for the paid components and for any
-waivers it grants.
+Unless otherwise stated in the applicable order form, Licensee’s right to use the Software
+for End Products is granted for the lifetime of Licensee, subject to ongoing compliance
+with this Agreement.
 
-## 1. License Grant (Demo)
+### 2.2 Updates / Support Window
 
-Subject to the terms below, we grant you a non-exclusive, worldwide, revocable license to:
+Unless otherwise stated in the applicable order form, purchase includes a limited period
+of updates/support access (commonly one year) starting from purchase/activation.
+Continuing access to updates may require renewal or purchase of additional access.
 
-1. view and use the Software;
-2. modify the Software to build End Products;
-3. use the Software to perform paid development services for clients, including building
-   End Products for clients, provided you comply with this license;
-4. distribute End Products you build with the Software; and
-5. redistribute the Software only as permitted in **Section 4** (Redistribution).
+## 3. Authorized Users and GitHub Seats
 
-## 2. Commercial Use (Allowed Under Threshold)
+### 3.1 Authorized Users
 
-Commercial use is allowed provided that, in the prior 12 months, you have not generated
-**USD $10,000 or more** in gross revenue that is attributable to:
+An “Authorized User” is an individual person (employee or contractor) authorized by
+Licensee to access the private Software repository and who is assigned a valid seat.
 
-1. an End Product built with the Software, and/or
-2. services substantially enabled by the Software
+### 3.2 Seats
 
-(the **Revenue Threshold**).
+A “GitHub seat” (or “Seat”) grants one GitHub account access to the private repository
+and updates for the purchased access period. Seats are personal to the assigned user and
+may not be shared.
 
-If you meet or exceed the Revenue Threshold, you must obtain a paid FullProduct.dev
-license to continue using the Software for commercial purposes.
+### 3.3 Contractors
 
-## 3. No Premium Features; No Mixing Premium Code
+Contractors may be Authorized Users provided they are working on behalf of Licensee and
+are assigned their own Seat.
 
-The demo Software does not include premium features (for example: CLI workflows,
-installable PRs, auto-documentation, or other premium plugins).
+### 3.4 Offboarding
 
-You may not copy, incorporate, or distribute any premium FullProduct.dev code, features,
-or plugins unless you have a valid paid license for those premium components. If you are
-licensed for premium components, you must comply with the applicable commercial
-license/EULA for those components.
+Licensee is responsible for promptly removing access for any user who is no longer an
+Authorized User.
 
-## 4. Redistribution (Demo Only) — Allowed With Conditions
+## 4. Permitted Uses
 
-You may redistribute the unmodified Software, or your modified version of the Software,
-provided that:
+Licensee may:
 
-1. the redistributed code contains only demo-version code and does not contain any premium
-   code/features/plugins;
-2. you include this `LICENSE.md` file in full with the redistributed code;
-3. you do not represent the redistributed code as an official FullProduct.dev release; and
-4. you comply with the attribution requirements in **Section 6** (unless waived under
-   **Section 0** by a paid license).
+- develop unlimited End Products for itself and/or for its clients;
+- sell or otherwise commercially exploit End Products;
+- keep End Product source code private; and
+- maintain Private Starters indefinitely, provided all such Private Starters and derivatives
+  remain private as required by **Section 6**.
 
-## 5. No Private Redistribution of the Starter (Demo)
+## 5. Client Work and Client Delivery
 
-You may not distribute the Software (including modified versions) as a reusable
-Starter/Template, boilerplate, or codebase in any private manner to any third party
-(including but not limited to: private GitHub forks, private mirrors, private repos, zipped
-downloads, or direct sharing), except as permitted by a paid license under **Section 0**.
+### 5.1 Client Work
 
-### Clarifications
+Licensee may use the Software to perform paid development services for clients.
 
-1. This restriction does **not** prohibit you from performing paid client work using the
-   Software, as long as you do not provide the Software itself to the client (or any other
-   third party) as a reusable Starter/Template/codebase.
-2. This restriction does **not** prohibit you from keeping your End Product source code
-   private, so long as you are not distributing the Software itself as a reusable
-   Starter/Template/codebase to third parties.
-3. Delivering an End Product codebase to a client is permitted, provided that the delivered
-   codebase is a specific End Product (not marketed, packaged, or intended as a reusable
-   Starter/Template) and you continue to comply with this license (including **Section 3**
-   and **Section 6** unless waived under **Section 0**).
-4. Sharing an End Product codebase with the client’s employees and contractors who are
-   working on that End Product is permitted, provided it is for the purpose of developing,
-   maintaining, or operating that End Product and not for creating or distributing a reusable
-   Starter/Template.
-5. You must not provide the Software to any third party as a separate “clean starter” or
-   “base template” repository, even if you also deliver an End Product.
+### 5.2 Delivering End Product Code to Clients
 
-## 6. Attribution Requirements (README + End Product) (Waivable With Paid License)
+Licensee may deliver an End Product codebase (including source) to a client, provided that:
 
-Unless waived under **Section 0** by a paid license, if you redistribute the Software
-(**Section 4**) or ship an End Product built with the Software, you must provide attribution
-as follows:
+- it is delivered solely for the purpose of developing, maintaining, or operating that
+  specific End Product; and
+- it is not marketed, packaged, or intended as a reusable starter/template/boilerplate; and
+- the client is not permitted to further share or repurpose the delivered codebase as a
+  reusable starter/template outside the client’s team.
 
-### (a) README attribution (for redistributed Software or source-available starters)
+### 5.3 Client Team Access
 
-Keep an attribution section in the README that states the project is based on FullProduct.dev
-and links to:
+The client’s employees and contractors may access the delivered End Product codebase only
+to develop, maintain, or operate that End Product, and must not distribute it further.
 
-- https://fullproduct.dev
-- the original demo repository URL (or your public redistribution URL)
+## 6. Mandatory Privacy (No Public Distribution)
 
-### (b) End Product attribution (for shipped apps/websites)
+### 6.1 Private-Only Requirement
 
-Include a visible attribution in the End Product, such as in “About”, “Settings”, “Legal”,
-an in-app credits screen, or a website footer, stating **“Built with FullProduct.dev”**
-(or similar) and linking to https://fullproduct.dev where technically feasible.
+The Software and all derivatives of the Software (including Private Starters and any codebases
+that contain or are substantially based on the Software) must remain private in all cases.
 
-You may satisfy this for native mobile apps by including the attribution in a “Legal”,
-“About”, or “Libraries” screen.
+### 6.2 Prohibited Public Distribution
 
-## 7. Restrictions
+Licensee may not, and may not permit any third party to:
 
-Except as expressly permitted by this license, you may not:
+- open-source, publish, or otherwise make the Software or derivatives publicly available;
+- post the Software or derivatives to public repositories, gists, paste sites, torrents, or
+  similar public channels; or
+- distribute the Software or derivatives to any third party except as expressly permitted
+  for specific End Product delivery under **Section 5**.
 
-1. sell, sublicense, or resell the Software as a starter kit, template, boilerplate, or codebase;
-2. make the Software available to end users as a product whose primary purpose is to provide
-   access to the Software as a Starter/Template; or
-3. remove or alter copyright, trademark, or licensing notices included with the Software.
+## 7. No Redistribution / No Resale as a Starter
 
-## 8. Trademarks
+Licensee may not:
 
-“FullProduct.dev” and related marks/logos are trademarks of Aetherspace Digital.
+- sublicense, sell, resell, rent, lease, or redistribute the Software or any derivative as a
+  starter kit, template, boilerplate, or reusable codebase;
+- use the Software to create an end product whose primary purpose is to enable end users
+  to create their own end products from the Software or its derivatives (e.g. “app builder”),
+  unless Company grants written permission; or
+- remove or alter copyright, trademark, or licensing notices included with the Software.
 
-This license does not grant any rights to use our trademarks except for:
+## 8. Attribution
 
-1. the attribution required by **Section 6**, and
-2. truthful, nominative use.
+No attribution is required by default for End Products built with the premium Software,
+unless expressly stated in an applicable order form or plan.
 
-## 9. Warranty Disclaimer
+## 9. Intellectual Property
 
-THE SOFTWARE IS PROVIDED “AS IS” AND “AS AVAILABLE”, WITHOUT WARRANTY OF ANY KIND, EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+### 9.1 Ownership
 
-## 10. Limitation of Liability
+All intellectual property rights in the Software (including code, documentation, tooling,
+and updates) are and shall remain the sole property of Company or its licensors.
 
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT WILL THE COPYRIGHT HOLDER OR AUTHORS BE
-LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT,
-OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE. OUR TOTAL LIABILITY WILL NOT EXCEED THE AMOUNT YOU PAID FOR THE
-SOFTWARE (IF ANY).
+### 9.2 Licensee Work
 
-## 11. Termination
+Licensee retains ownership of its original code and content created for End Products.
+Company claims no ownership rights to Licensee’s original contributions that are not part
+of the Software itself. The underlying Software and Company IP remain Company’s property.
 
-If you violate this license, your rights under this license terminate automatically. Upon
-termination, you
+## 10. Warranty Disclaimer
+
+THE SOFTWARE IS PROVIDED “AS IS” AND “AS AVAILABLE,” WITH ALL FAULTS AND WITHOUT WARRANTY
+OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+
+## 11. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT WILL COMPANY BE LIABLE FOR ANY INDIRECT,
+INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF DATA, OR BUSINESS INTERRUPTION, ARISING OUT OF OR RELATED TO THE SOFTWARE
+OR THIS AGREEMENT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+COMPANY’S TOTAL LIABILITY FOR ANY CLAIM WILL NOT EXCEED THE FEES PAID BY LICENSEE FOR THE
+SOFTWARE (OR FOR UPDATE ACCESS, IF APPLICABLE) IN THE 12 MONTHS PRECEDING THE EVENT GIVING
+RISE TO THE CLAIM.
+
+## 12. Termination
+
+If Licensee breaches this Agreement, Company may terminate Licensee’s rights under this
+Agreement. Upon termination, Licensee must cease any new use of the Software and cease any
+distribution of the Software or derivatives as source code. End Products already delivered
+to end users/clients may continue to be used, provided they do not grant access to the
+Software as a reusable starter/template.
+
+## 13. Order of Precedence
+
+If there is a conflict between:
+
+1. an order form / invoice / plan description,
+2. this `LICENSE.md`, and
+3. any online terms or website EULA,
+
+the order form controls, then this `LICENSE.md`, then the online terms.
+
+## 14. Trademarks
+
+“FullProduct.dev” and related marks/logos are trademarks of Aetherspace Digital. This
+Agreement does not grant any rights to use Company trademarks except for truthful, nominative
+use (e.g. describing that you used the Software).
+
+## 15. Contact
+
+Licensing questions: https://fullproduct.dev/eula
