@@ -85,6 +85,49 @@ roundDownTo(3.14159, 2) // => 3.14
 
 <div className="h-8" />
 
+## Number Formatting Utils
+
+### `formatPercent()`
+
+Turns a decimal number into a percentage string, optionally rounding to specific decimals.
+
+```typescript
+// Basic usage
+formatPercent(0.5) // => '50%'
+formatPercent(0.75) // => '75%'
+
+// With decimal precision
+formatPercent(0.12345, 2) // => '12.35%'
+formatPercent(0.666666, 1) // => '66.7%'
+
+// With custom rounding function
+formatPercent(0.12345, 2, roundUpTo) // => '12.35%'
+formatPercent(0.12341, 2, roundDownTo) // => '12.34%'
+```
+
+### `formatMoney()`
+
+Turns a float number into a formatted money string.
+
+```typescript
+// Basic usage
+formatMoney(1000) // => '$ 1,000.00'
+formatMoney(1234567.89) // => '$ 1,234,567.89'
+
+// Custom currency symbol
+formatMoney(1000, '€') // => '€ 1,000.00'
+formatMoney(1000, '£') // => '£ 1,000.00'
+
+// Custom decimal places
+formatMoney(1000, '$', 0) // => '$ 1,000'
+formatMoney(1000.5, '$', 3) // => '$ 1,000.500'
+
+// Without grouping separators
+formatMoney(1000000, '$', 2, false) // => '$ 1000000.00'
+```
+
+<div className="h-8" />
+
 ## Number Validation Utils
 
 ### `hasLeadingZeroes()`

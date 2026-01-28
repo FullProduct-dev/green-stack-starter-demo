@@ -5,6 +5,7 @@ import { z, schema } from '@green-stack/schemas'
 import { cn, View, Pressable, getThemeColor } from '../components/styled'
 import { Icon } from '@green-stack/components/Icon'
 import { useFocusedPress } from '@green-stack/hooks/useFocusedPress'
+import { isValidNumber } from '@green-stack/utils/numberUtils'
 
 /* --- Schema ---------------------------------------------------------------------------------- */
 
@@ -16,6 +17,7 @@ export const NumberStepperProps = schema('NumberStepperProps', {
     placeholder: z.string().optional().example('Enter number...'),
     disabled: z.boolean().default(false),
     readOnly: z.boolean().default(false),
+    startFromPlaceholder: z.boolean().default(false).describe('If true, the stepper will start from the placeholder value when pressing the +/- controls when the input is empty'),
     hasError: z.boolean().default(false),
     className: z.string().optional(),
     pressableClassName: z.string().optional(),
@@ -31,6 +33,7 @@ export type NumberStepperProps = z.input<typeof NumberStepperProps> & {
 /* --- useNumberStepper() ---------------------------------------------------------------------- */
 
 export const useNumberStepper = (rawProps: NumberStepperProps) => {
+
     // Props
     const props = NumberStepperProps.applyDefaults(rawProps)
     const { min, max, step, disabled, hasError, onChange, ...restProps } = props
@@ -42,7 +45,10 @@ export const useNumberStepper = (rawProps: NumberStepperProps) => {
     const constrainValue = (value: number) => Math.min(Math.max(value, min), max || Infinity)
 
     // Vars
-    const numberValue = constrainValue(value)
+    const startFromPlaceholder = props.startFromPlaceholder && isValidNumber(props.placeholder)
+    const placeholderValue = startFromPlaceholder ? +rawProps.placeholder! : value
+    const editableValue = value || placeholderValue
+    const numberValue = constrainValue(editableValue)
 
     // Flags
     const hasMinValue = typeof rawProps.min !== undefined
@@ -54,9 +60,9 @@ export const useNumberStepper = (rawProps: NumberStepperProps) => {
  
     // -- Handlers --
 
-    const onIncrement = () => setValue(constrainValue(numberValue + step))
+    const onIncrement = () => setValue(constrainValue(editableValue + step))
 
-    const onDecrement = () => setValue(constrainValue(numberValue - step))
+    const onDecrement = () => setValue(constrainValue(editableValue - step))
 
     const onKeyPress = ({ nativeEvent }: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
         if (nativeEvent.key === 'ArrowUp') return onIncrement()
@@ -120,6 +126,7 @@ export const NumberStepper = forwardRef<
     ElementRef<typeof TextInput>,
     NumberStepperProps
 >((rawProps, ref) => {
+
     // Hooks
     const stepper = useNumberStepper(rawProps)
 
