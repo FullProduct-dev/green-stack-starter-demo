@@ -52,6 +52,7 @@
     "add:route": "npx turbo gen route",
     "env:local": "npx turbo run env:local",
     "gen": "npx turbo gen",
+    "test": "npm -w @green-stack/core test",
     "turbo:login": "npx turbo login",
     "turbo:link": "npx turbo link",
     "turbo:unlink": "npx turbo unlink",

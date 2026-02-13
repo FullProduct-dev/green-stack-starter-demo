@@ -1,6 +1,8 @@
 import type { TadaDocumentNode, VariablesOf, ResultOf } from 'gql.tada'
-import { graphqlQuery } from '@app/core/graphql/graphqlQuery'
-import { QueryConfig } from '@app/core/graphql/graphqlQuery.types'
+import type { QueryConfig } from '@app/core/graphql/graphqlQuery.types'
+
+/** -i- Lazy-loaded to avoid pulling in auth (and react-native) in Node/Bun test environments */
+const loadGraphqlQuery = () => import('@app/core/graphql/graphqlQuery').then((m) => m.graphqlQuery)
 
 /** --- bridgedFetcher() ----------------------------------------------------------------------- */
 /** -i- Helper to create a typed fetcher from config created by `createDataBridge()` */
@@ -34,6 +36,7 @@ export const bridgedFetcher = <
             variables: VariablesOf<Exclude<FinalQuery, unknown>>,
             config?: QueryConfig<TadaDocumentNode>,
         ) => {
+            const graphqlQuery = await loadGraphqlQuery()
             try {
                 const result = await graphqlQuery(query, { ...config, variables })
                 return result
@@ -54,6 +57,7 @@ export const bridgedFetcher = <
         variables: VariablesOf<Exclude<FinalQuery, unknown>>,
         config?: QueryConfig<TadaDocumentNode>,
     ) => {
+        const graphqlQuery = await loadGraphqlQuery()
         try {
             const result = await graphqlQuery(query, { ...config, variables })
             return result as ResultOf<FinalQuery>
