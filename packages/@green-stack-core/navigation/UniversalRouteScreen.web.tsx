@@ -44,8 +44,8 @@ export const UniversalRouteScreen = <
     const routeParams = extractParams(nextParams)
     const searchParams = extractParams(nextSearchParams)
 
-    // Hooks
-    const nextRouterParams = useRouteParams(props)
+    // Disable reactive listening to avoid re-rendering the entire route tree on shallow param changes
+    const nextRouterParams = useRouteParams(props, { reactive: false })
 
     // Context
     const { requestContext } = useContext(CoreContext)

@@ -1,6 +1,6 @@
 import { Image } from '@app/primitives'
 import { FileTree, Callout } from 'nextra/components'
-import { TitleWrapper } from '@app/docs/components/Hidden'
+import { TitleWrapper, LLMOptimized } from '@app/docs/components/Hidden'
 
 <TitleWrapper>
     ## Usage - `useRouter()`
@@ -16,33 +16,187 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 
 # Universal `useRouter()` hook
 
-```tsx
-import { useRouter } from '@green-stack/navigation/useRouter'
-```
+A unified router API that works identically across Expo (iOS, Android) and Next.js (web).
 
-You can use `router.push()` to navigate to a new page:
+```tsx copy
+import { useRouter } from '@green-stack/navigation'
+```
 
 ```tsx
 const router = useRouter()
 
-router.push('/examples/[slug]', '/examples/123')
+router.push('/examples/123')
 ```
 
-> `.push()` will use a push operation on mobile if possible.
+<div className="h-8" />
 
-There are also other methods available on the `router` object:
+## Methods
 
-- `router.navigate()` - Navigate to the provided href
-- `router.replace()` - Navigate without appending to the history
-- `router.back()` - Go back in the history
-- `router.canGoBack()` - Check if there's history that supports invoking the `back()` function
-- `router.setParams()` - Update the current route query params without navigating
+### `push(href)`
+
+Navigate to a new route. On mobile, this uses a **push** operation — the new screen slides in and the user can swipe back. On web, it behaves like `next/navigation`'s `router.push()`.
+
+```tsx
+router.push('/dashboard')
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `href` | `string` | The path to navigate to. |
+
+| Platform | Behavior |
+|----------|----------|
+| **Expo** | `expo-router`'s `router.push()` — pushes onto the native navigation stack |
+| **Next.js** | `next/navigation`'s `router.push()` — client-side navigation, adds to browser history |
+
+---
+
+### `navigate(href)`
+
+Navigate to a route. On mobile, Expo Router will deduplicate the route if it's already in the stack (avoiding double-pushes). On web, this is equivalent to `push()`.
+
+```tsx
+router.navigate('/settings')
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `href` | `string` | The path to navigate to. |
+
+| Platform | Behavior |
+|----------|----------|
+| **Expo** | `expo-router`'s `router.navigate()` — navigates without duplicating in stack |
+| **Next.js** | Same as `push()` — client-side navigation |
+
+<Callout type="info">
+    **When to use `push()` vs `navigate()`:** Use `push()` when you always want a new entry in the navigation stack (e.g. drilling into a detail screen). Use `navigate()` when you want to go somewhere without risking a duplicate (e.g. tab switches, redirects).
+</Callout>
+
+---
+
+### `replace(href)`
+
+Navigate to a route **without** adding an entry to the history stack. The current route is replaced — the user cannot go "back" to it.
+
+```tsx
+// After login, replace the sign-in screen so the user can't go back to it
+router.replace('/dashboard')
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `href` | `string` | The path to navigate to. |
+
+| Platform | Behavior |
+|----------|----------|
+| **Expo** | `expo-router`'s `router.replace()` |
+| **Next.js** | `next/navigation`'s `router.replace()` |
+
+---
+
+### `back()`
+
+Go back to the previous route in the history stack.
+
+```tsx
+router.back()
+```
+
+| Platform | Behavior |
+|----------|----------|
+| **Expo** | `expo-router`'s `router.back()` — pops the native navigation stack |
+| **Next.js** | `next/navigation`'s `router.back()` — equivalent to `window.history.back()` |
+
+---
+
+### `canGoBack()`
+
+Returns `true` if there's a previous route in the history to go back to. Useful for conditionally showing a back button.
+
+```tsx
+{router.canGoBack() && (
+    <Button onPress={() => router.back()} text="Go back" />
+)}
+```
+
+| Returns | Type |
+|---------|------|
+| Whether back navigation is possible | `boolean` |
+
+| Platform | Behavior |
+|----------|----------|
+| **Expo** | `expo-router`'s `router.canGoBack()` — checks the native navigation stack |
+| **Next.js** | Checks `window.history.length > 1` |
+
+---
+
+### `setParams(params, opts?)`
+
+Update the current route's query parameters without navigating to a different route. Useful for persisting form state, filter selections, or modal visibility to the URL.
+
+```tsx
+// Persist filter state to the URL
+router.setParams({ sort: 'date', category: 'featured' })
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `params` | `Record<string, any>` | Key-value pairs to set as query parameters. Nested objects and arrays are automatically serialized. Empty values are omitted. |
+| `options.shallow` | `boolean` | **Web only.** When `true`, updates the URL via `history.replaceState()` without triggering a Next.js navigation. Default: `false`. |
+
+| Platform | Behavior |
+|----------|----------|
+| **Expo** | `expo-router`'s `router.setParams()` — updates the current screen's params in-place |
+| **Next.js** | Default: calls `router.replace()` with the updated URL (triggers a navigation cycle). With `shallow: true`: uses `window.history.replaceState()` instead. |
+
+<Callout type="warning">
+    **Avoiding unnecessary re-renders on web:** By default, `setParams()` calls Next.js's `router.replace()` under the hood, which triggers a full navigation cycle and re-renders the entire page component tree — even if only the query string changed.
+
+    If you're using `setParams()` to persist UI state (e.g. form values, modal visibility) and don't need downstream components to re-render from the URL change, pass `{ shallow: true }`:
+
+    ```tsx
+    router.setParams({ identity: 'startups' }, { shallow: true })
+    ```
+
+    This updates the URL bar without triggering any React re-renders. The `shallow` option has no effect on mobile — Expo's `setParams` already updates in-place without re-rendering the tree.
+</Callout>
+
+<div className="h-8" />
+
+## Full Type Reference
+
+<details>
+<summary>View `UniversalRouterMethods` type</summary>
+
+```tsx
+type UniversalRouterMethods = {
+    /** Navigate to the provided href, uses a push operation on mobile if possible. */
+    push: (href: string) => void
+
+    /** Navigate to the provided href. Deduplicates on mobile. */
+    navigate: (href: string) => void
+
+    /** Navigate to route without appending to the history. */
+    replace: (href: string) => void
+
+    /** Go back in the history. */
+    back: () => void
+
+    /** If there's history that supports invoking the `back` function. */
+    canGoBack: () => boolean
+
+    /** Update the current route query params without navigating. */
+    setParams: (params?: Record<string, any>, options?: { shallow?: boolean }) => void
+}
+```
+
+</details>
 
 <div className="h-8" />
 
 ## React Portability Patterns
 
-Each environment has it's own optimized router. This is why there are also versions specifically for each of those environments:
+Each environment has its own optimized router. This is why there are also versions specifically for each of those environments:
 
 <FileTree>
     <FileTree.Folder name="packages" defaultOpen>

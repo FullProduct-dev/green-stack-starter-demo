@@ -1,10 +1,10 @@
 import { useContext } from 'react'
 import { CoreContext } from '../context/CoreContext'
-import { UniversalRouteScreenProps } from './useRouteParams.types'
+import { UniversalRouteScreenProps, UseRouteParamsOptions } from './useRouteParams.types'
 
 /* --- useRouteParams() ------------------------------------------------------------------------ */
 
-export const useRouteParams = (routeScreenProps: UniversalRouteScreenProps) => {
+export const useRouteParams = (routeScreenProps: UniversalRouteScreenProps, options?: UseRouteParamsOptions) => {
     const { useContextRouteParams } = useContext(CoreContext)
-    return useContextRouteParams(routeScreenProps)
+    return useContextRouteParams(routeScreenProps, options)
 }

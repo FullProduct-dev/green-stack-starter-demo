@@ -2,6 +2,7 @@ import { useRouter as useNextRouter } from 'next/navigation'
 import { UniversalRouterMethods } from './useRouter.types'
 import { buildUrlParamsObject } from '../utils/objectUtils'
 import { isEmpty } from '../utils/commonUtils'
+import { SHALLOW_PARAMS_CHANGE_EVENT } from './searchParamsStore'
 
 /* --- useRouter() -------------------------------------------------------------------- */
 
@@ -22,7 +23,11 @@ export const useRouter = () => {
         return window.history.length > 1
     }
 
-    const setParams = (params: Record<string, any$Unknown> = {}) => {
+    const setParams = (
+        params: Record<string, any$Unknown> = {},
+        options: { shallow?: boolean} = {},
+    ) => {
+        const { shallow = false } = options
         if (typeof window === 'undefined') return
         const url = new URL(window.location.href)
         const search = new URLSearchParams()
@@ -32,7 +37,11 @@ export const useRouter = () => {
             if (!isEmpty(paramVal)) search.set(key, paramVal)
         })
         url.search = search.toString()
-        nextRouter.replace(url.toString(), { scroll: false })
+        if (!shallow) nextRouter.replace(url.toString(), { scroll: false })
+        else {
+            window?.history?.replaceState(window.history.state, '', url.toString())
+            window?.dispatchEvent(new CustomEvent(SHALLOW_PARAMS_CHANGE_EVENT))
+        }
     }
 
     // -- Return --

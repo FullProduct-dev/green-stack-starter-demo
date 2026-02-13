@@ -16,5 +16,5 @@ export type UniversalRouterMethods = {
     canGoBack: () => boolean
 
     /** Update the current route query params. */
-    setParams: (params?: Record<string, any$Unknown>) => void
+    setParams: (params?: Record<string, any$Unknown>, options?: { shallow?: boolean }) => void
 }
