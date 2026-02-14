@@ -16,7 +16,7 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 
 # useRouteParams()
 
-Tiny absctraction layer that retrieves the parameters of a route in both the Expo Router and Next.js app routers. Serverside, in the browser and on iOS or Android:
+A tiny abstraction layer that retrieves the parameters of a route in both the Expo Router and Next.js app routers. Server-side, in the browser and on iOS or Android:
 
 ```tsx copy
 import { useRouteParams } from '@green-stack/navigation'
@@ -26,11 +26,76 @@ import { useRouteParams } from '@green-stack/navigation'
 const routeParams = useRouteParams(routeProps)
 ```
 
-Typescript should complain if you don't, but make sure to include the route's screen props when using this hook, as it relies on them to access the route parameters in Next.js
+TypeScript should complain if you don't, but make sure to include the route's screen props when using this hook, as it relies on them to access the route parameters in Next.js.
+
+<div className="h-8" />
+
+## Options
+
+`useRouteParams` accepts an optional second argument:
+
+```tsx
+const routeParams = useRouteParams(routeProps, { reactive: true })
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `reactive` | `boolean` | `true` | When `true`, the hook subscribes to shallow URL changes made via `router.setParams(..., { shallow: true })` and re-renders the component when search params change. |
+
+### Reactive mode (default)
+
+By default, `useRouteParams` subscribes to shallow search param changes on web. This means if another component calls `router.setParams({ filter: 'new' }, { shallow: true })`, any component using `useRouteParams` with `reactive: true` will re-render with the updated params:
+
+```tsx
+// This component re-renders when shallow params change
+const MyFilter = (props) => {
+    const params = useRouteParams(props) // reactive: true by default
+    return <Text>{params.filter}</Text>
+}
+```
+
+<Callout type="info">
+    On Expo, `useLocalSearchParams()` is already reactive by nature, so the `reactive` option has no effect on mobile.
+</Callout>
+
+### Non-reactive mode
+
+Pass `{ reactive: false }` when you don't need the component to respond to shallow URL changes. This is useful for components high in the tree (like route wrappers) where re-rendering would be expensive:
+
+```tsx
+// This component won't re-render on shallow param changes
+const routeParams = useRouteParams(props, { reactive: false })
+```
+
+<Callout type="warning">
+    The built-in `UniversalRouteScreen` wrapper uses `{ reactive: false }` by default to avoid re-rendering the entire page tree on shallow param updates. If your screen component needs to respond to shallow changes, use `useRouteParams` directly within the screen component itself (where `reactive` defaults to `true`).
+</Callout>
+
+<div className="h-8" />
+
+## Full Type Reference
+
+<details>
+<summary>View `UseRouteParamsOptions` type</summary>
+
+```tsx
+type UseRouteParamsOptions = {
+    /** When `true`, the hook subscribes to shallow URL changes
+     ** (via `router.setParams(..., { shallow: true })`)
+     ** and re-renders the component when search params change.
+     ** On Expo, `useLocalSearchParams()` is already reactive, so this option has no effect.
+     ** @default true */
+    reactive?: boolean
+}
+```
+
+</details>
+
+<div className="h-8" />
 
 ## React Portability Patterns
 
-Each environment has it's own ways of accessing route parameters. This is why there are also versions specifically for each of those environments:
+Each environment has its own ways of accessing route parameters. This is why there are also versions specifically for each of those environments:
 
 <FileTree>
     <FileTree.Folder name="packages" defaultOpen>
@@ -45,7 +110,7 @@ Each environment has it's own ways of accessing route parameters. This is why th
     </FileTree.Folder>
 </FileTree>
 
-Where `useRouteParams.next.tsx` covers the Next.js app router, and `useRouteParams.expo.tsx` covers Expo Router. The main `useRouteParams.tsx` retrieves whichever implementation was provided to the `<UniversalAppProviders>` component and, which is further passed to `<CoreContext.Provider/>`:
+Where `useRouteParams.next.ts` covers the Next.js app router, and `useRouteParams.expo.ts` covers Expo Router. The main `useRouteParams.ts` retrieves whichever implementation was provided to the `<UniversalAppProviders>` component, which is further passed to `<CoreContext.Provider/>`:
 
 ```tsx /.expo/ /useExpoRouteParams/ filename="ExpoRootLayout.tsx" copy
 import { useRouteParams as useExpoRouteParams } from '@green-stack/navigation/useRouteParams.expo'
