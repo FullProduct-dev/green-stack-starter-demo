@@ -17,11 +17,18 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 # `add-form`
 
 ```md copy
+npm run add:form
+```
+
+Interactive, or with args (positional or named; `--args` optional):
+
+```md copy
 npm run add:form -- --args <workspacePath> <formSchema> <formHookName>
 ```
 
 ```md copy
-npx turbo gen add-form --args <workspacePath> <formSchema> <formHookName>
+npm run add:form -- features/@app-core HealthCheckInput useHealthCheckForm
+npm run add:form -- --workspacePath features/@app-core --formSchema HealthCheckInput --formHookName useHealthCheckForm
 ```
 
 <FileTree>

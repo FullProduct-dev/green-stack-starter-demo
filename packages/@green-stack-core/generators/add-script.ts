@@ -5,12 +5,12 @@ import open from 'open'
 
 /* --- Disclaimer ------------------------------------------------------------------------------ */
 
-// -i- Learn more about Turborepo Generators at:
-// -i- https://turbo.build/repo/docs/core-concepts/monorepos/code-generation 
+// -i- Learn more about Plop Generators at:
+// -i- https://github.com/plopjs/plop
 
 /* --- Prompts --------------------------------------------------------------------------------- */
 
-export const gen = createPrompts({
+export const gen = createPrompts('add-script', {
 
     upgrade: {
         type: 'confirm',
@@ -27,7 +27,7 @@ export const gen = createPrompts({
 /** --- Script Generator ----------------------------------------------------------------------- */
 /** -i- Add a new script */
 export const registerScriptGenerator = (plop: PlopTypes.NodePlopAPI) => {
-    plop.setGenerator('script', {
+    plop.setGenerator(gen.name, {
         description: 'Add a new script',
         prompts: gen.prompts,
         actions: (data: GenAnswers) => {

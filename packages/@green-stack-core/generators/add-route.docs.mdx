@@ -17,11 +17,18 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 # `add-route`
 
 ```md copy
-npm run add:route -- --args <workspacePath> <screenName> <routePath> <initialDataTarget>
+npm run add:route
+```
+
+Interactive, or with args (positional or named; `--args` optional):
+
+```md copy
+npm run add:route -- --args <workspacePath> <screenName> <routePath> <initialDataTarget> <initialDataResolver> <initialDataResolverArgs>
 ```
 
 ```md copy
-npx turbo gen route --args <workspacePath> <screenName> <routePath> <initialDataTarget>
+npm run add:route -- features/@app-core PostScreen /posts "[slug]" healthCheck
+npm run add:route -- --workspacePath features/@app-core --screenName PostScreen --routePath /posts "[slug]"
 ```
 
 <FileTree>

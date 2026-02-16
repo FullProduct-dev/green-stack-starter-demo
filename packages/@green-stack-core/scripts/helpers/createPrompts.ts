@@ -154,7 +154,6 @@ export const createAutocompleteSource = (
             if (typeof option !== 'string') checkedString = `${option.name} ${option.value}`
             return checkedString.includes(input)
         })
-        // console.log({ answersSoFar, filteredOptions })
         return Promise.resolve(filteredOptions)
     }
 }
@@ -162,16 +161,23 @@ export const createAutocompleteSource = (
 /** --- createPrompts() ------------------------------------------------------------------------ */
 /** -i- Creates a list of prompt and provides typesafety for dynamic computed fields while doing so */
 export const createPrompts = <
-    PROMPTS extends Record<string, BasePrompt<any$Unknown, any$Unknown>>, // @ts-ignore
-    VALUES = { [K in keyof PROMPTS]: PromptValue<PROMPTS[K]['type'], ExtractChoices<PROMPTS[K]['choices']>> }, // @ts-ignore
-    POTENTIAL_REFINEMENTS = { [K in keyof VALUES]: PromptRefinement<K, VALUES> },
+    NAME extends string,
+    PROMPTS extends Record<string, BasePrompt<any$Unknown, any$Unknown>>,
+    // @ts-expect-error - complex generic constraints
+    VALUES = { [K in keyof PROMPTS]: PromptValue<PROMPTS[K]['type'], ExtractChoices<PROMPTS[K]['choices']>> },
+    // @ts-expect-error - VALUES may not satisfy Record<string, any>
+    POTENTIAL_REFINEMENTS = { [K in Extract<keyof VALUES, string>]: PromptRefinement<K, VALUES> },
+    // REFINEMENTS may not satisfy Partial<POTENTIAL_REFINEMENTS>
     REFINEMENTS extends Partial<POTENTIAL_REFINEMENTS> = Partial<POTENTIAL_REFINEMENTS>,
     PARSER extends (answers: VALUES) => any$Unknown = (answers: VALUES) => VALUES,
     PARSED = ReturnType<PARSER>,
 >(
+    name: NAME,
     prompts: PROMPTS,
     options?: {
+        /** -i- Optional dynamic computed fields for prompts based on other prompt answers (e.g. dynamic choices, validation, etc) */
         compute?: REFINEMENTS,
+        /** -i- Optional parser function to transform the final answers into a different format for the generator actions */
         parser?: PARSER,
     },
 ) => {
@@ -211,8 +217,15 @@ export const createPrompts = <
     })
 
     return {
+        /** -i- Plop generator name for registration */
+        name,
+        /** -i- Full list of prompts with dynamic fields computed */
         prompts: fullPrompts,
+        /** -i- Ordered list of prompt keys for CLI arg mapping (positional or named) */
+        promptKeys: Object.keys(prompts) as (keyof PROMPTS)[],
+        /** -i- Parser function to transform the final answers into a different format for the generator actions */
         parseAnswers: (parser || ((answers: VALUES) => answers)) as PARSER,
+        /// -i- Internal fields for type inference, not used at runtime
         _values: null as VALUES,
         _refinements: null as POTENTIAL_REFINEMENTS,
         _parsed: null as PARSED,

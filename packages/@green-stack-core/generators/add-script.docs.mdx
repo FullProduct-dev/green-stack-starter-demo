@@ -17,11 +17,18 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 # `add-script`
 
 ```md copy
+npm run add:script
+```
+
+Interactive, or with args (positional or named; `--args` optional):
+
+```md copy
 npm run add:script -- --args <workspacePath> <scriptName> <scriptFileName>
 ```
 
 ```md copy
-npx turbo gen script --args <workspacePath> <scriptName> <scriptFileName>
+npm run add:script -- features/@app-core my:script myScript.ts
+npm run add:script -- --workspacePath features/@app-core --scriptName my:script --scriptFileName myScript.ts
 ```
 
 <FileTree>

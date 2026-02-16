@@ -7,13 +7,13 @@ import fs from 'fs'
 
 /* --- Disclaimer ------------------------------------------------------------------------------ */
 
-// -i- Learn more about Turborepo Generators at:
-// -i- https://turbo.build/repo/docs/core-concepts/monorepos/code-generation
+// -i- Learn more about Plop Generators at:
+// -i- https://github.com/plopjs/plop
 
 /* --- Usage ----------------------------------------------------------------------------------- */
 
-// -i- npm run add:dependencies -- --args <workspacePkg> <dependencies>
-// -i- npx turbo gen dependencies --args <workspacePkg> <dependencies>
+// -i- npm run add:dependencies -- --args <workspacePkg> <dependencies> (pass _ to prompt for missing args)
+// -i- npm run add:dependencies -- --workspacePkg @app/core --dependencies dep-1 dep-2 dep-3
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
@@ -21,7 +21,7 @@ const { workspacePackages } = parseWorkspaces('./', true)
 
 /* --- Prompts --------------------------------------------------------------------------------- */
 
-export const gen = createPrompts({
+export const gen = createPrompts('add-dependencies', {
 
     workspacePkg: {
         type: 'autocomplete',
@@ -34,7 +34,7 @@ export const gen = createPrompts({
     },
 
 }, {
-
+    
     compute: {
         dependencies: {
             validate: (value) => !!value,
@@ -71,7 +71,7 @@ type Context = typeof gen._parsed
 /** --- Dependency Installer ------------------------------------------------------------------- */
 /** -i- Install Expo SDK compatible dependencies in a workspace */
 export const registerDependencyGenerator = (plop: PlopTypes.NodePlopAPI) => {
-    plop.setGenerator('add-dependencies', {
+    plop.setGenerator(gen.name, {
         description: 'Install Expo SDK compatible dependencies in a workspace',
         prompts: gen.prompts,
         actions: (data: GenAnswers) => {
