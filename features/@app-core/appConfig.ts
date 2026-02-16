@@ -134,5 +134,5 @@ export const appConfig = {
 /* --- Debug ----------------------------------------------------------------------------------- */
 
 if (Platform.OS !== 'web' && appConfig.baseURL === '') {
-    console.warn('appConfig.baseURL is empty, you may be missing some environment variables')
+    console.warn('appConfig.baseURL is empty, you may be missing the EXPO_PUBLIC_BASE_URL environment variables')
 }

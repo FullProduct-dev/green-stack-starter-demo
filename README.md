@@ -13,7 +13,7 @@
 > A universal starter kit for building apps with Expo (iOS / Android) and Next.js (Web + SSR) - Providing a familiar but optimized, write-once, app router experience.
 
 > [!NOTE]  
-> FullProduct.dev is still in early access. While the core is there, we are still actively adding worthwhile plugins.
+> While the core of FullProduct.dev is pretty mature, it's still early when it comes to our available list of plugins and integrations. But this shouldn't be a huge problem for a good dev team as it's easy to add your own reusable features as git plugins.
 
 ---
 

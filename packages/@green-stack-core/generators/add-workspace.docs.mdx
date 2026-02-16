@@ -17,11 +17,18 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 # `add-workspace`
 
 ```md copy
+npm run add:workspace
+```
+
+Interactive, or with args (positional, named, or mixed; `--args` optional):
+
+```md copy
 npm run add:workspace -- --args <workspaceType> <folderName> <packageName> <workspaceStructure> <packageDescription>
 ```
 
 ```md copy
-npx turbo gen add-workspace --args <workspaceType> <folderName> <packageName> <workspaceStructure> <packageDescription>
+npm run add:workspace -- feature my-feature @app/my-feature schemas resolvers "Description"
+npm run add:workspace -- --workspaceStructure schemas resolvers components --folderName my-feature --packageName @app/my-feature
 ```
 
 <FileTree>

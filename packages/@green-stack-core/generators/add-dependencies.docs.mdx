@@ -17,14 +17,21 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 # `add-dependencies`
 
 ```md copy
+npm run add:dependencies
+```
+
+Interactive, or with args (positional or named; `--args` optional):
+
+```md copy
 npm run add:dependencies -- --args <workspacePkg> <dependencies>
 ```
 
 ```md copy
-npx turbo gen dependencies --args <workspacePkg> <dependencies>
+npm run add:dependencies -- @app/core zod,date-fns
+npm run add:dependencies -- --workspacePkg @app/core --dependencies zod date-fns
 ```
 
-Less of a generator and more of a utility script, this generator **installs Expo SDK compatible versions** of the specified dependencies in the selected workspace's `package.json`.
+Less of a generator and more of a utility script, this **installs Expo SDK compatible versions** of the specified dependencies in the selected workspace's `package.json`.
 
 <FileTree>
   <FileTree.Folder name="packages" defaultOpen>
@@ -42,7 +49,7 @@ Less of a generator and more of a utility script, this generator **installs Expo
 
 | Argument      | Type         | Question / Description                                                                                    |
 |---------------|--------------|-----------------------------------------------------------------------------------------------------------|
-| workspacePath | autocomplete | Where would you like to install these dependencies? <br/>=> e.g. `@app/core` or `some-package`            |
+| workspacePkg   | autocomplete | Where would you like to install these dependencies? <br/>=> e.g. `@app/core` or `some-package`                |
 | dependencies  | text         | Which dependencies should we install Expo SDK compatible versions for? <br/>=> `string` (comma separated) |
 
 <div className="h-8" />

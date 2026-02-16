@@ -17,11 +17,18 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 # `add-schema`
 
 ```md copy
+npm run add:schema
+```
+
+Interactive, or with args (positional, named, or mixed; `--args` optional):
+
+```md copy
 npm run add:schema -- --args <workspacePath> <schemaName> <schemaDescription>
 ```
 
 ```md copy
-npx turbo gen schema --args <workspacePath> <schemaName> <schemaDescription>
+npm run add:schema -- packages/@green-stack-core MySchema "Description"
+npm run add:schema -- --workspacePath packages/@green-stack-core --schemaName MySchema --schemaDescription "Description"
 ```
 
 <FileTree>

@@ -5,7 +5,8 @@
     "dependencies": {},
     "scripts": {
         "collect:models": "npm -w @green-stack/core run run:script ../../packages/@db-driver/scripts/collect-models.ts",
-        "collect:drivers": "npm -w @green-stack/core run run:script ../../packages/@green-stack-core/scripts/collect-drivers.ts"
+        "collect:drivers": "npm -w @green-stack/core run run:script ../../packages/@green-stack-core/scripts/collect-drivers.ts",
+        "test": "cd ../../ && bun test --tsconfig-override ./packages/@green-stack-core/tsconfig.json --preload ./packages/@green-stack-core/preload.test.ts --verbose ./packages/@db-driver/**/*.test.ts"
     },
     "stackConfig": {
         "relatedWorkspaces": [

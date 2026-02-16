@@ -5,13 +5,13 @@ import { createPrompts } from '../scripts/helpers/scriptUtils'
 
 /* --- Disclaimer ------------------------------------------------------------------------------ */
 
-// -i- Learn more about Turborepo Generators at:
-// -i- https://turbo.build/repo/docs/core-concepts/monorepos/code-generation
+// -i- Learn more about Plop Generators at:
+// -i- https://github.com/plopjs/plop
 
 /* --- Usage ----------------------------------------------------------------------------------- */
 
-// -i- npm run add:workspace -- --args <workspaceType> <folderName> <packageName> <workspaceStructure> <packageDescription>
-// -i- npx turbo gen add-workspace --args <workspaceType> <folderName> <packageName> <workspaceStructure> <packageDescription>
+// -i- npm run add:workspace -- --args <workspaceType> <folderName> <packageName> <workspaceStructure> <packageDescription> (pass _ to prompt for missing args)
+// -i- npm run add:workspace -- --workspaceType feature --folderName @app-core --packageName @app/core --workspaceStructure schemas resolvers components hooks screens routes utils --packageDescription "desc"
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
@@ -22,7 +22,7 @@ const WORKSPACE_FOLDER_MAPPER = {
 
 /* --- Prompts --------------------------------------------------------------------------------- */
 
-export const gen = createPrompts({
+export const gen = createPrompts('add-workspace', {
 
     workspaceType: {
         type: 'list',
@@ -118,7 +118,7 @@ const tsConfigTemplate = `{
 /** --- Workspace Generator -------------------------------------------------------------------- */
 /** -i- Simple generator to add a new feature or package workspace */
 export const registerWorkspaceGenerator = (plop: PlopTypes.NodePlopAPI) => {
-    plop.setGenerator('add-workspace', {
+    plop.setGenerator(gen.name, {
         description: 'Create a new feature or package workspace',
         prompts: gen.prompts,
         actions: (data: GenAnswers) => {

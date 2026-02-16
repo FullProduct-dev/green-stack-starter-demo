@@ -1,7 +1,7 @@
 import React from 'react'
 import { UniversalLinkProps } from '@green-stack/navigation/Link.types'
 import { UniversalRouterMethods } from '@green-stack/navigation/useRouter.types'
-import { UniversalRouteScreenProps } from '@green-stack/navigation/useRouteParams.types'
+import { UniversalRouteScreenProps, UseRouteParamsOptions } from '@green-stack/navigation/useRouteParams.types'
 import type { useLocalSearchParams } from 'expo-router'
 import type { UniversalImageMethods, UniversalImageProps } from '../components/Image.types'
 import { KnownRoutes } from '@app/registries/routeManifest.generated'
@@ -21,7 +21,7 @@ export type CoreContextType = {
     contextLink: <HREF extends KnownRoutes>(props: UniversalLinkProps<HREF>) => JSX.Element
     contextRouter: UniversalRouterMethods
     // Hooks
-    useContextRouteParams: (routeScreenProps: UniversalRouteScreenProps) => ReturnType<typeof useLocalSearchParams>
+    useContextRouteParams: (routeScreenProps: UniversalRouteScreenProps, options?: UseRouteParamsOptions) => ReturnType<typeof useLocalSearchParams>
     // Flags
     isExpo?: boolean
     isNext?: boolean
