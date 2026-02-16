@@ -5,13 +5,13 @@ import { createPrompts } from '../scripts/helpers/scriptUtils'
 
 /* --- Disclaimer ------------------------------------------------------------------------------ */
 
-// -i- Learn more about Turborepo Generators at:
-// -i- https://turbo.build/repo/docs/core-concepts/monorepos/code-generation
+// -i- Learn more about Plop Generators at:
+// -i- https://github.com/plopjs/plop
 
 /* --- Usage ----------------------------------------------------------------------------------- */
 
-// -i- npm run add:schema -- --args <workspacePath> <schemaName> <schemaDescription>
-// -i- npx turbo gen schema --args <workspacePath> <schemaName> <schemaDescription>
+// -i- npm run add:schema -- --args <workspacePath> <schemaName> <schemaDescription> (pass _ to prompt for missing args)
+// -i- npm run add:schema -- --workspacePath features/@app-core --schemaName=Foo --schemaDescription "desc"
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
@@ -20,7 +20,7 @@ const workspaceOptions = getWorkspaceOptions('./')
 
 /* --- Prompts --------------------------------------------------------------------------------- */
 
-export const gen = createPrompts({
+export const gen = createPrompts('add-schema', {
 
     workspacePath: {
         type: 'autocomplete',
@@ -31,7 +31,7 @@ export const gen = createPrompts({
         type: 'input',
         message: 'What is the schema name?',
     },
-    schemaDescription:{
+    schemaDescription: {
         type: 'input',
         message: 'Optional description: What data structure does this schema describe?',
     },
@@ -115,11 +115,11 @@ export const createSchemaContent = (ctx: Context) => [
 /** --- Schema Generator ----------------------------------------------------------------------- */
 /** -i- Add a new zod schema as a single source of truth */
 export const registerSchemaGenerator = (plop: PlopTypes.NodePlopAPI) => {
-    plop.setGenerator('schema', {
+    plop.setGenerator(gen.name, {
         description: 'Add a new zod schema as a single source of truth',
         prompts: gen.prompts,
         actions: (answers: GenAnswers) => {
-            
+
             const ctx = gen.parseAnswers(answers)
 
             // -- Build schema --

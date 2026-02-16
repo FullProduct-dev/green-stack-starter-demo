@@ -17,11 +17,18 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 # `add-resolver`
 
 ```md copy
-npm run add:resolver -- --args <workspacePath> <resolverName> <resolverDescription> <resolverType> ...
+npm run add:resolver
+```
+
+Interactive, or with args (positional or named; `--args` optional):
+
+```md copy
+npm run add:resolver -- --args <workspacePath> <resolverName> <resolverDescription> <resolverType> <generatables> <inputSchemaTarget> <inputSchemaName> <outputSchemaTarget> <outputSchemaName> <apiPath> <formHookName>
 ```
 
 ```md copy
-npx turbo gen resolver --args <workspacePath> <resolverName> <resolverDescription> <resolverType> ...
+npm run add:resolver -- features/@app-core myResolver "Description" query ...
+npm run add:resolver -- --workspacePath features/@app-core --resolverName myResolver --generatables GET POST
 ```
 
 <FileTree>

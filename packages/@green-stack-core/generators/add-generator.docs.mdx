@@ -17,11 +17,18 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 # `add-generator`
 
 ```md copy
+npm run add:generator
+```
+
+Interactive, or with args (positional or named; `--args` optional):
+
+```md copy
 npm run add:generator -- --args <workspacePath> <generatedEntity>
 ```
 
 ```md copy
-npx turbo gen generator --args <workspacePath> <generatedEntity>
+npm run add:generator -- features/@app-core component
+npm run add:generator -- --workspacePath features/@app-core --generatedEntity component
 ```
 
 <FileTree>
