@@ -1,6 +1,6 @@
 {
-    "$schema": "https://turbo.build/schema.v1.json",
-    "pipeline": {
+    "$schema": "https://turbo.build/schema.json",
+    "tasks": {
         "build": {
             "dependsOn": ["@green-stack/core#build:schema"],
             "outputs": [".next/**", "!.next/cache/**"],
@@ -36,134 +36,8 @@
             "dependsOn": ["@green-stack/core#build:schema"],
             "cache": false
         },
-        "@app-expo#add-dependencies": {
+        "@app/expo#add-dependencies": {
             "cache": false
-        },
-        "@green-stack/core#collect:resolvers": {
-            "outputs": [
-                "../../packages/@registries/resolvers.generated.ts",
-                "../../packages/@registries/bridges.generated.ts"
-            ],
-            "inputs": [
-                "../../features/**/resolvers/*.ts",
-                "../../features/**/resolvers/*.resolver.ts",
-                "../../features/**/resolvers/*.bridge.ts",
-                "../../features/**/routes/api/**/route.ts",
-                "../../packages/**/resolvers/*.ts",
-                "../../packages/**/resolvers/*.resolver.ts",
-                "../../packages/**/resolvers/*.bridge.ts",
-                "../../packages/**/routes/api/**/route.ts",
-                "../../packages/@green-stack-core/utils/*.ts",
-                "../../packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
-                "../../packages/@green-stack-core/scripts/collect-resolvers.ts"
-            ],
-            "cache": true
-        },
-        "@green-stack/core#link:routes": {
-            "cache": false
-        },
-        "@green-stack/core#build:schema": {
-            "dependsOn": [
-                "@green-stack/core#collect:resolvers",
-                "@green-stack/core#link:routes",
-                "@green-stack/core#collect:drivers",
-                "@db/driver#collect:models"
-            ],
-            "outputs": [
-                "../../features/@app-core/graphql/schema.graphql",
-                "../../features/@app-core/graphql/typeDefs.ts"
-            ],
-            "inputs": [
-                "../../features/**/schemas/*.ts",
-                "../../features/**/schemas/*.schema.ts",
-                "../../features/**/resolvers/*.bridge.ts",
-                "../../packages/**/schemas/*.ts",
-                "../../packages/**/schemas/*.schema.ts",
-                "../../packages/**/resolvers/*.bridge.ts",
-                "../../packages/@green-stack-core/utils/**.ts",
-                "../../packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
-                "../../packages/@green-stack-core/schemas/createGraphSchemaDefs.ts",
-                "../../packages/@green-stack-core/scripts/build-graphql-schema.ts"
-            ],
-            "cache": true
-        },
-        "@green-stack/core#build:theme-colors": {
-            "outputs": [
-                "../../packages/@registries/themeColors.generated.ts"
-            ],
-            "inputs": [
-                "../../apps/next/global.css",
-                "../../packages/@green-stack-core/scripts/build-theme-colors.ts"
-            ],
-            "cache": true
-        },
-        "@green-stack/core#collect:generators": {
-            "outputs": [
-                "../../packages/@registries/generators.generated.ts"
-            ],
-            "inputs": [
-                "../../features/**/generators/**.ts",
-                "../../packages/**/generators/**.ts",
-                "../../packages/@green-stack-core/utils/**.ts",
-                "../../packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
-                "../../packages/@green-stack-core/scripts/collect-generators.ts"
-            ],
-            "cache": true
-        },
-        "@green-stack/core#check:workspaces": {
-            "dependsOn": [
-                "@green-stack/core#build:theme-colors",
-                "@green-stack/core#collect:generators"
-            ],
-            "cache": false
-        },
-        "@green-stack/core#collect:schemas": {
-            "outputs": [
-                "../../packages/@registries/schemas.generated.ts"
-            ],
-            "inputs": [
-                "../../features/**/schemas/*.ts",
-                "../../features/**/schemas/*.schema.ts",
-                "../../packages/**/schemas/*.ts",
-                "../../packages/**/schemas/*.schema.ts",
-                "../../packages/@green-stack-core/utils/**.ts",
-                "../../packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
-                "../../packages/@green-stack-core/scripts/collect-schemas.ts"
-            ],
-            "cache": true
-        },
-        "@green-stack/core#collect:drivers": {
-            "dependsOn": ["@green-stack/core#check:workspaces"],
-            "outputs": [
-                "../../packages/@registries/drivers.generated.ts",
-                "../../packages/@registries/driversConfig.ts"
-            ],
-            "inputs": [
-                "../../features/**/drivers/**.ts",
-                "../../packages/**/drivers/**.ts",
-                "../../packages/@green-stack-core/utils/**.ts",
-                "../../packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
-                "../../packages/@green-stack-core/scripts/collect-drivers.ts"
-            ],
-            "cache": true
-        },
-        "@db/driver#collect:models": {
-            "dependsOn": ["@green-stack/core#collect:drivers"],
-            "outputs": [
-                "../../packages/@registries/models.generated.ts"
-            ],
-            "inputs": [
-                "../../features/**/schemas/*.ts",
-                "../../features/**/schemas/*.schema.ts",
-                "../../features/**/models/*.models.ts",
-                "../../packages/**/schemas/*.ts",
-                "../../packages/**/schemas/*.schema.ts",
-                "../../packages/**/models/*.models.ts",
-                "../../packages/@green-stack-core/utils/**.ts",
-                "../../packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
-                "../../packages/@db-driver/scripts/collect-models.ts"
-            ],
-            "cache": true
         },
         "env:local": {
             "cache": false

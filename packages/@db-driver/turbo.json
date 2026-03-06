@@ -1,0 +1,21 @@
+{
+    "extends": ["//"],
+    "tasks": {
+        "collect:models": {
+            "dependsOn": ["@green-stack/core#collect:drivers"],
+            "outputs": ["$TURBO_ROOT$/packages/@registries/models.generated.ts"],
+            "inputs": [
+                "$TURBO_ROOT$/features/**/schemas/*.ts",
+                "$TURBO_ROOT$/features/**/schemas/*.schema.ts",
+                "$TURBO_ROOT$/features/**/models/*.models.ts",
+                "$TURBO_ROOT$/packages/**/schemas/*.ts",
+                "$TURBO_ROOT$/packages/**/schemas/*.schema.ts",
+                "$TURBO_ROOT$/packages/**/models/*.models.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/utils/**.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
+                "$TURBO_ROOT$/packages/@db-driver/scripts/collect-models.ts"
+            ],
+            "cache": true
+        }
+    }
+}

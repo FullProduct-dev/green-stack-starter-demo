@@ -1,4 +1,4 @@
-import { Image } from '@app/primitives'
+import { Image } from '@app/ui'
 import { FileTree, Callout } from 'nextra/components'
 import { TitleWrapper, LLMOptimized } from '@app/docs/components/Hidden'
 
@@ -7,7 +7,7 @@ import { TitleWrapper, LLMOptimized } from '@app/docs/components/Hidden'
 </TitleWrapper>
 
 <Image
-    src={require('@app/assets/green-stack-logo.png')}
+    src="/green-stack-logo.png"
     style={{ marginTop: 20 }}
     width={60}
     height={60}
@@ -22,10 +22,10 @@ If you import the `Link` component from `@green-stack/navigation`, it will autom
 import { Link } from '@green-stack/navigation'
 ```
 
-However, you can also ***import it from `@app/primitives` to apply tailwind styles***:
+However, you can also ***import it from `@app/ui` to apply tailwind styles***:
 
 ```tsx copy
-import { Link } from '@app/primitives'
+import { Link } from '@app/ui'
 ```
 
 You can use the `href` prop to navigate to a new page:

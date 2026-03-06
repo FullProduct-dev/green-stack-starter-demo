@@ -1,0 +1,11 @@
+{
+    "name": "@app/demo",
+    "version": "0.0.1",
+    "private": true,
+    "description": "Demo pages, screens, routes and components (removable)",
+    "scripts": {},
+    "dependencies": {
+        "@app/core": "*",
+        "@app/registries": "*"
+    }
+}

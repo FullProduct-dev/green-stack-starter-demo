@@ -1,4 +1,4 @@
-import { Image } from '@app/primitives'
+import { Image } from '@app/ui'
 import { FileTree } from 'nextra/components'
 import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
 
@@ -7,7 +7,7 @@ import { TitleWrapper, Hidden } from '@app/docs/components/Hidden'
 </TitleWrapper>
 
 <Image
-    src={require('@app/assets/green-stack-logo.png')}
+    src="/green-stack-logo.png"
     style={{ marginTop: 20 }}
     width={60}
     height={60}
@@ -84,10 +84,10 @@ Gets the relative glob path of a glob-style selector using [`globSync`](https://
 
 ```typescript
 globRel('packages/**/*.ts')
-// => ['packages/@green-stack-core/utils.ts', 'packages/@app-core/components.ts']
+// => ['packages/@green-stack-core/utils.ts', 'packages/@app-ui/components.ts']
 
 globRel('features/**/components/*.tsx')
-// => ['features/@app-core/components/Button.tsx', 'features/@app-core/components/Input.tsx']
+// => ['packages/@app-ui/components/Button.tsx', 'packages/@app-ui/components/Input.tsx']
 ```
 
 ### `hasOptOutPatterns()`
@@ -300,9 +300,7 @@ const aliases = readImportAliases('../../')
 //       '@app/core/schemas': '@app/schemas',
 //       '@app/core/utils': '@app/utils',
 //       '@app/core/hooks': '@app/hooks',
-//       '@app/core/components/styled': '@app/primitives',
-//       '@app/core/components': '@app/components',
-//       '@app/core/forms': '@app/forms',
+//       '@app/core/components/styled': '@app/ui',
 //       '@app/core/screens': '@app/screens',
 //       '@app/core/assets': '@app/assets',
 //       '@app/core/resolvers': '@app/resolvers',

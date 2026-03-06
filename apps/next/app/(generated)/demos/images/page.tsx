@@ -1,2 +1,2 @@
 "use client"
-export { default } from '@app/core/routes/demos/images/index'
+export { default } from '@app/demo/routes/demos/images/index'

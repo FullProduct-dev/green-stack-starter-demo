@@ -107,13 +107,25 @@ const tsConfigTemplate = `{
         "**/*.tsx",
         "../../apps/next/next-env.d.ts",
         "../../packages/@green-stack-core/global.d.ts",
-        "../../features/@app-core/nativewind-env.d.ts",
+        "../../packages/@app-ui/nativewind-env.d.ts",
         "../../features/@app-core/appConfig.ts",
         "../../features/**/*.ts",
         "../../features/**/*.tsx",
     ],
     "exclude": ["node_modules"]
 }`
+
+/** --- createPackageJsonContent() ------------------------------------------------------------- */
+/** -i- Builds package.json contents for a new workspace based on passed metadata */
+const createPackageJsonContent = (ctx: Context) => [
+    '{',
+    `    "name": "${ctx.packageName}",`,
+    `    "version": "0.0.1",${ctx.privateLine}`,
+    `    "description": "${ctx.packageDescription}",`,
+    '    "scripts": {},',
+    '    "dependencies": {}',
+    '}',
+].join('\n')
 
 /** --- Workspace Generator -------------------------------------------------------------------- */
 /** -i- Simple generator to add a new feature or package workspace */
@@ -132,8 +144,7 @@ export const registerWorkspaceGenerator = (plop: PlopTypes.NodePlopAPI) => {
                 {
                     type: 'add',
                     path: `${ctx.workspacePath}/package.json`,
-                    templateFile: '../../packages/@green-stack-core/generators/templates/package-json.hbs',
-                    data: ctx,
+                    template: createPackageJsonContent(ctx),
                 },
                 {
                     type: 'add',

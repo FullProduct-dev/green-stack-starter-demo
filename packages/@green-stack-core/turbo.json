@@ -1,0 +1,107 @@
+{
+    "extends": ["//"],
+    "tasks": {
+        "collect:resolvers": {
+            "outputs": [
+                "$TURBO_ROOT$/packages/@registries/resolvers.generated.ts",
+                "$TURBO_ROOT$/packages/@registries/bridges.generated.ts"
+            ],
+            "inputs": [
+                "$TURBO_ROOT$/features/**/resolvers/*.ts",
+                "$TURBO_ROOT$/features/**/resolvers/*.resolver.ts",
+                "$TURBO_ROOT$/features/**/resolvers/*.bridge.ts",
+                "$TURBO_ROOT$/features/**/routes/api/**/route.ts",
+                "$TURBO_ROOT$/packages/**/resolvers/*.ts",
+                "$TURBO_ROOT$/packages/**/resolvers/*.resolver.ts",
+                "$TURBO_ROOT$/packages/**/resolvers/*.bridge.ts",
+                "$TURBO_ROOT$/packages/**/routes/api/**/route.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/utils/*.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/collect-resolvers.ts"
+            ],
+            "cache": true
+        },
+        "link:routes": {
+            "cache": false
+        },
+        "build:schema": {
+            "dependsOn": [
+                "@green-stack/core#collect:resolvers",
+                "@green-stack/core#link:routes",
+                "@green-stack/core#collect:drivers",
+                "@db/driver#collect:models"
+            ],
+            "outputs": [
+                "$TURBO_ROOT$/features/@app-core/graphql/schema.graphql",
+                "$TURBO_ROOT$/features/@app-core/graphql/typeDefs.ts"
+            ],
+            "inputs": [
+                "$TURBO_ROOT$/features/**/schemas/*.ts",
+                "$TURBO_ROOT$/features/**/schemas/*.schema.ts",
+                "$TURBO_ROOT$/features/**/resolvers/*.bridge.ts",
+                "$TURBO_ROOT$/packages/**/schemas/*.ts",
+                "$TURBO_ROOT$/packages/**/schemas/*.schema.ts",
+                "$TURBO_ROOT$/packages/**/resolvers/*.bridge.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/utils/**.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/schemas/createGraphSchemaDefs.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/build-graphql-schema.ts"
+            ],
+            "cache": true
+        },
+        "build:theme-colors": {
+            "outputs": ["$TURBO_ROOT$/packages/@registries/themeColors.generated.ts"],
+            "inputs": [
+                "$TURBO_ROOT$/apps/next/global.css",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/build-theme-colors.ts"
+            ],
+            "cache": true
+        },
+        "collect:generators": {
+            "outputs": ["$TURBO_ROOT$/packages/@registries/generators.generated.ts"],
+            "inputs": [
+                "$TURBO_ROOT$/features/**/generators/**.ts",
+                "$TURBO_ROOT$/packages/**/generators/**.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/utils/**.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/collect-generators.ts"
+            ],
+            "cache": true
+        },
+        "check:workspaces": {
+            "dependsOn": [
+                "@green-stack/core#build:theme-colors",
+                "@green-stack/core#collect:generators"
+            ],
+            "cache": false
+        },
+        "collect:schemas": {
+            "outputs": ["$TURBO_ROOT$/packages/@registries/schemas.generated.ts"],
+            "inputs": [
+                "$TURBO_ROOT$/features/**/schemas/*.ts",
+                "$TURBO_ROOT$/features/**/schemas/*.schema.ts",
+                "$TURBO_ROOT$/packages/**/schemas/*.ts",
+                "$TURBO_ROOT$/packages/**/schemas/*.schema.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/utils/**.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/collect-schemas.ts"
+            ],
+            "cache": true
+        },
+        "collect:drivers": {
+            "dependsOn": ["@green-stack/core#check:workspaces"],
+            "outputs": [
+                "$TURBO_ROOT$/packages/@registries/drivers.config.ts",
+                "$TURBO_ROOT$/packages/@registries/drivers/**/*.drivers.generated.ts"
+            ],
+            "inputs": [
+                "$TURBO_ROOT$/features/**/drivers/**.ts",
+                "$TURBO_ROOT$/packages/**/drivers/**.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/utils/**.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/helpers/scriptUtils.ts",
+                "$TURBO_ROOT$/packages/@green-stack-core/scripts/collect-drivers.ts"
+            ],
+            "cache": true
+        }
+    }
+}

@@ -1,9 +1,11 @@
+"use client"
 import React from 'react'
 import { UniversalLinkProps } from '@green-stack/navigation/Link.types'
 import { UniversalRouterMethods } from '@green-stack/navigation/useRouter.types'
 import { UniversalRouteScreenProps, UseRouteParamsOptions } from '@green-stack/navigation/useRouteParams.types'
 import type { useLocalSearchParams } from 'expo-router'
 import type { UniversalImageMethods, UniversalImageProps } from '../components/Image.types'
+import { Image as FallbackImage } from '../components/Image.fallback'
 import { KnownRoutes } from '@app/registries/routeManifest.generated'
 
 /* --- Notes ----------------------------------------------------------------------------------- */
@@ -41,7 +43,7 @@ const createDummyComponent = (contextComponentName: string) => () => {
 /* --- Context --------------------------------------------------------------------------------- */
 
 export const CoreContext = React.createContext<CoreContextType>({
-    contextImage: createDummyComponent('contextImage') as any,
+    contextImage: FallbackImage as any,
     contextLink: createDummyComponent('contextLink'),
     contextRouter: null as unknown as UniversalRouterMethods,
     useContextRouteParams: () => ({}),

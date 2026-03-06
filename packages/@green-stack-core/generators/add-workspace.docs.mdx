@@ -1,5 +1,5 @@
 import { FileTree } from 'nextra/components'
-import { Image } from '@app/primitives'
+import { Image } from '@app/ui'
 import { TitleWrapper } from '@app/docs/components/Hidden'
 
 <TitleWrapper>
@@ -7,7 +7,7 @@ import { TitleWrapper } from '@app/docs/components/Hidden'
 </TitleWrapper>
 
 <Image
-    src={require('@app/assets/green-stack-logo.png')}
+    src="/green-stack-logo.png"
     style={{ marginTop: 20 }}
     width={60}
     height={60}
@@ -57,7 +57,7 @@ npm run add:workspace -- --workspaceStructure schemas resolvers components --fol
 
 ### Resulting Files
 
-```bash
+```md
 /{workspaceType}/ # <- e.g. packages/ or features/
  └── {folderName}/ ❇️
      └── {workspaceStructure}/ ❇️ # <- e.g. schemas/, resolvers/, components/, ...

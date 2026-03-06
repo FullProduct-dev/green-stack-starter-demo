@@ -165,17 +165,17 @@ test('getAvailableSchemas() lists all available schemas in the codebase for gene
     // Check that the config for the healthCheck input schema is correct
     const HealthCheckArgsInfo = schemaConfigMap['HealthCheckInput']
     expect(HealthCheckArgsInfo.schemaName).toBe('HealthCheckInput')
-    expect(HealthCheckArgsInfo.schemaPath).toBe('features/@app-core/schemas/HealthCheckInput.ts')
-    expect(HealthCheckArgsInfo.workspacePath).toBe('features/@app-core')
-    expect(HealthCheckArgsInfo.workspaceName).toBe('@app/core')
+    expect(HealthCheckArgsInfo.schemaPath).toBe('features/@app-demo/schemas/HealthCheckInput.ts')
+    expect(HealthCheckArgsInfo.workspacePath).toBe('features/@app-demo')
+    expect(HealthCheckArgsInfo.workspaceName).toBe('@app/demo')
     expect(HealthCheckArgsInfo.isNamedExport).toBe(true)
     expect(HealthCheckArgsInfo.isDefaultExport).toBe(false)
     // Check that the config for the healthCheck output schema is correct
     const HealthCheckResponseInfo = schemaConfigMap['HealthCheckOutput']
     expect(HealthCheckResponseInfo.schemaName).toBe('HealthCheckOutput')
-    expect(HealthCheckResponseInfo.schemaPath).toBe('features/@app-core/schemas/HealthCheckOutput.ts')
-    expect(HealthCheckResponseInfo.workspacePath).toBe('features/@app-core')
-    expect(HealthCheckResponseInfo.workspaceName).toBe('@app/core')
+    expect(HealthCheckResponseInfo.schemaPath).toBe('features/@app-demo/schemas/HealthCheckOutput.ts')
+    expect(HealthCheckResponseInfo.workspacePath).toBe('features/@app-demo')
+    expect(HealthCheckResponseInfo.workspaceName).toBe('@app/demo')
     expect(HealthCheckResponseInfo.isNamedExport).toBe(true)
     expect(HealthCheckResponseInfo.isDefaultExport).toBe(false)
 })
@@ -186,10 +186,10 @@ test('getAvailableDataBridges() lists all available DataBridges in the codebase 
     expect(dataBridgeConfigMap['healthCheckBridge']).toBeDefined()
     // Check that the config for the healthCheck DataBridge is correct
     const healthCheckBridgeInfo = dataBridgeConfigMap['healthCheckBridge']
-    expect(healthCheckBridgeInfo.bridgePath).toBe('features/@app-core/resolvers/healthCheck.bridge.ts')
+    expect(healthCheckBridgeInfo.bridgePath).toBe('features/@app-demo/resolvers/healthCheck.bridge.ts')
     expect(healthCheckBridgeInfo.bridgeName).toBe('healthCheckBridge')
-    expect(healthCheckBridgeInfo.workspacePath).toBe('features/@app-core')
-    expect(healthCheckBridgeInfo.workspaceName).toBe('@app/core')
+    expect(healthCheckBridgeInfo.workspacePath).toBe('features/@app-demo')
+    expect(healthCheckBridgeInfo.workspaceName).toBe('@app/demo')
     expect(healthCheckBridgeInfo.resolverName).toBe('healthCheck')
     expect(healthCheckBridgeInfo.isNamedExport).toBe(true)
     expect(healthCheckBridgeInfo.isDefaultExport).toBe(false)

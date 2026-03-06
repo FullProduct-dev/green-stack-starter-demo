@@ -26,6 +26,16 @@ export type AppendActionConfig = PlopTypes.ActionConfig & {
     data?: Record<string, unknown>
 }
 
+/** --- detectIndent() ------------------------------------------------------------------------- */
+/** -i- Detect indent size from existing JSON content. Returns 2 as default for new files. */
+const detectIndent = (content: string): number => {
+    const match = content.match(/^\s+/m)
+    if (!match) return 4
+    const spaces = match[0]
+    if (spaces.includes('\t')) return 4 // JSON.stringify doesn't support tabs, use 4 as fallback
+    return Math.max(2, spaces.length)
+}
+
 /** --- getProjectRoot() ----------------------------------------------------------------------- */
 /** -i- Returns monorepo root. getPlopfilePath() returns the plopfile's directory (e.g. scripts/ or turbo/generators/) */
 const getProjectRoot = (plop: PlopTypes.NodePlopAPI) => {
@@ -106,64 +116,45 @@ export default function (plop: PlopTypes.NodePlopAPI) {
 
         plop.setActionType(
             'add-turbo-script', // @ts-ignore
-            function (answers, config: { workspacePkg: string, scriptName: string, cache?: boolean }, plop: PlopTypes.NodePlopAPI) {
+            function (answers, config: {
+                workspacePath: string,
+                workspacePkg: string,
+                scriptName: string,
+                cache?: boolean,
+                outputs?: string[],
+                inputs?: string[],
+            }, plop: PlopTypes.NodePlopAPI) {
                 return new Promise((resolve, reject) => {
                     try {
-                        const { workspacePkg, scriptName, cache = false } = config
-                        const scriptKey = `${workspacePkg}#${scriptName}`
-                        console.log(`Adding "${scriptKey}" script to turbo.json...`)
-                        const turboJson = fs.readFileSync('turbo.json', 'utf8')
-                        const turboJsonLines = turboJson.split('\n')
-                        const numSpaces = turboJsonLines[1].indexOf('"')
-                        const turboConfig = JSON.parse(turboJson)
-                        const spaces = ' '.repeat(numSpaces)
-                        const indent = spaces.repeat(2)
-                        const pkgMatch = `${indent}"${workspacePkg}#` // @ts-ignore
-                        const lastPkgScriptIndex = turboJsonLines.findLastIndex((line) => line.startsWith(pkgMatch))
-                        const strategy = lastPkgScriptIndex > 0 ? 'append-last-pkg-script' : 'append-last'
-                        if (strategy === 'append-last') {
-                            const pipelineMatch = `${spaces}"pipeline": {`
-                            const pipelineIndex = turboJsonLines.findIndex((line) => line.startsWith(pipelineMatch))
-                            const prePipelineLines = turboJsonLines.slice(0, pipelineIndex + 1)
-                            const restPipelineLines = turboJsonLines.slice(pipelineIndex + 1)
-                            const endPipelineMatch = `${spaces}}`
-                            const endPipelineIndex = restPipelineLines.findIndex((line) => line.startsWith(endPipelineMatch))
-                            const pipelineLines = restPipelineLines.slice(0, endPipelineIndex)
-                            const lastPipelineLine = pipelineLines[pipelineLines.length - 1]
-                            const shouldAddComma = !lastPipelineLine.endsWith(',')
-                            if (shouldAddComma) pipelineLines[pipelineLines.length - 1] = `${lastPipelineLine},`
-                            const postPipelineLines = restPipelineLines.slice(endPipelineIndex)
-                            const newScriptEntry = JSON.stringify({ [scriptKey]: { cache } }, null, numSpaces)
-                            const newScriptLines = newScriptEntry.split('\n').slice(1, -1).map((line) => `${spaces}${line}`)
-                            const newTurboJsonLines = [
-                                ...prePipelineLines,
-                                ...pipelineLines,
-                                ...newScriptLines,
-                                ...postPipelineLines,
-                            ]
-                            const newTurboJson = newTurboJsonLines.join('\n')
-                            fs.writeFileSync('turbo.json', newTurboJson)
-                        } else if (strategy === 'append-last-pkg-script') {
-                            const finalPkgMatchEnd = `${indent}}`
-                            const remainingTurboConfigLines = turboJsonLines.slice(lastPkgScriptIndex + 1)
-                            const nextPkgScriptConfigEndIndex = remainingTurboConfigLines.findIndex((line) => line.includes(finalPkgMatchEnd))
-                            const finalPkgScriptIndex = lastPkgScriptIndex + nextPkgScriptConfigEndIndex + 1 + 1
-                            const newScriptLines = [
-                                `${spaces.repeat(2)}"${scriptKey}": {`,
-                                `${spaces.repeat(3)}"cache": ${JSON.stringify(cache)}`,
-                                `${spaces.repeat(2)}},`,
-                            ]
-                            const newTurboJsonLines = [
-                                ...turboJsonLines.slice(0, finalPkgScriptIndex),
-                                ...newScriptLines,
-                                ...turboJsonLines.slice(finalPkgScriptIndex),
-                            ]
-                            const newTurboJson = newTurboJsonLines.join('\n')
-                            fs.writeFileSync('turbo.json', newTurboJson)
+
+                        const root = getProjectRoot(plop)
+                        const { workspacePath, workspacePkg, scriptName, cache = false } = config
+                        const scriptKey = `${scriptName}`
+                        const turboPath = path.join(root, workspacePath, 'turbo.json')
+                        console.log(`Adding "${scriptKey}" to ${workspacePath}/turbo.json...`)
+
+                        const newTasksConfig = { [scriptKey]: { cache } }
+                        let turboConfig: { extends?: string[], tasks?: Record<string, unknown> }
+                        let indentSize = 4
+
+                        if (fs.existsSync(turboPath)) {
+                            const turboJson = fs.readFileSync(turboPath, 'utf8')
+                            indentSize = detectIndent(turboJson)
+                            turboConfig = JSON.parse(turboJson)
+                            turboConfig.tasks = { ...(turboConfig.tasks ?? {}), ...newTasksConfig }
+                        } else {
+                            turboConfig = {
+                                extends: ['//'],
+                                tasks: newTasksConfig,
+                            }
                         }
-                        resolve(`Added "${scriptKey}" script to turbo.json`)
+
+                        const newTurboJson = JSON.stringify(turboConfig, null, indentSize)
+                        fs.writeFileSync(turboPath, newTurboJson)
+                        resolve(`Added "${scriptKey}" to ${workspacePath}/turbo.json`)
+
                     } catch (error) {
-                        console.error('Failed to add script to package.json:', error)
+                        console.error('Failed to add turbo script:', error)
                         reject(error)
                     }
                 })

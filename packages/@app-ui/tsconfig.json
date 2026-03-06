@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "noEmit": true,
+        "incremental": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "allowImportingTsExtensions": true,
+        "jsx": "preserve",
+        "types": ["node"],
+        "paths": {
+            "@green-stack/navigation": ["../../packages/@green-stack-core/navigation/index.ts"],
+            "@green-stack/navigation/*": ["../../packages/@green-stack-core/navigation/*"],
+            "@green-stack/components/*": ["../../packages/@green-stack-core/components/*"],
+            "@green-stack/styles": ["../../packages/@green-stack-core/styles/index.tsx"],
+            "@green-stack/styles/*": ["../../packages/@green-stack-core/styles/*"],
+            "@green-stack/forms/*": ["../../packages/@green-stack-core/forms/*"],
+            "@green-stack/schemas": ["../../packages/@green-stack-core/schemas"],
+            "@green-stack/schemas/*": ["../../packages/@green-stack-core/schemas/*"],
+            "@green-stack/hooks/*": ["../../packages/@green-stack-core/hooks/*"],
+            "@green-stack/utils/*": ["../../packages/@green-stack-core/utils/*"],
+            "@app/registries/*": ["../../packages/@registries/*"]
+        }
+    },
+    "include": ["**/*.ts", "**/*.tsx", "../../packages/@green-stack-core/global.d.ts", "./nativewind-env.d.ts"],
+    "exclude": ["node_modules"],
+    "extends": "expo/tsconfig.base"
+}
