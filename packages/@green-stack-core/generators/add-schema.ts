@@ -12,6 +12,7 @@ import { createPrompts } from '../scripts/helpers/scriptUtils'
 
 // -i- npm run add:schema -- --args <workspacePath> <schemaName> <schemaDescription> (pass _ to prompt for missing args)
 // -i- npm run add:schema -- --workspacePath features/@app-core --schemaName=Foo --schemaDescription "desc"
+// -i- npm run add:schema -- --open  (open generated files in preferred editor)
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
@@ -67,7 +68,7 @@ export const gen = createPrompts('add-schema', {
             jsDocTitle = createDivider(schemaName, true)
             describeStatement = `.describe(d)`
         } else {
-            jsDocTitle = createDivider(schemaName, false)
+            jsDocTitle = `${createDivider(schemaName, false)}\n`
         }
 
         // -- Return --
@@ -97,20 +98,20 @@ export const createSchemaContent = (ctx: Context) => [
 
     `import { z, schema } from '@green-stack/schemas'\n`,
 
-    `${createDivider('Description')}\n`,
+    !!ctx.schemaDescription && `${createDivider('Description')}\n`,
 
-    `const d = "${ctx.schemaDescription}"\n`,
+    !!ctx.schemaDescription && `const d = "${ctx.schemaDescription}"\n`,
 
     [ctx.jsDocTitle, ctx.jsDocDescription].filter(Boolean).join('\n'),
     `export const ${ctx.schemaName} = schema('${ctx.schemaName}', {`,
-        ctx.schemaFields.map((l) => `    ${l}`).join('\n'),
+        ctx.schemaFields.length ? ctx.schemaFields.map((l) => `    ${l}`).join('\n') : '    ',
     `})${ctx.describeStatement}\n`,
 
     `${createDivider('Type Alias')}\n`,
 
     `export type ${ctx.schemaName} = z.input<typeof ${ctx.schemaName}>\n`,
 
-].join('\n')
+].filter(Boolean).join('\n')
 
 /** --- Schema Generator ----------------------------------------------------------------------- */
 /** -i- Add a new zod schema as a single source of truth */
@@ -135,7 +136,7 @@ export const registerSchemaGenerator = (plop: PlopTypes.NodePlopAPI) => {
                     template: schemaContent,
                 },
                 {
-                    type: 'open-files-in-vscode',
+                    type: 'open-files-in-editor',
                     paths: [`${ctx.workspacePath}/schemas/${ctx.schemaName}.schema.ts`],
                 },
             ] as PlopTypes.ActionType[]

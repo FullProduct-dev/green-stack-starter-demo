@@ -12,6 +12,7 @@ import { createPrompts } from '../scripts/helpers/scriptUtils'
 
 // -i- npm run add:workspace -- --args <workspaceType> <folderName> <packageName> <workspaceStructure> <packageDescription> (pass _ to prompt for missing args)
 // -i- npm run add:workspace -- --workspaceType feature --folderName @app-core --packageName @app/core --workspaceStructure schemas resolvers components hooks screens routes utils --packageDescription "desc"
+// -i- npm run add:workspace -- --open  (open generated files in preferred editor)
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
@@ -179,7 +180,7 @@ export const registerWorkspaceGenerator = (plop: PlopTypes.NodePlopAPI) => {
             return [
                 ...actions,
                 {
-                    type: 'open-files-in-vscode',
+                    type: 'open-files-in-editor',
                     paths: [`${ctx.workspacePath}/package.json`],
                 },
                 { type: 'install' },

@@ -3,7 +3,7 @@
 import fs from 'fs'
 import path from 'path'
 import { PlopTypes } from '@turbo/gen'
-import { execSync } from 'child_process'
+import { execSync, spawn } from 'child_process'
 import * as workspaceGenerators from '../../packages/@registries/generators.generated'
 
 /* --- Disclaimer ------------------------------------------------------------------------------ */
@@ -43,6 +43,23 @@ const getProjectRoot = (plop: PlopTypes.NodePlopAPI) => {
     return plopfileDir.includes('turbo' + path.sep + 'generators')
         ? path.join(plopfileDir, '..', '..')
         : path.dirname(plopfileDir)
+}
+
+/** --- getEditorCommand() --------------------------------------------------------------------- */
+/** -i- Detects preferred editor: GEN_EDITOR → cursor/code/code-insiders → VISUAL → EDITOR */
+const getEditorCommand = (): string | null => {
+    if (process.env.GEN_EDITOR) return process.env.GEN_EDITOR
+    for (const cmd of ['cursor', 'code', 'code-insiders']) {
+        try {
+            execSync(`which ${cmd}`, { stdio: 'ignore' })
+            return cmd
+        } catch {
+            /* not found */
+        }
+    }
+    if (process.env.VISUAL) return process.env.VISUAL
+    if (process.env.EDITOR) return process.env.EDITOR
+    return null
 }
 
 /* --- Register Generators --------------------------------------------------------------------- */
@@ -161,26 +178,33 @@ export default function (plop: PlopTypes.NodePlopAPI) {
             }
         )
 
-        plop.setActionType(
-            'open-files-in-vscode', // @ts-ignore
-            function (answers, config: { paths: string[] }, plop: PlopTypes.NodePlopAPI) {
-                return new Promise((resolve, reject) => {
-                    try {
-                        console.log('Opening files in VSCode...')
-                        const targetPath = getProjectRoot(plop)
-                        const absolutePaths = config.paths.map((p) => path.join(targetPath, p))
-                        const numFiles = absolutePaths.length
-                        const fileOrFiles = numFiles === 1 ? 'file' : 'files'
-                        // Open files in VSCode
-                        execSync(`code ${absolutePaths.join(' ')}`)
-                        resolve(`Opened ${numFiles} ${fileOrFiles} in VSCode`)
-                    } catch (error) {
-                        // Fail silently
-                        resolve('Skipped opening files in vscode')
-                    }
-                })
-            }
-        )
+        const openFilesInEditorHandler = (
+            _answers: unknown,
+            config: { paths: string[] } | undefined,
+            plop: PlopTypes.NodePlopAPI
+        ) => {
+            return new Promise<string>((resolve) => {
+                if (!config?.paths?.length) return resolve('Skipped opening files (no paths)')
+                if (process.env.GEN_OPEN !== '1') return resolve('Skipped opening files (use --open to open generated files)')
+                try {
+                    const editor = getEditorCommand()
+                    if (!editor) return resolve('Skipped opening files (no editor found; set GEN_EDITOR or install code/cursor)')
+                    const targetPath = getProjectRoot(plop)
+                    const absolutePaths = config.paths.map((p) => path.join(targetPath, p))
+                    const numFiles = absolutePaths.length
+                    const fileOrFiles = numFiles === 1 ? 'file' : 'files'
+                    console.log(`Opening ${numFiles} ${fileOrFiles} in ${editor}...`)
+                    spawn(editor, absolutePaths, { stdio: 'ignore', detached: true })
+                    resolve(`Opened ${numFiles} ${fileOrFiles} in ${editor}`)
+                } catch {
+                    resolve('Skipped opening files')
+                }
+            })
+        }
+
+        // @ts-ignore - handler signature compatible with CustomActionFunction (config may be undefined)
+        plop.setActionType('open-files-in-editor', openFilesInEditorHandler as Parameters<PlopTypes.NodePlopAPI['setActionType']>[1])
+        plop.setActionType('open-files-in-vscode', openFilesInEditorHandler as Parameters<PlopTypes.NodePlopAPI['setActionType']>[1])
 
         plop.setActionType(
             'collect-resolvers', // @ts-ignore

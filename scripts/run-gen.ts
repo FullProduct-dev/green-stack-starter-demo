@@ -16,10 +16,21 @@ import nodePlop from 'node-plop'
 // -i- npm run add:schema -- --workspacePath pkg --schemaName=Foo --schemaDescription "desc"          ->  named args (w/o --args)
 // -i- npm run add:schema -- --args --workspacePath pkg --schemaName Foo --schemaDescription "desc"   ->  named args (with --args)
 // -i- npm run add:workspace -- --workspaceStructure schemas resolvers components                     ->  space-separated array answers (checkbox)
+// -i- npm run add:schema -- --open                                                                ->  open generated files in preferred editor (opt-in)
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
 const PLOPFILE_PATH = path.join(process.cwd(), 'scripts/plopfile.cjs')
+
+const OPEN_FLAGS = ['--open', '-o']
+
+/** --- processOpenFlag() ---------------------------------------------------------------------- */
+/** -i- Strips --open/-o from argv and sets GEN_OPEN env when present */
+const processOpenFlag = (argv: string[]): string[] => {
+    const hasOpen = argv.some((a) => OPEN_FLAGS.includes(a))
+    if (hasOpen) process.env.GEN_OPEN = '1'
+    return argv.filter((a) => !OPEN_FLAGS.includes(a))
+}
 
 /* --- Types ----------------------------------------------------------------------------------- */
 
@@ -36,10 +47,9 @@ const toBypassValue = (value: unknown, promptType?: string): string => {
 
 /** --- parseArgs() ---------------------------------------------------------------------------- */
 /** -i- Maps node generator args to plop execution params if available */
-const parseArgs = (): { generator?: string; args: string[]; isInteractive: boolean } => {
+const parseArgs = (argv: string[]): { generator?: string; args: string[]; isInteractive: boolean } => {
 
-    // Slice args to know whether we're in interactive mode or not
-    const argv = process.argv.slice(2)
+    // argv is already filtered for --open by caller
     const argsIndex = argv.indexOf('--args')
 
     // If --args is present, run in explicit args mode. Generator before --args, args after.
@@ -141,6 +151,7 @@ const printUsage = (generatorNames: string[]): void => {
     console.error('Usage:')
     console.error('  run-gen <generator> --args <arg1> [arg2] ...          (positional)')
     console.error('  run-gen <generator> --args --key1 val1 --key2 val2    (named)')
+    console.error('  run-gen <generator> [args...] --open                  (open generated files in editor)')
     console.error('')
     console.error('Generators:', generatorNames.join(', '))
 }
@@ -221,12 +232,13 @@ const runWithArgs = async (generatorName: string, args: string[]): Promise<void>
 const runInteractive = (): void => {
 
     // For interactive mode, we simply spawn the plop CLI with our plopfile and inherit stdio for user interaction
+    const rawArgv = process.argv.slice(2).filter((a) => a !== '--')
     const plopArgs = [
         '--plopfile',
         PLOPFILE_PATH,
         '--dest',
         process.cwd(),
-        ...process.argv.slice(2).filter((a) => a !== '--'),
+        ...processOpenFlag(rawArgv),
     ]
 
     // Spawn plop CLI as a child process, inheriting stdio for interactive prompts
@@ -244,8 +256,12 @@ const runInteractive = (): void => {
 
 const main = async () => {
 
+    // Process --open flag early (sets GEN_OPEN env, strips from argv)
+    const rawArgv = process.argv.slice(2)
+    const argv = processOpenFlag(rawArgv)
+
     // Parse command line arguments to determine generator and mode (interactive vs non-interactive)
-    const { generator, args, isInteractive } = parseArgs()
+    const { generator, args, isInteractive } = parseArgs(argv)
 
     // If in interactive mode, run the plop CLI interface; otherwise, run the specified generator with args
     if (isInteractive) return runInteractive()

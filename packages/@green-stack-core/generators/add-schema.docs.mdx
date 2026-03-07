@@ -29,7 +29,10 @@ npm run add:schema -- --args <workspacePath> <schemaName> <schemaDescription>
 ```md copy
 npm run add:schema -- packages/@green-stack-core MySchema "Description"
 npm run add:schema -- --workspacePath packages/@green-stack-core --schemaName MySchema --schemaDescription "Description"
+npm run add:schema -- --open
 ```
+
+Append `--open` (or `-o`) to open generated files in your preferred editor (detects Cursor, VS Code, or `GEN_EDITOR`/`VISUAL`/`EDITOR` env vars).
 
 <FileTree>
   <FileTree.Folder name="packages" defaultOpen>
