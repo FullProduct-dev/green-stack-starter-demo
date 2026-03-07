@@ -1,3 +1,4 @@
+"use client"
 import React from 'react'
 import { CoreContext } from '../context/CoreContext'
 import type { UniversalImageProps, UniversalImageMethods } from './Image.types'

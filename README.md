@@ -92,12 +92,12 @@ This allows you to copy-paste **"feature folders"** between projects, without th
   - Fast monorepo setup with Turborepo (or use standalone if you prefer).
   - Includes a generator to quickly add new generators and scripts.
 
-[![Rich Interactive docs example](https://fullproduct.dev/blog-assets/imgs/nextra-url-docs-example.jpg)](https://fullproduct.dev/docs/@app-core/components/Button?showCode=true)
+[![Rich Interactive docs example](https://fullproduct.dev/blog-assets/imgs/nextra-url-docs-example.jpg)](https://fullproduct.dev/docs/@app-ui/components/Button?showCode=true)
 
 - **Rich Interactive Docs 📚 - Automatically grow with your project**
   - Full documentation at [fullproduct.dev/docs](https://fullproduct.dev/docs?v=gh-prfl)
   - Best practices and guides included in the built-in docs
-  - Automatic UI, API and Types docs generation from Zod schemas [(e.g.)](https://fullproduct.dev/docs/@app-core/components/Button?showCode=true)
+  - Automatic UI, API and Types docs generation from Zod schemas [(e.g.)](https://fullproduct.dev/docs/@app-ui/components/Button?showCode=true)
   - Easy Onboardings / Handovers + *Great Context for LLMs*
 
 ## ❇️ The GREEN stack:
@@ -209,7 +209,7 @@ Now, I'm glad to share my learnings to help others build their own universal app
 
 Use **`git clone`**, or the GitHub UI to ❇️ **[generate a new project](https://github.com/new?template_name=green-stack-starter-demo&template_owner=FullProduct-dev&visibility=private&use_v2_form=true&description=🚧%20Make%20sure%20to%20run%20`npx%20@fullproduct/universal-app%20sync`%20to%20attach%20the%20starterkit%27s%20git%20history%20💡%20Run%20`npx%20@fullproduct/universal-app%20install%20plugins`%20afterwards%20to%20expand%20your%20setup)** from our **[template repo](https://github.com/FullProduct-dev/green-stack-starter-demo)**, then run:
 
-```bash
+```md
 npm install
 npm run dev
 ```

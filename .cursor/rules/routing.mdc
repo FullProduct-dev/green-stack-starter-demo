@@ -1,0 +1,14 @@
+---
+description: Workspace-defined routes - define in features, not apps
+globs: "**/routes/**/*"
+alwaysApply: false
+---
+
+# Routing
+
+When editing route files, reference [https://fullproduct.dev/docs/universal-routing](https://fullproduct.dev/docs/universal-routing) for:
+
+- Routes live in `features/*/routes/`, not in `apps/expo/app/` or `apps/next/app/`
+- Run `npm run link:routes` to re-export routes from features to the Expo/Next app routers
+- Use `npm run add:route` generator to create new routes
+- Re-export screens from route files; use Next.js-style routing conventions

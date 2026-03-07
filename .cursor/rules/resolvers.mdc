@@ -1,0 +1,16 @@
+---
+description: Data resolvers and API design - createDataBridge, createResolver
+globs: "**/resolvers/**/*.ts"
+alwaysApply: false
+---
+
+# Data Resolvers
+
+When editing resolver files, reference [https://fullproduct.dev/docs/data-resolvers](https://fullproduct.dev/docs/data-resolvers) for:
+
+- `createDataBridge()` - Combines input/output schemas for type-safe API bridges
+- `createResolver()` - Bind a bridge to business logic
+- `createNextRouteHandler()` - Turn resolver into API route
+- `createGraphResolver()` - Turn resolver into GraphQL mutation/query
+- Use `.bridge.ts` suffix for bridge files
+- RPC-style (GraphQL or API route) resolver (shape resolvers for UI screens, not traversible graph)

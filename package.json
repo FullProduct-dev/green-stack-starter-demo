@@ -2,6 +2,7 @@
   "name": "@full-product-dot-dev/universal-starter-demo",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.8.1",
   "workspaces": [
     "apps/*",
     "features/*",
@@ -13,12 +14,14 @@
   "overrides": {
     "fsevents": "2.3.2",
     "graphql": "16.8.1",
-    "next": "~15.0.4",
-    "expo": "~52.0.11",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-native-reanimated": "3.16.3",
-    "@types/react": "18.3.1"
+    "next": "~16.1.6",
+    "expo": "~53.0.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native-reanimated": "~3.17.4",
+    "react-native-web": "^0.20.0",
+    "expo-router": "~5.1.11",
+    "@types/react": "19.0.0"
   },
   "scripts": {
     "dev": "npm run dev:apps",
@@ -59,13 +62,13 @@
   },
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.9.1",
-    "@turbo/gen": "^1.13.2",
-    "@types/react": "18.3.1",
+    "@turbo/gen": "^2.5.0",
+    "@types/react": "19.0.0",
     "inquirer-autocomplete-prompt": "^3.0.1",
     "node-plop": "^0.32.3",
     "plop": "^4.0.5",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "turbo": "^1.13.2"
+    "turbo": "^2.5.0"
   }
 }

@@ -1,3 +1,4 @@
+"use client"
 import type { KnownRoutes } from '@app/registries/routeManifest.generated'
 import type { UniversalLinkProps } from './Link.types'
 import React from 'react'

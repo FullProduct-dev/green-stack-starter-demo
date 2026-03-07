@@ -12,6 +12,7 @@ import { createPrompts } from '../scripts/helpers/scriptUtils'
 
 // -i- npm run add:workspace -- --args <workspaceType> <folderName> <packageName> <workspaceStructure> <packageDescription> (pass _ to prompt for missing args)
 // -i- npm run add:workspace -- --workspaceType feature --folderName @app-core --packageName @app/core --workspaceStructure schemas resolvers components hooks screens routes utils --packageDescription "desc"
+// -i- npm run add:workspace -- --open  (open generated files in preferred editor)
 
 /* --- Constants ------------------------------------------------------------------------------- */
 
@@ -107,13 +108,25 @@ const tsConfigTemplate = `{
         "**/*.tsx",
         "../../apps/next/next-env.d.ts",
         "../../packages/@green-stack-core/global.d.ts",
-        "../../features/@app-core/nativewind-env.d.ts",
+        "../../packages/@app-ui/nativewind-env.d.ts",
         "../../features/@app-core/appConfig.ts",
         "../../features/**/*.ts",
         "../../features/**/*.tsx",
     ],
     "exclude": ["node_modules"]
 }`
+
+/** --- createPackageJsonContent() ------------------------------------------------------------- */
+/** -i- Builds package.json contents for a new workspace based on passed metadata */
+const createPackageJsonContent = (ctx: Context) => [
+    '{',
+    `    "name": "${ctx.packageName}",`,
+    `    "version": "0.0.1",${ctx.privateLine}`,
+    `    "description": "${ctx.packageDescription}",`,
+    '    "scripts": {},',
+    '    "dependencies": {}',
+    '}',
+].join('\n')
 
 /** --- Workspace Generator -------------------------------------------------------------------- */
 /** -i- Simple generator to add a new feature or package workspace */
@@ -132,8 +145,7 @@ export const registerWorkspaceGenerator = (plop: PlopTypes.NodePlopAPI) => {
                 {
                     type: 'add',
                     path: `${ctx.workspacePath}/package.json`,
-                    templateFile: '../../packages/@green-stack-core/generators/templates/package-json.hbs',
-                    data: ctx,
+                    template: createPackageJsonContent(ctx),
                 },
                 {
                     type: 'add',
@@ -168,7 +180,7 @@ export const registerWorkspaceGenerator = (plop: PlopTypes.NodePlopAPI) => {
             return [
                 ...actions,
                 {
-                    type: 'open-files-in-vscode',
+                    type: 'open-files-in-editor',
                     paths: [`${ctx.workspacePath}/package.json`],
                 },
                 { type: 'install' },

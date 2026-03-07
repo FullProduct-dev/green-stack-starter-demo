@@ -1,5 +1,6 @@
 // @ts-ignore
 import { expect, test } from 'bun:test'
+import { graphql } from 'gql.tada'
 import { ASTNode, print } from 'graphql'
 import { z, schema } from '../index'
 import { createDataBridge } from '../createDataBridge'
@@ -31,12 +32,18 @@ test("Bridges created by createDataBridge can build the graphql query from args 
     expect(print(graphqlQuery as ASTNode)).toBe(expectedQuery)
 })
 
-test("Bridges created by createDataBridge can use a custom graphql query", async () => {
-    // Lazily import the query to avoid circular dependencies
-    const { healthCheckQuery } = await (import('@app/core/resolvers/healthCheck.query'))
+test("Bridges created by createDataBridge can use a custom graphql query", () => {
+    // Custom query with optional args (HealthCheckInput vs HealthCheckInput!) - differs from default
+    const customHealthCheckQuery = graphql(`
+        query healthCheck($healthCheckArgs: HealthCheckInput) {
+            healthCheck(args: $healthCheckArgs) {
+                echo
+            }
+        }
+    `)
     const bridgeWithCustomQuery = createDataBridge({
         ...healtCheckBridge,
-        graphqlQuery: healthCheckQuery,
+        graphqlQuery: customHealthCheckQuery,
     })
     const graphqlQuery = bridgeWithCustomQuery.getGraphqlQuery()
     expect(print(graphqlQuery as ASTNode)).not.toBe(expectedQuery)

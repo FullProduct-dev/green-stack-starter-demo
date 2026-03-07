@@ -4,7 +4,12 @@ import { print } from 'graphql'
 import { z, schema } from '../index'
 import { createSchemaPlugin } from '../createSchemaPlugin'
 import { createGraphSchemaDefs } from '../createGraphSchemaDefs'
-import { healthCheck } from '../../../@registries/resolvers.generated'
+
+/* --- Mock healthCheck resolver (lives in @app/demo, avoid loading in test env) ------------- */
+
+const HealthCheckInput = schema('HealthCheckInput', { echo: z.string().default('Hello World') })
+const HealthCheckOutput = schema('HealthCheckOutput', { echo: z.string().optional(), status: z.literal('OK') })
+const healthCheck = Object.assign(async () => ({}), { argSchema: HealthCheckInput, resSchema: HealthCheckOutput })
 
 /* --- createSchemaPlugin() -------------------------------------------------------------------- */
 

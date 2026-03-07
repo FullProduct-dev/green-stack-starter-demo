@@ -1,2 +1,2 @@
 "use client"
-export { default } from '@app/core/routes/subpages/[slug]/index'
+export { default } from '@app/demo/routes/subpages/[slug]/index'

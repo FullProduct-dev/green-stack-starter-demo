@@ -12,7 +12,7 @@
         "incremental": true,
         "esModuleInterop": true,
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
         "allowImportingTsExtensions": true,
@@ -30,9 +30,7 @@
             "@app/schemas/*": ["../../features/@app-core/schemas/*"],
             "@app/utils/*": ["../../features/@app-core/utils/*"],
             "@app/hooks/*": ["../../features/@app-core/hooks/*"],
-            "@app/primitives": ["../../features/@app-core/components/styled.tsx"],
-            "@app/components/*": ["../../features/@app-core/components/*"],
-            "@app/forms/*": ["../../features/@app-core/forms/*"],
+            "@app/ui": ["../../packages/@app-ui/index.tsx"],
             "@app/screens/*": ["../../features/@app-core/screens/*"],
             "@app/assets/*": ["../../features/@app-core/assets/*"],
             "@app/resolvers/*": ["../../features/@app-core/resolvers/*"],
@@ -57,7 +55,7 @@
     "include": [
         "../../apps/next/next-env.d.ts",
         "../../packages/@green-stack-core/global.d.ts",
-        "../../features/@app-core/nativewind-env.d.ts",
+        "../../packages/@app-ui/nativewind-env.d.ts",
         "../../features/@app-core/appConfig.ts",
         "**/*.ts",
         "**/*.tsx"

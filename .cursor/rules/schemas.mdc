@@ -1,0 +1,15 @@
+---
+description: Zod schemas as single source of truth - schema() usage
+globs: "**/schemas/**/*.ts"
+alwaysApply: false
+---
+
+# Schemas
+
+When editing schema files, reference [https://fullproduct.dev/docs/single-sources-of-truth](https://fullproduct.dev/docs/single-sources-of-truth) for:
+
+- Use `schema()` from `@green-stack/schemas` (not raw `z.object()`)
+- Schemas drive types, validation, GraphQL, API inputs/outputs, forms, docs and even DB models
+- Use `.extendSchema()`, `.pickSchema()`, `.omitSchema()` for schema composition
+- Add `.describe()`, `.example()`, `.default()` for docs and docgen
+- Use `.sensitive()` for fields that shouldn't appear in GraphQL/introspection or on the front-end at all
