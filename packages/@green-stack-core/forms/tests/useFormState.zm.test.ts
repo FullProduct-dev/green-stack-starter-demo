@@ -2,13 +2,14 @@
 import { expect, test } from 'bun:test'
 import { renderHook, act } from '@testing-library/react'
 import { useFormState } from '../useFormState'
-import { z, schema } from '../../schemas'
+import * as z from '../../schemas/mini'
+import { schema } from '../../schemas/mini'
 
-/* --- Test Data ------------------------------------------------------------------------------- */
+/* --- Test Data (zod mini uses z._default) ----------------------------------------------------- */
 
 const User = schema('User', {
-    name: z.string().default('Thorr'),
-    age: z.number().default(31),
+    name: z._default(z.string(), 'Thorr'),
+    age: z._default(z.number(), 31),
 })
 
 type User = z.infer<typeof User>
@@ -119,8 +120,8 @@ test('formState.validate() should populate errors with our custom error messages
     
     // Schema with custom error messages
     const User2 = schema('User', {
-        name: z.string({ message: errNoName }).default('Thorr'),
-        age: z.number({ message: errNoAge }).default(31),
+        name: z._default(z.string({ message: errNoName }), 'Thorr'),
+        age: z._default(z.number({ message: errNoAge }), 31),
     })
 
     // Hook

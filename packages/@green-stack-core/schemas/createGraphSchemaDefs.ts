@@ -1,5 +1,6 @@
 import { gql } from 'graphql-tag'
-import { Metadata, Meta$Schema, ZodSchema } from './index'
+import type { Metadata, Meta$Schema, ObjectSchemaLike } from './schemas.compat'
+import { getSchemaMetadata } from './schemas.compat'
 import { normalizeSchemaName } from './createDataBridge'
 import { createSchemaPlugin } from './createSchemaPlugin'
 import { isEmpty, warnOnce } from '../utils/commonUtils'
@@ -18,8 +19,8 @@ const SCHEMA_PRIMITIVES_LOOKUP = {
 /* --- Types ----------------------------------------------------------------------------------- */
 
 type ResolverFnType = ((...args: any[]) => Promise<unknown>) & {
-    argSchema: ZodSchema,
-    resSchema: ZodSchema,
+    inputSchema: ObjectSchemaLike
+    outputSchema: ObjectSchemaLike
     isMutation?: boolean
 }
 
@@ -29,8 +30,8 @@ type ResolversMapType = {
 
 type ResolverConfig = {
     resolverName: string
-    argSchema: ZodSchema,
-    resSchema: ZodSchema,
+    inputSchema: ObjectSchemaLike
+    outputSchema: ObjectSchemaLike
     isMutation?: boolean
     resolver: ResolverFnType
 }
@@ -38,20 +39,15 @@ type ResolverConfig = {
 /** --- createResolverDefinition() ------------------------------------------------------------- */
 /** -i- Creates the base schema definition line to put on the Query or Mutation definition in the GraphQL schema */
 export const createResolverDefinition = (resolverConfig: ResolverConfig) => {
-    // Vars
-    const { resolverName, argSchema, resSchema } = resolverConfig
-    const argsMeta = argSchema?.introspect?.() as Meta$Schema
-    const resMeta = resSchema?.introspect?.() as Meta$Schema
-    // Flags
-    const hasArgs = !isEmpty(argsMeta) && !isEmpty(argsMeta?.schema)
-    const areArgsRequired = hasArgs && !argsMeta?.isNullable && !argsMeta?.isOptional
-    const areArgsOptional = !areArgsRequired || Object.values(argsMeta?.schema!).every((arg) => arg.isOptional || arg.isNullable) // prettier-ignore
+    const { resolverName, inputSchema, outputSchema } = resolverConfig
+    const argsMeta = getSchemaMetadata(inputSchema) as Meta$Schema
+    const resMeta = getSchemaMetadata(outputSchema) as Meta$Schema
+    const hasArgs = !isEmpty(argsMeta) && !isEmpty(argsMeta.schema)
+    const areArgsRequired = hasArgs && !argsMeta.isNullable && !argsMeta.isOptional
+    const areArgsOptional = !areArgsRequired || Object.values(argsMeta.schema ?? {}).every((arg) => arg.isOptional || arg.isNullable) // prettier-ignore
     const nullableToken = areArgsOptional ? '' : '!'
-    // If there are args, we need to state an input type for them
-    if (!argsMeta.name) console.log('argsMeta', argsMeta)
     const argsName = normalizeSchemaName(argsMeta.name!, 'input')
     const argDef = hasArgs ? `(args: ${argsName}${nullableToken})` : ''
-    // Return resolver definition
     return `${resolverName}${argDef}: ${resMeta.name}`
 }
 
@@ -61,11 +57,14 @@ export const createSchemaDefinition = (
     schema: Meta$Schema,
     prefix: 'type' | 'input' = 'type',
 ) => {
+
     // Keep track of all (possibly nested) schema definitions
     let schemaDefinitions: string[] = []
+
     // HoC Builder pattern to create schema definitions
     const schemaDefinitionBuilder = (graphqlType: string) => {
         return (schemaKey: string, fieldMeta: Meta$Schema | Metadata<any>) => {
+
             // Allow overrides of the graphql type to happen in specific cases (e.g. Float vs. Int)
             let gqlType = graphqlType
 
@@ -164,19 +163,26 @@ export const createSchemaDefinition = (
 /** --- createDataDefinitions() ---------------------------------------------------------------- */
 /** -i- Turns a list of resolvers created with `createResolver()` into GraphQL schema definitions */
 export const createDataDefinitions = (resolverConfigs: ResolverConfig[]) => {
+
     // Use introspection metadata to create schema definitions of the input & output types
-    const dataDefinitions = resolverConfigs.reduce((acc, { argSchema, resSchema }) => {
-        let argDefinitions = createSchemaDefinition(argSchema.introspect() as Meta$Schema, 'input')
-        let resDefinitions = createSchemaDefinition(resSchema.introspect() as Meta$Schema, 'type')
+    const dataDefinitions = resolverConfigs.reduce((acc, { inputSchema, outputSchema }) => {
+
+        let argDefinitions = createSchemaDefinition(getSchemaMetadata(inputSchema) as Meta$Schema, 'input')
+        let resDefinitions = createSchemaDefinition(getSchemaMetadata(outputSchema) as Meta$Schema, 'type')
+
         // If there are no args, we don't need to define an input type
-        const hasArgs = !isEmpty(argSchema.introspect().schema)
+        const hasArgs = !isEmpty(getSchemaMetadata(inputSchema).schema)
         if (!hasArgs) argDefinitions = []
+
         // If there's no output, we don't need to define an output type
-        const hasRes = !isEmpty(resSchema.introspect().schema)
+        const hasRes = !isEmpty(getSchemaMetadata(outputSchema).schema)
         if (!hasRes) resDefinitions = []
+
         // Return the data definitions
         return [...acc, ...argDefinitions, ...resDefinitions] as string[]
+
     }, [] as string[])
+
     // Flatten the resulting array of definitions (can contain duplicates)
     return dataDefinitions.flat()
 }
@@ -184,6 +190,7 @@ export const createDataDefinitions = (resolverConfigs: ResolverConfig[]) => {
 /** --- createGraphSchemaDefs() ---------------------------------------------------------------- */
 /** -i- Turn a dictionary object of resolvers created with `createResolver()` into GraphQL schema definitions  */
 export const createGraphSchemaDefs = (resolvers: ResolversMapType) => {
+
     // Error checks
     if (isEmpty(resolvers)) {
         warnOnce('-i- No resolvers provided to createGraphSchemaDefs(), no schema definition to generate')
@@ -194,42 +201,50 @@ export const createGraphSchemaDefs = (resolvers: ResolversMapType) => {
             schemaDefsString: '',
         }
     }
+
     // Get resolver entries
     const resolverEntries = Object.entries(resolvers)
     const resolverConfigs = resolverEntries.map(([resolverName, resolver]) => ({
         resolverName,
-        argSchema: resolver.argSchema,
-        resSchema: resolver.resSchema,
+        inputSchema: resolver.inputSchema,
+        outputSchema: resolver.outputSchema,
         isMutation: !!resolver.isMutation,
         resolver,
     }))
+
     // Helper to rebuild the resolvers from their configs
     const rebuildFromConfig = (handlers: any, { resolverName, resolver }: ResolverConfig) => ({
         ...handlers, [resolverName]: resolver,
     })
+
     // Figure out the mutation definitions
     const mutationConfigs = resolverConfigs.filter((config) => !!config.isMutation)
     const mutationResolvers = mutationConfigs.reduce(rebuildFromConfig, {})
     const mutationDefs = mutationConfigs.map(createResolverDefinition).filter(Boolean)
     const hasMutations = mutationDefs.length > 0
-    const mutationDef = hasMutations ? `type Mutation {\n    ${mutationDefs.join('\n    ')}\n}` : '' // prettier-ignore
+    const mutationDef = hasMutations ? `type Mutation {\n    ${mutationDefs.join('\n    ')}\n}` : ''
+
     // Figure out the query definitions
     const queryConfigs = resolverConfigs.filter((config) => !config.isMutation)
     const queryResolvers = queryConfigs.reduce(rebuildFromConfig, {})
     const queryDefs = queryConfigs.map(createResolverDefinition).filter(Boolean)
     const hasQueries = queryDefs.length > 0
     const queryDef = hasQueries ? `type Query {\n    ${queryDefs.join('\n    ')}\n}` : ''
+
     // Figure out the data definitions
     const dataSchemaDefs = Array.from(new Set(createDataDefinitions(resolverConfigs)))
+
     // Combine all definitions
     const allSchemaDefs = [...dataSchemaDefs, queryDef, mutationDef].filter(Boolean)
     const schemaDefsString = allSchemaDefs.join('\n\n')
     const graphqlSchemaDefs = gql`${schemaDefsString}`
+
     // Combine all resolvers
     const generatedResolvers = {
         ...(hasQueries ? { Query: queryResolvers } : {}),
         ...(hasMutations ? { Mutation: mutationResolvers } : {}),
     }
+
     // Return results
     return {
         hasQueries,

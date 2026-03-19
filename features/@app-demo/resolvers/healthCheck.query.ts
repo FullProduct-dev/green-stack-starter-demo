@@ -52,7 +52,7 @@ export const healthCheckFetcher = bridgedFetcher({
     graphqlQuery: healthCheckQuery,
 })
 
-/** --- useHealthCheckQuery() ------------------------------------------------------------- */
+/** --- useHealthCheckQuery() ------------------------------------------------------------------ */
 /** -i- React Query hook to update the organisation's plan name, linked github org and slug */
 export const useHealthCheckQuery = (
     input: HealthCheckQueryInput,

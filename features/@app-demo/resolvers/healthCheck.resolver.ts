@@ -16,6 +16,7 @@ const ALIVE_SINCE = new Date()
 /** --- healthCheck() -------------------------------------------------------------------------- */
 /** -i- Check the health status of the server. Includes relevant urls, server time(zone), versions and more */
 export const healthCheck = createResolver(async ({ args, withDefaults, req, context }) => {
+    
     // Inputs
     const { echo, verbose } = args
 

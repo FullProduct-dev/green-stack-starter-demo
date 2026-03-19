@@ -60,3 +60,7 @@ yarn-error.log*
 
 .turbo
 .vscode/tmp
+
+# Cursor
+.cursor/hooks/state
+.cursor/worktrees.json

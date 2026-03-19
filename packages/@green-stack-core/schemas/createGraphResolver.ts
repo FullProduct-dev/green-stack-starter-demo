@@ -1,17 +1,17 @@
-import { z } from '../schemas'
+import type { AnyZodSchema, SchemaInput, SchemaOutput } from './schemas.compat'
 import type { RequestContext } from '@app/middleware/createRequestContext'
  
-/** --- createGraphResolver() ------------------------------------------------------------------ **/
+/** --- createGraphResolver() ------------------------------------------------------------------ */
 /** -i- Codegen: Build a graphQL resolver from a schema resolver */
 export const createGraphResolver = <
-    ArgsShape extends z.ZodRawShape,
-    ResShape extends z.ZodRawShape,
-    ArgsInput = z.ZodObject<ArgsShape>['_input'],
-    ResOutput = z.ZodObject<ResShape>['_output'],
+    InputSchema extends AnyZodSchema,
+    OutputSchema extends AnyZodSchema,
+    ArgsInput = SchemaInput<InputSchema>,
+    ResOutput = SchemaOutput<OutputSchema>,
 >(
     resolver: ((input: { args: ArgsInput, context: RequestContext }) => Promise<ResOutput>) & {
-        argSchema: z.ZodObject<ArgsShape>,
-        resSchema: z.ZodObject<ResShape>,
+        inputSchema: InputSchema,
+        outputSchema: OutputSchema,
         isMutation?: boolean
     },
 ) => {
@@ -19,8 +19,8 @@ export const createGraphResolver = <
         return resolver({ args, context: { ...context, parent, info } })
     }
     return Object.assign(wrappedResolver, {
-        argSchema: resolver.argSchema,
-        resSchema: resolver.resSchema,
+        inputSchema: resolver.inputSchema,
+        outputSchema: resolver.outputSchema,
         _input: undefined as ArgsInput,
         _output: undefined as ResOutput,
         isMutation: resolver.isMutation,
