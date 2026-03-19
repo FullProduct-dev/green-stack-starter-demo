@@ -1,9 +1,9 @@
 // @ts-ignore
 import { expect, test } from 'bun:test'
-import { z, schema, Meta$Schema } from '../index'
+import { z, schema, Meta$Schema } from './schemas.v3'
 import { ZodError } from 'zod'
 
-/* --- Schema Essentials ----------------------------------------------------------------------- */
+/* --- Test Resources -------------------------------------------------------------------------- */
 
 const User = schema('User', {
     name: z.string(),
@@ -11,6 +11,34 @@ const User = schema('User', {
 })
 
 type User = z.infer<typeof User>
+
+const Primitives = schema('Primitives', {
+    str: z.string().min(1).max(10).nullish().default('Hello').example('World').describe('somestring'),
+    num: z.number().min(1).max(50).default(1).example(42).describe('Number'),
+    bln: z.boolean().default(false).example(true).describe('Boolean'),
+    date: z.date().default(new Date('2024-01-01')).example(new Date('2020-01-01')).describe('Date'),
+})
+
+type Primitives = z.infer<typeof Primitives>
+
+const AdvancedTypes = schema('AdvancedTypes', {
+    enum: z.enum(['A', 'B', 'C']).default('A').example('B'),
+    tuple: z.tuple([z.string(), z.number()]).default(['hello', 42]).example(['world', 24]),
+    union: z.union([z.string(), z.number()]).default('hello').example(42),
+    array: z.array(z.string()).min(0).max(5).length(1).default([]).example(['world']),
+})
+
+type AdvancedTypes = z.infer<typeof AdvancedTypes>
+
+const Nested = schema('Nested', {
+    user: User,
+    primitives: Primitives,
+    advanced: AdvancedTypes,
+})
+
+type Nested = z.infer<typeof Nested>
+
+/* --- Tests ----------------------------------------------------------------------------------- */
 
 test("Schemas can be introspected", () => {
     expect(User.introspect).toBeInstanceOf(Function)
@@ -31,15 +59,6 @@ test("Schemas can be named and renamed", () => {
     expect(User2.introspect().name).toBe('User2')
     expect(User.introspect().name).toBe('User')
 })
-
-const Primitives = schema('Primitives', {
-    str: z.string().min(1).max(10).nullish().default('Hello').example('World').describe('somestring'),
-    num: z.number().min(1).max(50).default(1).example(42).describe('Number'),
-    bln: z.boolean().default(false).example(true).describe('Boolean'),
-    date: z.date().default(new Date('2024-01-01')).example(new Date('2020-01-01')).describe('Date'),
-})
-
-type Primitives = z.infer<typeof Primitives>
 
 test("Optionality, defaults & example values persist in schema introspection", () => {
     const metadata = Primitives.introspect() as Meta$Schema
@@ -198,15 +217,6 @@ test("Adds isSparse: true to metadata when .sparse() is called", () => {
 
 /* --- Advanced Types -------------------------------------------------------------------------- */
 
-const AdvancedTypes = schema('AdvancedTypes', {
-    enum: z.enum(['A', 'B', 'C']).default('A').example('B'),
-    tuple: z.tuple([z.string(), z.number()]).default(['hello', 42]).example(['world', 24]),
-    union: z.union([z.string(), z.number()]).default('hello').example(42),
-    array: z.array(z.string()).min(0).max(5).length(1).default([]).example(['world']),
-})
-
-type AdvancedTypes = z.infer<typeof AdvancedTypes>
-
 test("Advanced types z.enum(), z.tuple(), z.union() & z.array() work as expected", () => {
     const metadata = AdvancedTypes.introspect() as Meta$Schema
     // Base Types
@@ -316,18 +326,12 @@ test("Deriving schemas with .extendSchema(), .omitSchema(), .pickSchema() work a
 
 /* --- Nested Schemas -------------------------------------------------------------------------- */
 
-const Nested = schema('Nested', {
-    user: User,
-    primitives: Primitives,
-    advanced: AdvancedTypes,
-})
-
 test("Nested schemas work as expected", () => {
-    const metadata = Nested.introspect() as Meta$Schema
+    const nestedMeta = Nested.introspect() as Meta$Schema
     // Nested Schemas
-    expect(metadata.schema?.user.zodType).toEqual('ZodObject')
-    expect(metadata.schema?.primitives.zodType).toEqual('ZodObject')
-    expect(metadata.schema?.advanced.zodType).toEqual('ZodObject')
+    expect(nestedMeta.schema?.user.zodType).toEqual('ZodObject')
+    expect(nestedMeta.schema?.primitives.zodType).toEqual('ZodObject')
+    expect(nestedMeta.schema?.advanced.zodType).toEqual('ZodObject')
     // Parsing Happy Paths
     expect(Nested.shape.user.parse({ name: 'John', age: 42 })).toEqual({ name: 'John', age: 42 })
     expect(Nested.shape.primitives.parse({ str: 'Hello', num: 42, bln: true, date: new Date('2020-01-01') })).toEqual({
@@ -342,14 +346,31 @@ test("Nested schemas work as expected", () => {
         union: 42,
         array: ['world'],
     })
+    // Introspection
+    expect(nestedMeta.schema?.user.name).toEqual('User')
+    expect(nestedMeta.schema?.primitives.name).toEqual('Primitives')
+    expect(nestedMeta.schema?.advanced.name).toEqual('AdvancedTypes')
 })
 
 /* --- Introspection flags --------------------------------------------------------------------- */
 
 test("Calling .introspect(true) includes the correct zodStruct", () => {
-    const metadata = Nested.introspect(true) as Meta$Schema
+    const nestedMeta = Nested.introspect(true) as Meta$Schema
     // Nested Schemas
-    expect(metadata.schema?.user.zodStruct).toEqual(User)
-    expect(metadata.schema?.primitives.zodStruct).toEqual(Primitives)
-    expect(metadata.schema?.advanced.zodStruct).toEqual(AdvancedTypes)
+    expect(nestedMeta.schema?.user.zodStruct).toEqual(User)
+    expect(nestedMeta.schema?.primitives.zodStruct).toEqual(Primitives)
+    expect(nestedMeta.schema?.advanced.zodStruct).toEqual(AdvancedTypes)
+})
+
+/* --- Documentation --------------------------------------------------------------------------- */
+
+test('documentationProps() applies exampleValues over defaults in previewProps', () => {
+    const WithDefaultsAndExamples = schema('WithDefaultsAndExamples', {
+        name: z.string().default('unknown').example('Alice'),
+        age: z.number().default(0).example(25),
+    })
+    const docProps = WithDefaultsAndExamples.documentationProps('TestComponent', {})
+    expect(docProps.componentName).toBe('TestComponent')
+    expect(docProps.propSchema).toBe(WithDefaultsAndExamples)
+    expect(docProps.previewProps).toEqual({ name: 'Alice', age: 25 })
 })

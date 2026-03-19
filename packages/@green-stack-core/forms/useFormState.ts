@@ -1,17 +1,17 @@
 import { useState, useMemo, useEffect } from 'react'
-import { z } from '@green-stack/schemas'
+import { applySchemaDefaults, safeParseInput, type ObjectSchemaLike, type SchemaInfer } from '@green-stack/schemas/compat'
 import { isEmpty } from '../utils/commonUtils'
 import { createKey } from '../utils/objectUtils'
 
 /** --- useFormState() ------------------------------------------------------------------------- */
 /** -i- Returns a set of form management tools to handle form state, including validation, errors and even the required props to add to inputs */
 export const useFormState = <
-    S extends z.ZodRawShape,
-    T extends z.infer<z.ZodObject<S>> = z.infer<z.ZodObject<S>>,
-    K extends keyof z.infer<z.ZodObject<S>> = keyof z.infer<z.ZodObject<S>>,
+    S extends ObjectSchemaLike,
+    T extends SchemaInfer<S> = SchemaInfer<S>,
+    K extends keyof SchemaInfer<S> = keyof SchemaInfer<S>,
     E extends Partial<Record<K, string[]>> = Partial<Record<K, string[]>>
 >(
-    schema: z.ZodObject<S>,
+    schema: S,
     options: {
         initialValues?: Partial<T>,
         validateOnBlur?: boolean,
@@ -25,9 +25,8 @@ export const useFormState = <
     const initialValues = (options.initialValues || {}) as T
     const initialValuesKey = createKey(initialValues)
 
-    // Initial
     const initialState = useMemo(() => {
-        return schema.applyDefaults(initialValues, { stripUnknown: true }) as T
+        return applySchemaDefaults(schema, initialValues, { stripUnknown: true }) as T
     }, [schema, initialValuesKey])
 
     // State
@@ -47,9 +46,8 @@ export const useFormState = <
     // -- Validation --
 
     const validate = (showErrors = true) => {
-        // Parse values
-        const validationResult = schema.safeParse(values)
-        const validationError = validationResult.error
+        const validationResult = safeParseInput(schema, values)
+        const validationError = validationResult.success ? undefined : validationResult.error
         // Set errors if invalid
         if (showErrors && validationError) {
             const zodIssues = validationError.issues.flat()
@@ -61,9 +59,8 @@ export const useFormState = <
             updateErrors(fieldErrors)
         }
         // Clear errors if valid
-        const shouldUpdateErrors = !validationError && !isEmpty(errors) && showErrors
+        const shouldUpdateErrors = validationResult.success && !isEmpty(errors) && showErrors
         if (shouldUpdateErrors) updateErrors({} as E)
-        // Return state validity
         return validationResult.success
     }
 
@@ -79,7 +76,7 @@ export const useFormState = <
     }
 
     const clearForm = () => {
-        setValues(schema.applyDefaults({}) as T)
+        setValues(applySchemaDefaults(schema, {}) as T)
         updateErrors({} as E)
     }
 
@@ -160,7 +157,7 @@ export const useFormState = <
     }, [valuesKey])
 
     useEffect(() => {
-        setValues(schema.applyDefaults(initialState, { stripUnknown: true }) as T)
+        setValues(applySchemaDefaults(schema, initialState, { stripUnknown: true }) as T)
     }, [syncFromPropsKey])
 
     // -- Return --

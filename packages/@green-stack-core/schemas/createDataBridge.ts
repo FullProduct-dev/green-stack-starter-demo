@@ -1,6 +1,7 @@
 import { TadaDocumentNode, graphql, VariablesOf, ResultOf } from 'gql.tada'
 import { print } from 'graphql'
-import { z, Metadata, Meta$Schema } from './index'
+import type { ObjectSchemaLike, Metadata, Meta$Schema, SchemaInput, SchemaOutput } from './schemas.compat'
+import { getSchemaMetadata } from './schemas.compat'
 import { lowercaseFirstChar } from '../utils/stringUtils'
 
 /* --- Constants ------------------------------------------------------------------------------- */
@@ -26,7 +27,7 @@ export const normalizeSchemaName = (schemaName: string, prefix: 'type' | 'input'
 
 /** --- renderGraphqlQuery() ------------------------------------------------------------------- */
 /** -i- Accepts a resolverName, inputSchema and outputSchema and spits out a graphql query that stops at 3 levels (or a custom number) of depth */
-export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape extends z.ZodRawShape>({
+export const renderGraphqlQuery = <InputSchema extends ObjectSchemaLike, OutputSchema extends ObjectSchemaLike>({
     resolverName,
     resolverArgsName,
     resolverType,
@@ -38,20 +39,20 @@ export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape ext
     resolverName: string
     resolverArgsName: string
     resolverType: 'query' | 'mutation'
-    inputSchema: z.ZodObject<ArgsShape>
-    outputSchema: z.ZodObject<ResShape>
+    inputSchema: InputSchema
+    outputSchema: OutputSchema
     maxFieldDepth?: number
     logWarnings?: boolean
 }) => {
 
-    // Introspect input & output schemas
-    const argsSchemaDefs = inputSchema.introspect()
-    const responseSchemaDefs = outputSchema.introspect()
-    let argsInputName = normalizeSchemaName(argsSchemaDefs.name!, 'input')
+    // Introspect input & output schemas (unified for v3/v4/mini)
+    const inputSchemaDefs = getSchemaMetadata(inputSchema)
+    const outputSchemaDefs = getSchemaMetadata(outputSchema)
+    let argsInputName = normalizeSchemaName(inputSchemaDefs.name!, 'input')
     const _resolverArgsName = lowercaseFirstChar(resolverArgsName)
 
     // Determine nullability of args
-    const isRequired = !argsSchemaDefs.isNullable && !argsSchemaDefs.isOptional
+    const isRequired = !inputSchemaDefs.isNullable && !inputSchemaDefs.isOptional
     if (isRequired) argsInputName = `${argsInputName}!`
 
     // Build query base
@@ -60,7 +61,7 @@ export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape ext
 
     // Re-evaluate query setup if there are no args
     // @ts-ignore
-    const hasArgs = Object.keys(argsSchemaDefs.schema).length > 0
+    const hasArgs = Object.keys(inputSchemaDefs.schema).length > 0
     if (!hasArgs) {
         query = `${resolverType} ${resolverName} {\n  {{body}}\n}`
         query = query.replace('{{body}}', `${resolverName} {\n{{fields}}\n    }`)
@@ -120,7 +121,7 @@ export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape ext
     }
 
     // Render fields into the query
-    const fields = renderFields(responseSchemaDefs as Meta$Schema, 2)
+    const fields = renderFields(outputSchemaDefs as Meta$Schema, 2)
     query = query.replace('{{fields}}', fields)
     return query
 }
@@ -129,12 +130,12 @@ export const renderGraphqlQuery = <ArgsShape extends z.ZodRawShape, ResShape ext
 /** -i- Create a reusable bridge object between a resolver and a page */
 export const createDataBridge = <
     ResolverName extends string,
-    ArgsShape extends z.ZodRawShape,
-    ResShape extends z.ZodRawShape,
+    InputSchema extends ObjectSchemaLike,
+    OutputSchema extends ObjectSchemaLike,
     CustomQuery extends TadaDocumentNode | null = null,
     ResolverArgsName extends `${ResolverName}Args` | HintedKeys = `${ResolverName}Args`,
-    DefaultQueryArgs = PrettifySingleKeyRecord<Record<LowercaseFirstChar<ResolverArgsName>, z.ZodObject<ArgsShape>['_input']>>,
-    DefaultQueryRes = PrettifySingleKeyRecord<Record<ResolverName, z.ZodObject<ResShape>['_output']>>,
+    DefaultQueryArgs = PrettifySingleKeyRecord<Record<LowercaseFirstChar<ResolverArgsName>, SchemaInput<InputSchema>>>,
+    DefaultQueryRes = PrettifySingleKeyRecord<Record<ResolverName, SchemaOutput<OutputSchema>>>,
     QueryArgs = CustomQuery extends null ? DefaultQueryArgs : VariablesOf<CustomQuery>,
     QueryRes = CustomQuery extends null ? DefaultQueryRes : ResultOf<CustomQuery>,
 >({
@@ -151,8 +152,8 @@ export const createDataBridge = <
     resolverName: ResolverName
     resolverType?: 'query' | 'mutation'
     resolverArgsName?: ResolverArgsName | HintedKeys
-    inputSchema: z.ZodObject<ArgsShape>
-    outputSchema: z.ZodObject<ResShape>
+    inputSchema: InputSchema
+    outputSchema: OutputSchema
     apiPath?: string
     allowedMethods?: ALLOWED_METHODS[]
     graphqlQuery?: CustomQuery
@@ -192,13 +193,8 @@ export const createDataBridge = <
         if (showPrintedQuery) return defaultGraphqlQueryString
 
         // Return the query as a TadaDocumentNode
-        const gqlArgsSchema = z.object({ [resolverName as ResolverName]: inputSchema })
-        const gqlResSchema = z.object({ [resolverName as ResolverName]: outputSchema })
-        const documentNode = graphql(defaultGraphqlQueryString) as TadaDocumentNode<
-            z.infer<typeof gqlArgsSchema>,
-            z.infer<typeof gqlResSchema>
-        >
-        return documentNode as TadaDocumentNode<QueryRes, QueryArgs>
+        const documentNode = graphql(defaultGraphqlQueryString) as TadaDocumentNode<QueryArgs, QueryRes>
+        return documentNode
     }
 
     // -- Return Data Bridge --
@@ -213,8 +209,8 @@ export const createDataBridge = <
         allowedMethods,
         isMutation,
         getGraphqlQuery,
-        _input: undefined as unknown as z.ZodObject<ArgsShape>['_input'],
-        _output: undefined as unknown as z.ZodObject<ResShape>['_output'],
+        _input: undefined as unknown as SchemaInput<InputSchema>,
+        _output: undefined as unknown as SchemaOutput<OutputSchema>,
     }
 }
 

@@ -8,7 +8,8 @@ import type {
 import { getApiParams, getHeaderContext } from '../utils/apiUtils'
 import { parseUrlParamsObject } from '../utils/objectUtils'
 import { tryCatch } from '../utils/functionUtils'
-import { z, ApplyDefaultsOptions } from './index'
+import type { ObjectSchemaLike, ApplyDefaultsOptions, SchemaInput, SchemaOutput } from './schemas.compat'
+import { getSchemaShape, parseInput, applySchemaDefaults } from './schemas.compat'
 
 /* --- Types ----------------------------------------------------------------------------------- */
 
@@ -72,22 +73,24 @@ export type ResolverExecutionParamsType<ArgsInput = any, ResOutput = any, ResInp
 export const createResolver = <
     ArgsOverride = null, // Args type override
     ResOverride = null, // Response type override
-    ArgsShape extends z.ZodRawShape = any,
-    ResShape extends z.ZodRawShape = any,
-    ArgsInput = ArgsOverride extends null ? z.ZodObject<ArgsShape>['_input'] : ArgsOverride,
-    ResOutput = ResOverride extends null ? z.ZodObject<ResShape>['_output'] : ResOverride,
-    ResInput = ResOverride extends null ? z.ZodObject<ResShape>['_input'] : ResOverride,
+    InputSchema extends ObjectSchemaLike = ObjectSchemaLike,
+    OutputSchema extends ObjectSchemaLike = ObjectSchemaLike,
+    ArgsInput = ArgsOverride extends null ? SchemaInput<InputSchema> : ArgsOverride,
+    ResOutput = ResOverride extends null ? SchemaOutput<OutputSchema> : ResOverride,
+    ResInput = ResOverride extends null ? SchemaInput<OutputSchema> : ResOverride,
 >(
     resolverFn: (ctx: ResolverExecutionParamsType<ArgsInput, ResOutput, ResInput>) => Promise<ResOutput | unknown>,
     options: {
         paramKeys?: string,
-        inputSchema: z.ZodObject<ArgsShape>,
-        outputSchema: z.ZodObject<ResShape>,
+        inputSchema: InputSchema,
+        outputSchema: OutputSchema,
         isMutation?: boolean
     },
 ) => {
+
     // Extract options
     const { paramKeys, inputSchema, outputSchema, isMutation } = options
+
     // Build Resolver
     const resolverWrapper = (ctx?: ResolverInputType<ArgsInput>): Promise<ResOutput> => {
         
@@ -102,8 +105,8 @@ export const createResolver = <
         // -- Input & Args --
         
         // Collect params from all possible sources
-        const { body, method } = (req as NextApiRequest) || {}
-        const schemaParamKeys = Object.keys(inputSchema?.shape ?? {})
+        const { body, method } = (req as NextApiRequest) || {} // @ts-ignore
+        const schemaParamKeys = Object.keys(getSchemaShape(inputSchema) ?? {})
         const apiParamKeys = [ctx?.paramKeys, paramKeys || schemaParamKeys].flat().filter(Boolean).join(' ') // prettier-ignore
         const query = { ...nextSsrContext?.query, ...(req as NextApiRequest)?.query }
         const params = { ...restParams, ...nextSsrContext?.params, ...context, ...ctx?.params } // @ts-ignore
@@ -134,16 +137,12 @@ export const createResolver = <
         
         // -- Helpers --
 
-        const parseArgs = (args: ArgsInput) => inputSchema.parse(args) as ArgsInput
-        const formatOutput = (
-            response: ResInput,
-            formatOptions?: ApplyDefaultsOptions
-        ) => {
-            return outputSchema.applyDefaults(
-                response as any$Ignore,
-                formatOptions,
-            ) as ResOutput
+        const parseArgs = (args: ArgsInput) => parseInput(inputSchema, args) as ArgsInput
+
+        const formatOutput = (response: ResInput, formatOptions?: ApplyDefaultsOptions) => {
+            return applySchemaDefaults(outputSchema, response as Record<string, any>, formatOptions || {}) as ResOutput
         }
+
         const withDefaults = (response: ResInput) => formatOutput(response, {
             stripSensitive: true,
             stripUnknown: true,
@@ -171,8 +170,8 @@ export const createResolver = <
     // -- Return Resolver --
 
     return Object.assign(resolverWrapper, {
-        argSchema: inputSchema,
-        resSchema: outputSchema,
+        inputSchema: inputSchema,
+        outputSchema: outputSchema,
         _input: undefined as ArgsInput,
         _output: undefined as ResOutput,
         isMutation,

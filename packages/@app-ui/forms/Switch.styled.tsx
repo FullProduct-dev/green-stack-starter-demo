@@ -77,9 +77,9 @@ export const SwitchWeb = forwardRef<
                         className={cn(
                             'pointer-events-none block h-5 w-5 rounded-full bg-background ring-0 transition-transform',
                             'web:shadow-md web:shadow-foreground/5',
-                            checked ? 'translate-x-5' : 'translate-x-0',
                             props.switchThumbClassName,
                         )}
+                        style={{ transform: [{ translateX: checked ? 20 : 0 }] }}
                         asChild
                     >
                         <View />

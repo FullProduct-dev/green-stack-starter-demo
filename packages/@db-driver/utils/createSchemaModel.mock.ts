@@ -1,6 +1,6 @@
 // @ts-ignore
 import { v4 as uuidV4 } from 'uuid'
-import { z } from '@green-stack/schemas'
+import { parseInput, getSchemaMetadata, applySchemaDefaults, type ObjectSchemaLike, type SchemaInput } from '@green-stack/schemas/compat'
 import { warnOnce } from '@green-stack/utils/commonUtils'
 import { getProperty } from '@green-stack/utils/objectUtils'
 import { memoryDB } from '../constants/memoryDB.mock'
@@ -11,16 +11,15 @@ import { LOGICAL_OPERATORS, QUERY_OPERATORS, QueryFilterType } from './createSch
 /** --- createSchemaModel() -------------------------------------------------------------------- */
 /** -i- Creates a schema model to interface with the mock memory DB */
 export const createSchemaModel = <
-    S extends z.ZodRawShape,
-    DataType extends Prettify<z.input<z.ZodObject<S>>> = Prettify<z.input<z.ZodObject<S>>>, // prettier-ignore
-    QueryFilter extends QueryFilterType<Partial<DataType>> = QueryFilterType<Partial<DataType>>, // prettier-ignore
+    T extends ObjectSchemaLike,
+    DataType extends Prettify<SchemaInput<T>> = Prettify<SchemaInput<T>>,
+    QueryFilter extends QueryFilterType<Partial<DataType>> = QueryFilterType<Partial<DataType>>,
 >(
-    schema: z.ZodObject<S>,
+    schema: T,
     modelName?: string,
 ) => {
     
-    // Apply the schema name as the model key?
-    const schemaMeta = schema.introspect()
+    const schemaMeta = getSchemaMetadata(schema) as { name?: string; schema?: Record<string, { isID?: boolean; isUnique?: boolean; isIndex?: boolean; zodType?: string }> }
     const modelKey = (modelName || schemaMeta.name) as string
 
     // Keep track of id fields used in find by ID operations
@@ -117,17 +116,17 @@ export const createSchemaModel = <
             // Generate a new ID if one is not provided
             const id = record.id || uuidV4()
             const newRecord = { ...record, id }
-            // Create a new model key if it does not exist (anymore)
             // Check that the record to insert is valid
-            schema.parse(schema.applyDefaults(newRecord))
+            parseInput(schema, applySchemaDefaults(schema, newRecord))
             // Check that the ID is unique
-            if (memoryDB[modelKey] && memoryDB[modelKey][id]) {
+            const idKey = String(id)
+            if (memoryDB[modelKey] && memoryDB[modelKey][idKey]) {
                 throw new Error(`Record with ID "${id}" already exists in model "${modelKey}"`)
             }
             // Insert the record into the memory DB
-            memoryDB[modelKey][id] = newRecord
+            memoryDB[modelKey][idKey] = newRecord
             // Return the inserted record
-            return memoryDB[modelKey][id] as Prettify<DataType>
+            return memoryDB[modelKey][idKey] as Prettify<DataType>
         } catch (error: any$FixMe) {
             throw new Error(`Failed to insert record into "${modelKey}" collection: ${error.message}`) // prettier-ignore
         }
@@ -145,17 +144,18 @@ export const createSchemaModel = <
             })
             // Check that the records to insert are valid
             newRecords.forEach((record) => {
-                schema.parse(schema.applyDefaults(record))
+                parseInput(schema, applySchemaDefaults(schema, record))
             })
             // Check that all IDs are unique
             newRecords.forEach((record) => {
-                if (memoryDB[modelKey] && memoryDB[modelKey][record.id]) {
+                const idKey = String(record.id)
+                if (memoryDB[modelKey] && memoryDB[modelKey][idKey]) {
                     throw new Error(`Record with ID "${record.id}" already exists in model "${modelKey}"`) // prettier-ignore
                 }
             })
             // Insert the records into the memory DB
             newRecords.forEach((record) => {
-                memoryDB[modelKey][record.id] = record
+                memoryDB[modelKey][String(record.id)] = record
             })
             // Return the inserted records
             return newRecords as Prettify<DataType>[]
@@ -248,7 +248,7 @@ export const createSchemaModel = <
                 throw new Error(`Cannot update a record's ID. Error while updating record with ID ${recordToUpdate.id} in "${modelKey}" collection`) // prettier-ignore
             }
             // Check that the updated record is valid
-            schema.parse(schema.applyDefaults(updatedRecord))
+            parseInput(schema, applySchemaDefaults(schema, updatedRecord))
             // Update the record in the memory DB
             memoryDB[modelKey][updatedRecord.id as string] = updatedRecord
             // Return the updated record
@@ -283,7 +283,7 @@ export const createSchemaModel = <
             const updatedRecords = recordsToUpdate.map((record) => {
                 const updatedRecord = { ...record, ...fieldUpdates } as DataType
                 // Check that the updated record is valid
-                schema.parse(schema.applyDefaults(updatedRecord))
+                ;(schema as { parse: (v: unknown) => unknown }).parse(applySchemaDefaults(schema, updatedRecord))
                 // Check that we're not trying to update the ID
                 if (record.id !== updatedRecord.id) {
                     throw new Error(`Cannot update a record's ID. Error while updating record with ID ${record.id} in "${modelKey}" collection`) // prettier-ignore

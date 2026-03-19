@@ -1,4 +1,4 @@
-import { SCHEMA_TYPE, Metadata } from './index'
+import { SCHEMA_TYPE, Metadata, getSchemaMetadata } from './index'
 
 /* --- Types ----------------------------------------------------------------------------------- */
 
@@ -31,14 +31,17 @@ export const createSchemaPlugin = <
     schemaMeta: Metadata<M>,
     schemaTypeMap: P
 ) => {
-    // @ts-expect-error
-    if (typeof schemaMeta.introspect === 'function') {
-        throw new Error("createSchemaPlugin() was passed a zod schema instead of it's metadata, please use .introspect() on the schema instead")
+
+    // Auto-introspect if schema was passed instead of metadata (supports v3, v4, mini)
+    const hasIntrospect = typeof (schemaMeta as any$Ignore).introspect === 'function'
+    const looksLikeSchema = !!(schemaMeta as any$Ignore)._zod || !!(schemaMeta as any$Ignore)._def
+    if (hasIntrospect || (looksLikeSchema && !schemaMeta.schema)) {
+        schemaMeta = getSchemaMetadata(schemaMeta) as Metadata<M>
     }
     if (!schemaMeta.schema) {
-        console.log(schemaMeta)
         throw new Error("createSchemaPlugin() was passed a schema without a schema property")
     }
+
     // Map schema to new structure
     const mappedSchema = Object.entries(schemaMeta.schema!).reduce((result, [schemaKey, fieldMeta]) => {
         const { baseType, zodType } = fieldMeta
@@ -53,6 +56,7 @@ export const createSchemaPlugin = <
         const newStructure = mappedSchemaBuilder(schemaKey, fieldMeta)
         return { ...result, [schemaKey]: newStructure }
     }, {})
+    
     // Return mapped schema
     return mappedSchema as {
         [K in keyof M]: SchemaPluginMap<M>[K] extends (schemaKey: string, fieldMeta: Metadata) => infer R ? R : unknown
