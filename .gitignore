@@ -45,6 +45,9 @@ yarn-error.log*
 *.mobileprovision
 *.orig.*
 
+# Expo Builds
+apps/expo/dist
+
 # Next.js
 /.next/*
 /out/
@@ -64,3 +67,6 @@ yarn-error.log*
 # Cursor
 .cursor/hooks/state
 .cursor/worktrees.json
+
+# GraphQL
+features/@app-core/graphql-env.d.ts.tmp

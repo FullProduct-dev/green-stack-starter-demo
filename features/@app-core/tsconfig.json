@@ -24,7 +24,7 @@
                 "tadaOutputLocation": "./graphql-env.d.ts"
             }
         ],
-        "types": ["node", "glob"],
+        "types": ["node"],
         "paths": {
             "@app/config": ["../../features/@app-core/appConfig.ts"],
             "@app/schemas/*": ["../../features/@app-core/schemas/*"],

@@ -9,4 +9,4 @@ export const HealthCheckInput = schema('HealthCheckInput', {
 
 /* --- Type Alias ------------------------------------------------------------------------------ */
 
-export type HealthCheckInput = z.infer<typeof HealthCheckInput>
+export type HealthCheckInput = z.input<typeof HealthCheckInput>

@@ -6,6 +6,7 @@
     "scripts": {},
     "dependencies": {
         "@app/core": "*",
-        "@app/registries": "*"
+        "@app/registries": "*",
+        "expo-status-bar": "~3.0.8"
     }
 }

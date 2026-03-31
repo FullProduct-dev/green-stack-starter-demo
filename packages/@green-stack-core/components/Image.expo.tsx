@@ -1,3 +1,4 @@
+import type { JSX } from 'react'
 import { Image as ExpoImage } from 'expo-image'
 import { Platform } from 'react-native'
 import { cssInterop } from 'nativewind'

@@ -70,7 +70,7 @@ const collectResolvers = () => {
         fs.writeFileSync('../../packages/@registries/resolvers.generated.ts', resolverRegistry)
 
         // Log completion message
-        console.log('-----------------------------------------------------------------')
+        console.log('\n-----------------------------------------------------------------')
         console.log('-i- Successfully created resolver registries at:')
         console.log('-----------------------------------------------------------------')
         console.log(' ✅ packages/@registries/resolvers.generated.ts')

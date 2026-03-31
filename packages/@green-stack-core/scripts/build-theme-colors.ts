@@ -31,7 +31,7 @@ const buildThemeColors = () => {
         fs.writeFileSync(themeColorsPath, themeColorsRegistry)
 
         // Log success message
-        console.log('-----------------------------------------------------------------')
+        console.log('\n-----------------------------------------------------------------')
         console.log('-i- Successfully created themeColors.generated.ts')
         console.log('-----------------------------------------------------------------')
 

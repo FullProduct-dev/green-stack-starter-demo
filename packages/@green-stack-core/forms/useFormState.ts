@@ -39,9 +39,7 @@ export const useFormState = <
 
     // -- Memos --
 
-    const isDefaultState = useMemo(() => {
-        return valuesKey === defaultsKey
-    }, [valuesKey, defaultsKey])
+    const isDefaultState = useMemo(() => valuesKey === defaultsKey, [valuesKey, defaultsKey])
 
     // -- Validation --
 
@@ -97,7 +95,7 @@ export const useFormState = <
     // -- Connectors --
 
     const getInputProps = <KEY extends K, VAL extends T[KEY] = T[KEY]>(key: KEY, ) => ({
-        value: values[key],
+        value: values[key]!,
         onChange: getChangeHandler<KEY, VAL>(key),
         onBlur: () => validateOnBlur && validate(),
         onFocus: () => validateOnBlur && validate(),

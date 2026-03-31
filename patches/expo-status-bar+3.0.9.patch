@@ -1,0 +1,10 @@
+diff --git a/node_modules/expo-status-bar/src/StatusBar.ts b/node_modules/expo-status-bar/src/StatusBar.ts
+index 5c0b65a..e92d5a5 100644
+--- a/node_modules/expo-status-bar/src/StatusBar.ts
++++ b/node_modules/expo-status-bar/src/StatusBar.ts
+@@ -6,5 +6,3 @@ export {
+   setStatusBarNetworkActivityIndicatorVisible,
+   setStatusBarTranslucent,
+ } from './NativeStatusBarWrapper';
+-
+-export { StatusBarStyle, StatusBarAnimation, StatusBarProps } from './types';

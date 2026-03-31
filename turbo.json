@@ -19,12 +19,17 @@
             "cache": false
         },
         "@app/next#start": {
-            "dependsOn": ["build"],
+            "dependsOn": ["@app/next#build"],
             "cache": false
         },
         "@app/expo#dev": {
             "dependsOn": ["@green-stack/core#build:schema"],
             "cache": false
+        },
+        "@app/expo#build": {
+            "dependsOn": ["@green-stack/core#build:schema"],
+            "outputs": ["dist/**"],
+            "cache": true
         },
         "android": {
             "cache": false
@@ -41,6 +46,10 @@
         },
         "env:local": {
             "cache": false
+        },
+        "typecheck": {
+            "cache": true,
+            "outputs": []
         }
     }
 }

@@ -25,6 +25,7 @@ configureReanimatedLogger({
 /* --- <ExpoRootLayout> ------------------------------------------------------------------------ */
 
 export default function ExpoRootLayout() {
+    
     // Navigation
     const expoContextRouter = useExpoContextRouter()
 

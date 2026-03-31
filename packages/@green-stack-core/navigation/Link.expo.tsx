@@ -5,9 +5,8 @@ import { parseNativewindStyles } from '../styles/parseNativewindStyles'
 
 /* --- <Link/> --------------------------------------------------------------------------------- */
 
-export const Link = <
-    HREF extends KnownRoutes
->(props: UniversalLinkProps<HREF>) => {
+export const Link = <HREF extends KnownRoutes>(props: UniversalLinkProps<HREF>) => {
+    
     // Props
     const {
         children,
@@ -52,7 +51,7 @@ export const Link = <
             href={finalHref}
             style={finalStyle}
             className={className}
-            onPress={onPress}
+            onPress={onPress!}
             target={target}
             asChild={asChild}
             replace={replace}

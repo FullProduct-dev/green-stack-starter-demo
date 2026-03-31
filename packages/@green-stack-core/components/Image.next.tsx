@@ -1,3 +1,4 @@
+import type { JSX } from 'react'
 import NextImage from 'next/image'
 import { parseNativewindStyles } from '../styles/parseNativewindStyles'
 import { cn } from '../utils/styleUtils'

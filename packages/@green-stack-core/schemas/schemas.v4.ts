@@ -103,8 +103,7 @@ declare module 'zod/v4/core' {
 		introspect(includeZodStruct?: boolean): Meta$Schema & Record<string, any>
 	}
 
-	interface $ZodObject<
-        // @ts-ignore
+	interface $ZodObject< // @ts-ignore
         Shape extends Readonly<z.core.$ZodShape> = Readonly<z.core.$ZodShape>,
         Params extends z.core.$ZodObjectConfig = z.core.$ZodObjectConfig,
     > {
@@ -140,12 +139,22 @@ declare module 'zod/v4/core' {
             Name extends string = string,
         >(
             componentName: Name,
-            config?: Partial<{ componentName: string; propSchema: any; propMeta: any; previewProps: any; exampleProps?: Partial<Props> }>
+            config?: Partial<{
+                componentName?: string,
+                propSchema?: any$Ignore,
+                propMeta?: any$Ignore,
+                previewProps?: any$Ignore,
+                exampleProps?: Partial<Props>,
+                valueProp?: keyof Props | HintedKeys,
+                onChangeProp?: keyof Props | HintedKeys,
+            }>
         ): {
-            componentName: Name;
-            propSchema: z.ZodObject<Shape, Params>;
-            propMeta: Record<string, Meta$Schema>;
-            previewProps: Partial<SchemaInput<z.ZodObject<Shape, Params>>>;
+            componentName: Name,
+            propSchema: z.ZodObject<Shape, Params>,
+            propMeta: Record<string, Meta$Schema>,
+            previewProps: Partial<SchemaInput<z.ZodObject<Shape, Params>>>,
+            valueProp?: keyof Props | HintedKeys,
+            onChangeProp?: keyof Props | HintedKeys,
         }
 
         // -- Deprecations --

@@ -1,3 +1,4 @@
+import type { PlopTypes } from '@turbo/gen'
 import { isKvRecord } from '../../utils/commonUtils'
 
 /* --- Types ----------------------------------------------------------------------------------- */
@@ -167,7 +168,6 @@ export const createPrompts = <
     VALUES = { [K in keyof PROMPTS]: PromptValue<PROMPTS[K]['type'], ExtractChoices<PROMPTS[K]['choices']>> },
     // @ts-expect-error - VALUES may not satisfy Record<string, any>
     POTENTIAL_REFINEMENTS = { [K in Extract<keyof VALUES, string>]: PromptRefinement<K, VALUES> },
-    // REFINEMENTS may not satisfy Partial<POTENTIAL_REFINEMENTS>
     REFINEMENTS extends Partial<POTENTIAL_REFINEMENTS> = Partial<POTENTIAL_REFINEMENTS>,
     PARSER extends (answers: VALUES) => any$Unknown = (answers: VALUES) => VALUES,
     PARSED = ReturnType<PARSER>,
@@ -216,16 +216,18 @@ export const createPrompts = <
 
     })
 
+    // -- Return --
+
     return {
         /** -i- Plop generator name for registration */
         name,
         /** -i- Full list of prompts with dynamic fields computed */
-        prompts: fullPrompts,
+        prompts: fullPrompts as PlopTypes.PromptQuestion[],
         /** -i- Ordered list of prompt keys for CLI arg mapping (positional or named) */
         promptKeys: Object.keys(prompts) as (keyof PROMPTS)[],
         /** -i- Parser function to transform the final answers into a different format for the generator actions */
         parseAnswers: (parser || ((answers: VALUES) => answers)) as PARSER,
-        /// -i- Internal fields for type inference, not used at runtime
+        /** -i- Internal fields for type inference, not used at runtime */
         _values: null as VALUES,
         _refinements: null as POTENTIAL_REFINEMENTS,
         _parsed: null as PARSED,

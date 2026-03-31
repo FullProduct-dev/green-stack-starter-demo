@@ -6,6 +6,7 @@ import { appConfig } from '../appConfig'
 /** --- graphqlQuery --------------------------------------------------------------------------- */
 /** -i- Isomorphic graphql request, uses the graphql endpoint in browser & mobile, but the executable schema serverside */
 export const graphqlQuery = Object.assign(async <T extends TadaDocumentNode, R = ResultOf<T>>(query: T, config?: QueryConfig<T>) => {
+    
     // Config
     const { variables, headers, graphqlEndpoint } = config || {}
 
