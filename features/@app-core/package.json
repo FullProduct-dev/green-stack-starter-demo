@@ -7,21 +7,21 @@
     "@as-integrations/next": "^3.0.0",
     "@rn-primitives/portal": "1.0.3",
     "@tanstack/react-query": "^5.29.2",
-    "expo-status-bar": "~2.2.3",
+    "expo-status-bar": "~3.0.8",
     "gql.tada": "^1.4.3",
     "graphql-tag": "^2.12.6",
     "graphql-type-json": "^0.3.2",
-    "nativewind": "^4.1.23",
-    "react-native-reanimated": "~3.17.4",
-    "react-native-safe-area-context": "~5.0.0",
+    "nativewind": "4.2.2",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-safe-area-context": "~5.6.0",
     "react-native-svg": "^15.2.0",
-    "tailwindcss": "3.3.2",
+    "tailwindcss": "3.4.17",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.9.1",
-    "tailwindcss": "3.3.2",
-    "typescript": "5.3.3"
+    "@types/react": "~19.1.0",
+    "tailwindcss": "3.4.17"
   },
   "stackConfig": {
     "relatedWorkspaces": [

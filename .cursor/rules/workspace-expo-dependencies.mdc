@@ -1,0 +1,25 @@
+---
+description: Portable workspaces — declare Expo/native deps on the package that imports them, not on @app/expo
+globs: "**/package.json"
+alwaysApply: true
+---
+
+# Expo & native dependencies (portable workspaces)
+
+**Goal:** Keep `apps/expo/package.json` lean. Anything required only by a feature or `packages/*` workspace should live in **that workspace’s `dependencies`** and `package.json`, not duplicated on the Expo app.
+
+## Adding or upgrading Expo SDK–aligned packages
+
+1. Use **`npm run add:dependencies`** (generator in `packages/@green-stack-core/generators/add-dependencies.ts`). It runs `expo install` in `@app/expo` to resolve **SDK-compatible** versions, then moves the new entries to the **target workspace** you choose.
+2. Do **not** leave Expo-only deps on `@app/expo` unless the **Expo app** is the only consumer (shell, router, `expo-router`, `expo-constants`, etc.).
+
+## When to put a dep on `@app/expo` vs a workspace
+
+| Put on `@app/expo` | Put on the feature / `packages/*` workspace that imports it |
+|--------------------|-------------------------------------------------------------|
+| `expo`, `expo-router`, `expo-constants`, `nativewind`, app shell | `expo-auth-session`, `expo-secure-store`, `expo-web-browser` if only `@auth/clerk` (or similar) imports them |
+| Core RN stack shared by the app entry | Driver-specific packages (`@clerk/*`, etc.) |
+
+## After edits
+
+Run `npm install` at the repo root and verify with **`npm run build:mobile`** (and any affected app build) when changing native/Expo deps.

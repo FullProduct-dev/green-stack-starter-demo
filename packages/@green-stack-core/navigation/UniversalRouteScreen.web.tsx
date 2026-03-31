@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useContext } from 'react'
-import { useQuery, HydrationBoundary } from '@tanstack/react-query'
+import { useQuery, HydrationBoundary, type DehydratedState } from '@tanstack/react-query'
 import { UniversalRouteProps, QueryFn, DEFAULT_QUERY_BRIDGE } from './UniversalRouteScreen.helpers'
 import { useRouteParams } from './useRouteParams'
 import { extractParams } from './useRouteParams.helpers'
@@ -18,10 +18,10 @@ const getSSRData = () => {
     return ssrData
 }
 
-const getDehydratedSSRState = () => {
+const getDehydratedSSRState = (): DehydratedState | null => {
     const $ssrHydrationState = document.getElementById('ssr-hydration-state')
     const ssrHydrationStateText = $ssrHydrationState?.getAttribute('data-ssr')
-    const ssrHydrationState = ssrHydrationStateText ? (JSON.parse(ssrHydrationStateText) as Record<string, any>) : null
+    const ssrHydrationState = ssrHydrationStateText ? (JSON.parse(ssrHydrationStateText) as DehydratedState) : null
     return ssrHydrationState
 }
 
@@ -52,7 +52,7 @@ export const UniversalRouteScreen = <
 
     // State
     const [hydratedData, setHydratedData] = useState<Record<string, any> | null>(null)
-    const [hydratedQueries, setHydratedQueries] = useState<Record<string, any> | null>(null)
+    const [hydratedQueries, setHydratedQueries] = useState<DehydratedState | null>(null)
 
     // Vars
     const isBrowser = typeof window !== 'undefined'

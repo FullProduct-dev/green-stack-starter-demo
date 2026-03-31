@@ -12,6 +12,7 @@ export const annualWorkHours = annualWorkDays * oneDay // Work hours per year
 /* --- calculateEfficiency() ------------------------------------------------------------------- */
 
 export const calculateEfficiency = (rawValues: FormScreenProps) => {
+    
     // Values
     const values = FormScreenProps.applyDefaults(rawValues)
     const { currentSetupHoursPerProject, pluginsToMerge, knownTech, identifiesWith } = values
@@ -42,10 +43,10 @@ export const calculateEfficiency = (rawValues: FormScreenProps) => {
     let pluginHoursSaved = oneDay // Default to 1 day saved for other plugins
     if (pluginsToMerge.includes('auth')) pluginHoursSaved += oneDay // Auth plugins
     if (pluginsToMerge.includes('db')) pluginHoursSaved += 5 // DB plugins
-    if (pluginsToMerge.includes('mail')) pluginHoursSaved += oneDay // Mail plugins
-    if (pluginsToMerge.includes('notifications')) pluginHoursSaved += 5 // Notifications plugins
     if (pluginsToMerge.includes('payments')) pluginHoursSaved += oneDay * 2 // Payments plugins
-    if (pluginsToMerge.includes('storage')) pluginHoursSaved += 4 // Storage plugins
+    // if (pluginsToMerge.includes('mail')) pluginHoursSaved += oneDay // Mail plugins
+    // if (pluginsToMerge.includes('notifications')) pluginHoursSaved += 5 // Notifications plugins
+    // if (pluginsToMerge.includes('storage')) pluginHoursSaved += 4 // Storage plugins
 
     // ⬇ Add additional hours saved per project based on exciting features
 

@@ -81,8 +81,8 @@ export const FormScreenProps = schema('FormScreenProps', {
     estHourlyPrice: z.number().min(20).max(1000).optional(),
 })
 
+/* --- Types ----------------------------------------------------------------------------------- */
+
 export type FormScreenProps = z.input<typeof FormScreenProps>
 
-/* --- Forms ----------------------------------------------------------------------------------- */
-
-export type EfficiencyFormState = ReturnType<typeof useFormState<typeof FormScreenProps['shape']>>
+export type EfficiencyFormState = ReturnType<typeof useFormState<typeof FormScreenProps>>

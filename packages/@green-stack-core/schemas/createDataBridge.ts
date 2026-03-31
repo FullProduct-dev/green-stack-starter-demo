@@ -193,7 +193,7 @@ export const createDataBridge = <
         if (showPrintedQuery) return defaultGraphqlQueryString
 
         // Return the query as a TadaDocumentNode
-        const documentNode = graphql(defaultGraphqlQueryString) as TadaDocumentNode<QueryArgs, QueryRes>
+        const documentNode = graphql(defaultGraphqlQueryString) as TadaDocumentNode<QueryRes, QueryArgs>
         return documentNode
     }
 

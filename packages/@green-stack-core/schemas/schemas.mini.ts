@@ -314,7 +314,20 @@ export function applyDefaults<
 export function documentationProps<
     Shape extends z4c.$ZodShape,
     Schema extends z4c.$ZodObject<Shape> = z4c.$ZodObject<Shape>,
->(schema: Schema, componentName: string, config: any = {}) {
+    Props extends SchemaInput<Schema> = SchemaInput<Schema>,
+>(
+    schema: Schema,
+    componentName: string,
+    config: {
+        componentName?: string,
+        propSchema?: any$Ignore,
+        propMeta?: any$Ignore,
+        previewProps?: any$Ignore,
+        exampleProps?: Partial<Props>,
+        valueProp?: keyof Props | HintedKeys,
+        onChangeProp?: keyof Props | HintedKeys,
+    } = {},
+) {
     return {
         ...config,
         componentName,

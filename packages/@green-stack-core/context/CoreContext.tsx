@@ -1,5 +1,6 @@
 "use client"
 import React from 'react'
+import type { JSX } from 'react'
 import { UniversalLinkProps } from '@green-stack/navigation/Link.types'
 import { UniversalRouterMethods } from '@green-stack/navigation/useRouter.types'
 import { UniversalRouteScreenProps, UseRouteParamsOptions } from '@green-stack/navigation/useRouteParams.types'

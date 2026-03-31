@@ -17,6 +17,17 @@ config.resolver.nodeModulesPaths = [
     path.resolve(workspaceRoot, 'node_modules'),
 ]
 
+// Singleton React because workspace packages (e.g. @auth/clerk → @clerk/clerk-react) can nest their own `node_modules/react`.
+// A second copy could break hooks (e.g. if React Native uses the hoisted renderer + a different React version).
+// By pinning the `react` + `react-dom` versions to the workspace root the entire expo app will always share 1 React instance.
+const workspaceReact = path.resolve(workspaceRoot, 'node_modules/react')
+const workspaceReactDom = path.resolve(workspaceRoot, 'node_modules/react-dom')
+config.resolver.extraNodeModules = {
+    ...config.resolver.extraNodeModules,
+    react: workspaceReact,
+    'react-dom': workspaceReactDom,
+}
+
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 // config.resolver.disableHierarchicalLookup = true
 

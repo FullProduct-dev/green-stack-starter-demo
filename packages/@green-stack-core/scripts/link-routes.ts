@@ -111,7 +111,7 @@ const linkRoutes = () => {
         fs.rmSync('../../apps/expo/app/(generated)', { recursive: true })
         fs.mkdirSync('../../apps/next/app/(generated)', { recursive: true }) // create empty folder if it doesn't exist
         fs.rmSync('../../apps/next/app/(generated)', { recursive: true })
-        console.log('-----------------------------------------------------------------')
+        console.log('\n-----------------------------------------------------------------')
         console.log("-i- Auto linking routes with 'npx turbo @green-stack/core#link:routes' ...")
         console.log('-----------------------------------------------------------------')
 

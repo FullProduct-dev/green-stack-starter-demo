@@ -105,12 +105,22 @@ declare module 'zod/v3' {
 
 		documentationProps<Props extends Input = Input, Name extends string = string>(
 			componentName: Name,
-			config?: Partial<{ componentName: string; propSchema: any; propMeta: any; previewProps: any; exampleProps?: Partial<Props> }>
+			config?: Partial<{
+                componentName?: string,
+                propSchema?: any$Ignore,
+                propMeta?: any$Ignore,
+                previewProps?: any$Ignore,
+                exampleProps?: Partial<Props>,
+                valueProp?: keyof Props | HintedKeys,
+                onChangeProp?: keyof Props | HintedKeys,
+            }>
 		): {
-            componentName: Name;
-            propSchema: ZodObject<T, UnknownKeys, Catchall>;
-            propMeta: Record<string, Meta$Schema>;
-            previewProps: Partial<Input>
+            componentName: Name,
+            propSchema: ZodObject<T, UnknownKeys, Catchall>,
+            propMeta: Record<string, Meta$Schema>,
+            previewProps: Partial<Input>,
+            valueProp?: keyof Props | HintedKeys,
+            onChangeProp?: keyof Props | HintedKeys,
         }
 
         // -- Deprecations --

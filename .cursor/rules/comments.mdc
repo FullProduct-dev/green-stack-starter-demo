@@ -1,0 +1,11 @@
+---
+description: Preserve existing comments when editing
+alwaysApply: true
+---
+
+# Comments
+
+When editing any file in this workspace:
+
+- **Preserve all existing comments** in that file. Do not delete or shorten them unless you are **deleting or rewriting the exact lines they refer to**—then update those comments to match the new behavior.
+- **Treat inline and block comments as part of the API** of the file: moving code should move comments with it; refactors must **re-home** comments, not drop them for brevity.
